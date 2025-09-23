@@ -28,11 +28,6 @@ services:
       PORT: "80"
     ports:
       - "8080:80"
-    healthcheck:
-      test: "curl http://localhost:80/healthz"
-      interval: 5s
-      retries: 5
-      timeout: 2s
 
   migrations:
     image: theedgeofrage/ytrssil:migrations

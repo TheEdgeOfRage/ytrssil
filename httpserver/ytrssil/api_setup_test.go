@@ -2,6 +2,8 @@ package ytrssil_test
 
 import (
 	"fmt"
+	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,7 +16,6 @@ import (
 	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/handler"
 	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/httpserver/auth"
 	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/httpserver/ytrssil"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/lib/log"
 )
 
 var testConfig config.Config
@@ -26,7 +27,7 @@ func init() {
 }
 
 func setupTestServer(t *testing.T) *http.Server {
-	l := log.NewNopLogger()
+	l := slog.New(slog.NewTextHandler(io.Discard, nil))
 
 	handler := handler.New(l, nil, nil)
 

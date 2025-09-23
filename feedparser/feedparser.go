@@ -5,12 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"sync"
 
 	"github.com/paulrosania/go-charset/charset"
-
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/lib/log"
 )
 
 var (
@@ -26,10 +25,10 @@ type Parser interface {
 }
 
 type parser struct {
-	log log.Logger
+	log *slog.Logger
 }
 
-func NewParser(l log.Logger) *parser {
+func NewParser(l *slog.Logger) *parser {
 	return &parser{
 		log: l,
 	}
@@ -38,13 +37,13 @@ func NewParser(l log.Logger) *parser {
 func (p *parser) fetch(url string) (io.ReadCloser, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		p.log.Log("level", "ERROR", "function", "feedparser.fetch", "call", "http.NewRequest", "error", err)
+		p.log.Error("Failed to create request", "call", "http.NewRequest", "error", err)
 		return nil, err
 	}
 
 	response, err := http.DefaultClient.Do(req)
 	if err != nil {
-		p.log.Log("level", "ERROR", "function", "feedparser.fetch", "call", "http.Do", "error", err)
+		p.log.Error("Failed to fetch feed", "call", "http.Do", "error", err)
 		return nil, err
 	}
 
@@ -71,7 +70,7 @@ func (p *parser) Parse(channelID string) (*Channel, error) {
 
 	var channel Channel
 	if err := xmlDecoder.Decode(&channel); err != nil {
-		p.log.Log("level", "ERROR", "function", "feedparser.Parse", "call", "xml.Decode", "error", err)
+		p.log.Error("Failed to decode XML for RSS feed", "call", "xml.Decode", "error", err)
 		return nil, fmt.Errorf("%w: %s", ErrParseFailed, err.Error())
 	}
 	channel.ID = channelID

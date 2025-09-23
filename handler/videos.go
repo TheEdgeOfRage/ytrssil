@@ -23,14 +23,14 @@ func (h *handler) GetWatchedVideos(ctx context.Context, username string) ([]mode
 func (h *handler) addVideoToAllSubscribers(ctx context.Context, channelID string, videoID string) error {
 	subs, err := h.db.GetChannelSubscribers(ctx, channelID)
 	if err != nil {
-		h.log.Log("level", "ERROR", "call", "db.GetChannelSubscribers", "err", err)
+		h.log.Error("failed to get channel subscribers", "call", "db.GetChannelSubscribers", "err", err)
 		return err
 	}
 
 	for _, sub := range subs {
 		err = h.db.AddVideoToUser(ctx, sub, videoID)
 		if err != nil {
-			h.log.Log("level", "ERROR", "call", "db.AddVideoToUser", "err", err)
+			h.log.Error("Failed to add video to user", "call", "db.AddVideoToUser", "err", err)
 			continue
 		}
 	}
@@ -42,7 +42,7 @@ func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedpa
 	for _, parsedVideo := range parsedChannel.Videos {
 		date, err := parsedVideo.Published.Parse()
 		if err != nil {
-			h.log.Log("level", "WARNING", "call", "feedparser.Parse", "err", err)
+			h.log.Warn("Failed to parse video information", "call", "feedparser.Parse", "err", err)
 			continue
 		}
 
@@ -55,7 +55,7 @@ func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedpa
 		err = h.db.AddVideo(ctx, video, parsedChannel.ID)
 		if err != nil {
 			if !errors.Is(err, db.ErrVideoExists) {
-				h.log.Log("level", "WARNING", "call", "db.AddVideo", "err", err)
+				h.log.Warn("Failed to save video to db", "call", "db.AddVideo", "err", err)
 			}
 			continue
 		}
@@ -67,7 +67,7 @@ func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedpa
 }
 
 func (h *handler) FetchVideos(ctx context.Context) error {
-	h.log.Log("level", "INFO", "msg", "fetching new videos for all channels")
+	h.log.Info("Fetching new videos for all channels")
 
 	channels, err := h.db.ListChannels(ctx)
 	if err != nil {

@@ -27,7 +27,7 @@ var getNewVideosQuery = `
 func (d *postgresDB) GetNewVideos(ctx context.Context, username string) ([]models.Video, error) {
 	rows, err := d.db.QueryContext(ctx, getNewVideosQuery, username)
 	if err != nil {
-		d.l.Log("level", "ERROR", "function", "db.GetNewVideos", "call", "sql.QueryContext", "error", err)
+		d.l.Error("Failed to query new videos", "call", "sql.QueryContext", "error", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -43,7 +43,7 @@ func (d *postgresDB) GetNewVideos(ctx context.Context, username string) ([]model
 			&video.ChannelName,
 		)
 		if err != nil {
-			d.l.Log("level", "ERROR", "function", "db.GetNewVideos", "call", "sql.Scan", "error", err)
+			d.l.Error("Failed to scan rows for get new videos", "call", "sql.Scan", "error", err)
 			return nil, err
 		}
 		videos = append(videos, video)
@@ -72,7 +72,7 @@ var getWatchedVideosQuery = `
 func (d *postgresDB) GetWatchedVideos(ctx context.Context, username string) ([]models.Video, error) {
 	rows, err := d.db.QueryContext(ctx, getWatchedVideosQuery, username)
 	if err != nil {
-		d.l.Log("level", "ERROR", "function", "db.GetWatchedVideos", "call", "sql.QueryContext", "error", err)
+		d.l.Error("Failed to query for watched videos", "call", "sql.QueryContext", "error", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -88,7 +88,7 @@ func (d *postgresDB) GetWatchedVideos(ctx context.Context, username string) ([]m
 			&video.ChannelName,
 		)
 		if err != nil {
-			d.l.Log("level", "ERROR", "function", "db.GetWatchedVideos", "call", "sql.Scan", "error", err)
+			d.l.Error("Failed to scan rows for watched videos", "call", "sql.Scan", "error", err)
 			return nil, err
 		}
 		videos = append(videos, video)
@@ -110,7 +110,7 @@ ON CONFLICT DO NOTHING
 func (d *postgresDB) AddVideo(ctx context.Context, video models.Video, channelID string) error {
 	resp, err := d.db.ExecContext(ctx, addVideoQuery, video.ID, video.Title, video.PublishedTime, channelID)
 	if err != nil {
-		d.l.Log("level", "ERROR", "function", "db.AddVideo", "call", "sql.Exec", "error", err)
+		d.l.Error("Failed to add video", "call", "sql.Exec", "error", err)
 		return err
 	}
 	if affected, _ := resp.RowsAffected(); affected == 0 {
@@ -125,7 +125,7 @@ var addVideoToUserQuery = `INSERT INTO user_videos (username, video_id) VALUES (
 func (d *postgresDB) AddVideoToUser(ctx context.Context, username string, videoID string) error {
 	_, err := d.db.ExecContext(ctx, addVideoToUserQuery, username, videoID)
 	if err != nil {
-		d.l.Log("level", "ERROR", "function", "db.AddVideoToUser", "error", err)
+		d.l.Error("Failed to add video to user", "error", err)
 		return err
 	}
 
@@ -139,7 +139,7 @@ func (d *postgresDB) SetVideoWatchTime(
 ) error {
 	_, err := d.db.ExecContext(ctx, setVideoWatchTimeQuery, watchTime, username, videoID)
 	if err != nil {
-		d.l.Log("level", "ERROR", "function", "db.WatchVideo", "error", err)
+		d.l.Error("", "error", err)
 		return err
 	}
 

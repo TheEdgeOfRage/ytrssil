@@ -2,19 +2,19 @@ package db
 
 import (
 	"database/sql"
+	"log/slog"
 
 	_ "github.com/lib/pq"
 
 	ytrssilConfig "gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/config"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/lib/log"
 )
 
 type postgresDB struct {
-	l  log.Logger
+	l  *slog.Logger
 	db *sql.DB
 }
 
-func NewPostgresDB(log log.Logger, dbCfg ytrssilConfig.DB) (*postgresDB, error) {
+func NewPostgresDB(log *slog.Logger, dbCfg ytrssilConfig.DB) (*postgresDB, error) {
 	db, err := sql.Open("postgres", dbCfg.DBURI)
 	if err != nil {
 		return nil, err

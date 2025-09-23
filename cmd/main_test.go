@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,7 +20,6 @@ import (
 	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/handler"
 	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/httpserver/auth"
 	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/httpserver/ytrssil"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/lib/log"
 	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
@@ -29,7 +30,7 @@ func init() {
 }
 
 func setupTestServer(t *testing.T) (*http.Server, db.DB) {
-	l := log.NewNopLogger()
+	l := slog.New(slog.NewTextHandler(io.Discard, nil))
 
 	db, err := db.NewPostgresDB(l, testConfig.DB)
 	if !assert.NoError(t, err) {

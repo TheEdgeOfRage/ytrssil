@@ -21,13 +21,13 @@ func (d *postgresDB) AuthenticateUser(ctx context.Context, user models.User) (bo
 			return false, nil
 		}
 
-		d.l.Log("level", "ERROR", "function", "db.AuthenticateUser", "error", err)
+		d.l.Error("Failed to query user for auth", "error", err)
 		return false, err
 	}
 
 	match, err := argon2id.ComparePasswordAndHash(user.Password, hashedPassword)
 	if err != nil {
-		d.l.Log("level", "ERROR", "function", "db.AuthenticateUser", "error", err)
+		d.l.Error("Failed to hash password", "error", err)
 		return false, err
 	}
 
@@ -39,7 +39,7 @@ var createUserQuery = `INSERT INTO users (username, password) VALUES ($1, $2) ON
 func (d *postgresDB) CreateUser(ctx context.Context, user models.User) error {
 	resp, err := d.db.ExecContext(ctx, createUserQuery, user.Username, user.Password)
 	if err != nil {
-		d.l.Log("level", "ERROR", "function", "db.CreateUser", "error", err)
+		d.l.Error("Failed to create user", "error", err)
 		return err
 	}
 
@@ -55,7 +55,7 @@ var deleteUserQuery = `DELETE FROM users WHERE username = $1`
 func (d *postgresDB) DeleteUser(ctx context.Context, username string) error {
 	_, err := d.db.ExecContext(ctx, deleteUserQuery, username)
 	if err != nil {
-		d.l.Log("level", "ERROR", "function", "db.DeleteUser", "error", err)
+		d.l.Error("Failed to delete user", "error", err)
 		return err
 	}
 

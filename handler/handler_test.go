@@ -2,13 +2,14 @@ package handler
 
 import (
 	"context"
+	"io"
+	"log/slog"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/config"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/lib/log"
 	db_mock "gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/mocks/db"
 	parser_mock "gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/mocks/feedparser"
 	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/models"
@@ -21,9 +22,7 @@ func init() {
 }
 
 func TestGetNewVideos(t *testing.T) {
-	// Arrange
-	l := log.NewNopLogger()
-
+	l := slog.New(slog.NewTextHandler(io.Discard, nil))
 	handler := New(l, &db_mock.DBMock{
 		GetNewVideosFunc: func(ctx context.Context, username string) ([]models.Video, error) {
 			return []models.Video{
@@ -37,11 +36,8 @@ func TestGetNewVideos(t *testing.T) {
 			}, nil
 		},
 	}, &parser_mock.ParserMock{})
-
-	// Act
 	resp, err := handler.GetNewVideos(context.TODO(), "username")
 
-	// Assert
 	if assert.NoError(t, err) {
 		if assert.NotNil(t, resp) {
 			assert.Equal(t, resp[0].ID, "test")
