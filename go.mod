@@ -1,6 +1,6 @@
 module gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api
 
-go 1.23.0
+go 1.25
 
 require (
 	github.com/alexedwards/argon2id v1.0.0

@@ -1,4 +1,4 @@
-FROM golang:1.24-trixie AS builder
+FROM golang:1.25-trixie AS builder
 
 COPY go.mod go.sum /app/
 WORKDIR /app/
@@ -19,5 +19,5 @@ RUN apt update \
 
 COPY --from=builder /app/dist/ /app/
 
-FROM migrate/migrate AS migrations
+FROM migrate/migrate:4 AS migrations
 COPY ./migrations/ /migrations/
