@@ -21,15 +21,14 @@ func NewServer(log *slog.Logger, handler handler.Handler) (*server, error) {
 }
 
 func ginLogFormatter(param gin.LogFormatterParams) string {
-	return fmt.Sprintf("timestamp=%v status=%d duration=%v size=%v ip=%s method=%s path=%#v error=%s\n",
+	return fmt.Sprintf("time=%v method=%s path=%#v status=%d ip=%s size=%v duration=%v\n",
 		param.TimeStamp.UTC().Format(time.RFC3339Nano),
-		param.StatusCode,
-		param.Latency,
-		param.BodySize,
-		param.ClientIP,
 		param.Method,
 		param.Path,
-		param.ErrorMessage,
+		param.StatusCode,
+		param.ClientIP,
+		param.BodySize,
+		param.Latency,
 	)
 }
 
