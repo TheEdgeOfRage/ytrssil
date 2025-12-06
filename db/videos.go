@@ -7,29 +7,25 @@ import (
 	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
-func (d *postgresDB) GetNewVideos(ctx context.Context, username string, sortDesc bool) ([]models.Video, error) {
-	getNewVideosQuery := `
+func (d *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models.Video, error) {
+	query := `
 		SELECT
 			videos.id
-			, videos.title
-			, videos.published_timestamp
-			, videos.is_short
-			, channels.name as channel_name
-			, channels.id as channel_id
-		FROM user_videos
-		LEFT JOIN videos ON video_id=videos.id
-		LEFT JOIN channels ON channel_id=channels.id
-		WHERE
-			1=1
-			AND watch_timestamp IS NULL
-			AND username=$1
+			, title
+			, published_timestamp
+			, is_short
+			, channels.name
+			, channels.id
+		FROM videos
+		LEFT JOIN channels ON videos.channel_id=channels.id
+		WHERE watch_timestamp IS NULL
 		ORDER BY published_timestamp
 	`
 	if sortDesc {
-		getNewVideosQuery += "DESC"
+		query += " DESC"
 	}
 
-	rows, err := d.db.QueryContext(ctx, getNewVideosQuery, username)
+	rows, err := d.db.QueryContext(ctx, query)
 	if err != nil {
 		d.l.Error("Failed to query new videos", "call", "sql.QueryContext", "error", err)
 		return nil, err
@@ -57,27 +53,26 @@ func (d *postgresDB) GetNewVideos(ctx context.Context, username string, sortDesc
 	return videos, nil
 }
 
-const getWatchedVideosQuery = `
-	SELECT
-		videos.id
-		, videos.title
-		, videos.published_timestamp
-		, videos.watch_timestamp
-		, videos.is_short
-		, channels.name as channel_name
-		, channels.id as channel_id
-	FROM user_videos
-	LEFT JOIN videos ON video_id=videos.id
-	LEFT JOIN channels ON channel_id=channels.id
-	WHERE
-		1=1
-		AND watch_timestamp IS NOT NULL
-		AND username=$1
-	ORDER BY watch_timestamp DESC
-`
+func (d *postgresDB) GetWatchedVideos(ctx context.Context, sortDesc bool) ([]models.Video, error) {
+	query := `
+		SELECT
+			videos.id
+			, title
+			, published_timestamp
+			, watch_timestamp
+			, is_short
+			, channels.name
+			, channels.id
+		FROM videos
+		LEFT JOIN channels ON videos.channel_id=channels.id
+		WHERE watch_timestamp IS NOT NULL
+		ORDER BY watch_timestamp DESC
+	`
+	if sortDesc {
+		query += " DESC"
+	}
 
-func (d *postgresDB) GetWatchedVideos(ctx context.Context, username string) ([]models.Video, error) {
-	rows, err := d.db.QueryContext(ctx, getWatchedVideosQuery, username)
+	rows, err := d.db.QueryContext(ctx, query)
 	if err != nil {
 		d.l.Error("Failed to query for watched videos", "call", "sql.QueryContext", "error", err)
 		return nil, err
@@ -105,21 +100,21 @@ func (d *postgresDB) GetWatchedVideos(ctx context.Context, username string) ([]m
 	return videos, nil
 }
 
-const addVideoQuery = `
-INSERT INTO videos (
-	id
-	, title
-	, published_timestamp
-	, is_short
-	, channel_id
-) VALUES ($1, $2, $3, $4, $5)
-ON CONFLICT DO NOTHING
-`
-
 func (d *postgresDB) AddVideo(ctx context.Context, video models.Video, channelID string) error {
+	query := `
+		INSERT INTO videos (
+			id
+			, title
+			, published_timestamp
+			, is_short
+			, channel_id
+		) VALUES ($1, $2, $3, $4, $5)
+		ON CONFLICT DO NOTHING
+	`
+
 	resp, err := d.db.ExecContext(
 		ctx,
-		addVideoQuery,
+		query,
 		video.ID,
 		video.Title,
 		video.PublishedTime,
@@ -137,24 +132,14 @@ func (d *postgresDB) AddVideo(ctx context.Context, video models.Video, channelID
 	return nil
 }
 
-const addVideoToUserQuery = `INSERT INTO user_videos (username, video_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`
-
-func (d *postgresDB) AddVideoToUser(ctx context.Context, username string, videoID string) error {
-	_, err := d.db.ExecContext(ctx, addVideoToUserQuery, username, videoID)
-	if err != nil {
-		d.l.Error("Failed to add video to user", "error", err)
-		return err
-	}
-
-	return nil
-}
-
-const setVideoWatchTimeQuery = `UPDATE user_videos SET watch_timestamp = $1 WHERE username = $2 AND video_id = $3`
+const setVideoWatchTimeQuery = `UPDATE videos SET watch_timestamp = $1 WHERE video_id = $2`
 
 func (d *postgresDB) SetVideoWatchTime(
-	ctx context.Context, username string, videoID string, watchTime *time.Time,
+	ctx context.Context,
+	videoID string,
+	watchTime *time.Time,
 ) error {
-	_, err := d.db.ExecContext(ctx, setVideoWatchTimeQuery, watchTime, username, videoID)
+	_, err := d.db.ExecContext(ctx, setVideoWatchTimeQuery, watchTime, videoID)
 	if err != nil {
 		d.l.Error("", "error", err)
 		return err

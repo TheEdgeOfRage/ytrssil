@@ -7,19 +7,10 @@ import (
 	flags "github.com/jessevdk/go-flags"
 )
 
-type DB struct {
-	DBURI string `long:"db-uri" env:"DB_URI"`
-}
-
-// Gin contains configuration for the gin framework
-type Gin struct {
-	Port int `long:"port" env:"PORT" default:"8080"`
-}
-
-// Config ties together all configs
 type Config struct {
-	DB  DB
-	Gin Gin
+	Port      int    `long:"port" env:"PORT" default:"8080"`
+	DBURI     string `long:"db-uri" env:"DB_URI"`
+	AuthToken string `long:"auth-token" env:"AUTH_TOKEN"`
 }
 
 func getenvOrDefault(key string, defaultValue string) string {
@@ -46,15 +37,10 @@ func TestConfig() Config {
 		dbURI = dbURI + "?sslmode=disable"
 	}
 
-	gin := Gin{
-		Port: 8080,
-	}
-	db := DB{
-		DBURI: dbURI,
-	}
 	config := Config{
-		Gin: gin,
-		DB:  db,
+		Port:      8080,
+		DBURI:     dbURI,
+		AuthToken: "foo",
 	}
 
 	return config

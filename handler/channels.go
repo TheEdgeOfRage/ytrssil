@@ -8,7 +8,7 @@ import (
 	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
-func (h *handler) SubscribeToChannel(ctx context.Context, username string, channelID string) error {
+func (h *handler) SubscribeToChannel(ctx context.Context, channelID string) error {
 	parsedChannel, err := h.parser.Parse(channelID)
 	if err != nil {
 		return err
@@ -19,14 +19,14 @@ func (h *handler) SubscribeToChannel(ctx context.Context, username string, chann
 		Name: parsedChannel.Name,
 	}
 
-	err = h.db.CreateChannel(ctx, channel)
+	err = h.db.SubscribeToChannel(ctx, channel)
 	if err != nil && !errors.Is(err, db.ErrChannelExists) {
 		return err
 	}
 
-	return h.db.SubscribeUserToChannel(ctx, username, channelID)
+	return nil
 }
 
-func (h *handler) UnsubscribeFromChannel(ctx context.Context, username string, channelID string) error {
-	return h.db.UnsubscribeUserFromChannel(ctx, username, channelID)
+func (h *handler) UnsubscribeFromChannel(ctx context.Context, channelID string) error {
+	return h.db.UnsubscribeFromChannel(ctx, channelID)
 }

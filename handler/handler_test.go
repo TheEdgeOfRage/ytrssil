@@ -24,7 +24,7 @@ func init() {
 func TestGetNewVideos(t *testing.T) {
 	l := slog.New(slog.NewTextHandler(io.Discard, nil))
 	handler := New(l, &db_mock.DBMock{
-		GetNewVideosFunc: func(ctx context.Context, username string, _ bool) ([]models.Video, error) {
+		GetNewVideosFunc: func(ctx context.Context, _ bool) ([]models.Video, error) {
 			return []models.Video{
 				{
 					ID:            "test",
@@ -35,7 +35,7 @@ func TestGetNewVideos(t *testing.T) {
 			}, nil
 		},
 	}, &parser_mock.ParserMock{})
-	resp, err := handler.GetNewVideos(context.TODO(), "username", false)
+	resp, err := handler.GetNewVideos(context.TODO(), false)
 
 	if assert.NoError(t, err) {
 		if assert.NotNil(t, resp) {

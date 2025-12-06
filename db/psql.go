@@ -5,8 +5,6 @@ import (
 	"log/slog"
 
 	_ "github.com/lib/pq"
-
-	ytrssilConfig "github.com/TheEdgeOfRage/ytrssil-api/config"
 )
 
 type postgresDB struct {
@@ -14,8 +12,10 @@ type postgresDB struct {
 	db *sql.DB
 }
 
-func NewPostgresDB(log *slog.Logger, dbCfg ytrssilConfig.DB) (*postgresDB, error) {
-	db, err := sql.Open("postgres", dbCfg.DBURI)
+var _ DB = (*postgresDB)(nil)
+
+func NewPostgresDB(log *slog.Logger, dbURI string) (*postgresDB, error) {
+	db, err := sql.Open("postgres", dbURI)
 	if err != nil {
 		return nil, err
 	}

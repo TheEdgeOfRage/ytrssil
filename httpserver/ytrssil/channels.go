@@ -18,9 +18,8 @@ func (srv *server) SubscribeToChannelJSON(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	username := c.GetString("username")
 
-	err = srv.handler.SubscribeToChannel(c.Request.Context(), username, channel.ID)
+	err = srv.handler.SubscribeToChannel(c.Request.Context(), channel.ID)
 	if err != nil {
 		if errors.Is(err, db.ErrAlreadySubscribed) {
 			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": err.Error()})
@@ -45,9 +44,8 @@ func (srv *server) UnsubscribeFromChannelJSON(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	username := c.GetString("username")
 
-	err = srv.handler.UnsubscribeFromChannel(c.Request.Context(), username, channel.ID)
+	err = srv.handler.UnsubscribeFromChannel(c.Request.Context(), channel.ID)
 	if err != nil {
 		if errors.Is(err, db.ErrChannelNotFound) {
 			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err.Error()})

@@ -1,70 +1,69 @@
 package auth
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 
-	db_mock "github.com/TheEdgeOfRage/ytrssil-api/mocks/db"
-	"github.com/TheEdgeOfRage/ytrssil-api/models"
+	"github.com/TheEdgeOfRage/ytrssil-api/config"
 )
 
-func setupTestServer() *http.Server {
-	db := &db_mock.DBMock{
-		AuthenticateUserFunc: func(ctx context.Context, user models.User) (bool, error) {
-			return user.Username == "username" && user.Password == "password", nil
-		},
-	}
+type AuthTestSuite struct {
+	suite.Suite
+
+	cfg    config.Config
+	server *http.Server
+	engine *gin.Engine
+}
+
+func TestAuthTestSuite(t *testing.T) {
+	suite.Run(t, new(AuthTestSuite))
+}
+
+func (s *AuthTestSuite) SetupSuite() {
+	s.cfg = config.TestConfig()
 
 	gin.SetMode(gin.TestMode)
-	router := gin.New()
-	// Middlewares are executed top to bottom in a stack-like manner
-	router.Use(
-		gin.Recovery(), // Recovery needs to go before other middlewares to catch panics
-		AuthMiddleware(db),
+	s.engine = gin.New()
+	s.engine.Use(
+		gin.Recovery(),
+		APIAuthMiddleware(s.cfg.AuthToken),
 	)
-	router.GET("/", func(c *gin.Context) {
+	s.engine.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "OK")
 	})
 
-	return &http.Server{Handler: router}
+	s.server = &http.Server{Handler: s.engine}
 }
 
-func TestSuccessfulAuthentication(t *testing.T) {
-	server := setupTestServer()
-
+func (s *AuthTestSuite) TestSuccessfulAuthentication() {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/", nil)
-	req.SetBasicAuth("username", "password") // Valid credentials
-	server.Handler.ServeHTTP(w, req)
+	req.Header["Authorization"] = []string{"foo"}
+	s.server.Handler.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, "OK", w.Body.String())
+	s.Equal(http.StatusOK, w.Code)
+	s.Equal("OK", w.Body.String())
 }
 
-func TestMissingAuthorizationHeader(t *testing.T) {
-	server := setupTestServer()
-
+func (s *AuthTestSuite) TestMissingAuthorizationHeader() {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/", nil)
-	server.Handler.ServeHTTP(w, req)
+	s.server.Handler.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusUnauthorized, w.Code)
-	assert.Equal(t, `{"error":"invalid basic auth header"}`, w.Body.String())
+	s.Equal(http.StatusUnauthorized, w.Code)
+	s.Equal(`{"error":"missing Authorization header"}`, w.Body.String())
 }
 
-func TestWrongCredentials(t *testing.T) {
-	server := setupTestServer()
-
+func (s *AuthTestSuite) TestWrongCredentials() {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/", nil)
-	req.SetBasicAuth("test", "test") // Invalid credentials
-	server.Handler.ServeHTTP(w, req)
+	req.Header["Authorization"] = []string{"bar"}
+	s.server.Handler.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusUnauthorized, w.Code)
-	assert.Equal(t, `{"error":"invalid username or password"}`, w.Body.String())
+	s.Equal(http.StatusUnauthorized, w.Code)
+	s.Equal(`{"error":"invalid auth token"}`, w.Body.String())
 }

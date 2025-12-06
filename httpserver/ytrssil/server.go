@@ -37,7 +37,12 @@ func (srv *server) Healthz(c *gin.Context) {
 }
 
 // SetupGinRouter sets up routes for all APIs on a Gin server (aka router)
-func SetupGinRouter(l *slog.Logger, handler handler.Handler, authMiddleware func(c *gin.Context)) (*gin.Engine, error) {
+func SetupGinRouter(
+	l *slog.Logger,
+	handler handler.Handler,
+	apiAuthMiddleware func(c *gin.Context),
+	pageAuthMiddleware func(c *gin.Context),
+) (*gin.Engine, error) {
 	engine := gin.New()
 	// Middlewares are executed top to bottom in a stack-like manner
 	engine.Use(
@@ -57,18 +62,17 @@ func SetupGinRouter(l *slog.Logger, handler handler.Handler, authMiddleware func
 		return nil, err
 	}
 	engine.GET("/healthz", srv.Healthz)
-	engine.POST("/register", srv.CreateUserJSON)
 	engine.POST("/fetch", srv.FetchVideosJSON)
 
 	pages := engine.Group("")
-	pages.Use(authMiddleware)
+	pages.Use(pageAuthMiddleware)
 
 	pages.GET("/", srv.NewVideosPage)
 	pages.POST("/videos/:video_id/watch", srv.MarkVideoAsWatchedPage)
 
 	// all APIs go in this routing group and require authentication
 	api := engine.Group("/api")
-	api.Use(authMiddleware)
+	api.Use(apiAuthMiddleware)
 	{
 		api.POST("channels/:channel_id/subscribe", srv.SubscribeToChannelJSON)
 		api.POST("channels/:channel_id/unsubscribe", srv.UnsubscribeFromChannelJSON)

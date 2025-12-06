@@ -14,30 +14,12 @@ import (
 	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
-func (h *handler) GetNewVideos(ctx context.Context, username string, sortDesc bool) ([]models.Video, error) {
-	return h.db.GetNewVideos(ctx, username, sortDesc)
+func (h *handler) GetNewVideos(ctx context.Context, sortDesc bool) ([]models.Video, error) {
+	return h.db.GetNewVideos(ctx, sortDesc)
 }
 
-func (h *handler) GetWatchedVideos(ctx context.Context, username string) ([]models.Video, error) {
-	return h.db.GetWatchedVideos(ctx, username)
-}
-
-func (h *handler) addVideoToAllSubscribers(ctx context.Context, channelID string, videoID string) error {
-	subs, err := h.db.GetChannelSubscribers(ctx, channelID)
-	if err != nil {
-		h.log.Error("failed to get channel subscribers", "call", "db.GetChannelSubscribers", "err", err)
-		return err
-	}
-
-	for _, sub := range subs {
-		err = h.db.AddVideoToUser(ctx, sub, videoID)
-		if err != nil {
-			h.log.Error("Failed to add video to user", "call", "db.AddVideoToUser", "err", err)
-			continue
-		}
-	}
-
-	return nil
+func (h *handler) GetWatchedVideos(ctx context.Context, sortDesc bool) ([]models.Video, error) {
+	return h.db.GetWatchedVideos(ctx, sortDesc)
 }
 
 func (h *handler) isShort(ctx context.Context, videoID string) (bool, error) {
@@ -92,10 +74,6 @@ func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedpa
 			}
 			continue
 		}
-		err = h.addVideoToAllSubscribers(ctx, parsedChannel.ID, videoID)
-		if err != nil {
-			continue
-		}
 	}
 }
 
@@ -128,11 +106,11 @@ func (h *handler) FetchVideos(ctx context.Context) error {
 	return nil
 }
 
-func (h *handler) MarkVideoAsWatched(ctx context.Context, username string, videoID string) error {
+func (h *handler) MarkVideoAsWatched(ctx context.Context, videoID string) error {
 	watchTime := time.Now()
-	return h.db.SetVideoWatchTime(ctx, username, videoID, &watchTime)
+	return h.db.SetVideoWatchTime(ctx, videoID, &watchTime)
 }
 
-func (h *handler) MarkVideoAsUnwatched(ctx context.Context, username string, videoID string) error {
-	return h.db.SetVideoWatchTime(ctx, username, videoID, nil)
+func (h *handler) MarkVideoAsUnwatched(ctx context.Context, videoID string) error {
+	return h.db.SetVideoWatchTime(ctx, videoID, nil)
 }

@@ -21,14 +21,12 @@ import (
 	"github.com/TheEdgeOfRage/ytrssil-api/httpserver/ytrssil"
 )
 
-const LevelFatal slog.Level = slog.LevelError + 4
-
 func init() {
 	// always use UTC
 	time.Local = time.UTC
 }
 
-func fetcherRoutine(ctx context.Context, wg *sync.WaitGroup, l *slog.Logger, h handler.Handler) {
+func fetcherRoutine(ctx context.Context, l *slog.Logger, h handler.Handler) {
 	ticker := time.NewTicker(5 * time.Minute)
 	for {
 		select {
@@ -47,15 +45,14 @@ func fetcherRoutine(ctx context.Context, wg *sync.WaitGroup, l *slog.Logger, h h
 func main() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
-	config, err := config.Parse()
+	cfg, err := config.Parse()
 	if err != nil {
-		logger.Log(context.Background(), LevelFatal, "Failed to parse config", "call", "config.Parse", "error", err)
+		logger.Error("Failed to parse config", "call", "config.Parse", "error", err)
 		return
 	}
-	db, err := db.NewPostgresDB(logger, config.DB)
+	db, err := db.NewPostgresDB(logger, cfg.DBURI)
 	if err != nil {
-		logger.Log(
-			context.Background(), LevelFatal,
+		logger.Error(
 			"Failed to create DB connection",
 			"call", "db.NewPostgresDB",
 			"error", err,
@@ -68,11 +65,11 @@ func main() {
 	router, err := ytrssil.SetupGinRouter(
 		logger,
 		handler,
-		auth.AuthMiddleware(db),
+		auth.APIAuthMiddleware(cfg.AuthToken),
+		auth.PageAuthMiddleware(cfg.AuthToken),
 	)
 	if err != nil {
-		logger.Log(
-			context.Background(), LevelFatal,
+		logger.Error(
 			"Failed to set up gin server",
 			"call", "ytrssil.SetupGinServer",
 			"error", err,
@@ -81,7 +78,7 @@ func main() {
 	}
 
 	server := &http.Server{
-		Addr:    fmt.Sprintf(":%v", config.Gin.Port),
+		Addr:    fmt.Sprintf(":%v", cfg.Port),
 		Handler: router,
 	}
 
@@ -92,11 +89,11 @@ func main() {
 	// start periodic fetch videos routine
 	fetcherContext, cancelFetcher := context.WithCancel(context.Background())
 	wg.Go(func() {
-		fetcherRoutine(fetcherContext, wg, logger, handler)
+		fetcherRoutine(fetcherContext, logger, handler)
 	})
 
 	wg.Go(func() {
-		logger.Info("ytrssil API is starting up", "port", config.Gin.Port)
+		logger.Info("ytrssil API is starting up", "port", cfg.Port)
 		if err := server.ListenAndServe(); err != nil {
 			if err != http.ErrServerClosed {
 				logger.Error("Server crashed", "call", "server.ListenAndServe", "error", err)

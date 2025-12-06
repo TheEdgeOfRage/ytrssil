@@ -10,8 +10,7 @@ import (
 )
 
 func (srv server) NewVideosPage(c *gin.Context) {
-	username := c.GetString("username")
-	videos, err := srv.handler.GetNewVideos(c.Request.Context(), username, true)
+	videos, err := srv.handler.GetNewVideos(c.Request.Context(), true)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -29,7 +28,6 @@ func (srv server) MarkVideoAsWatchedPage(c *gin.Context) {
 		Ctx: c.Request.Context(),
 	}
 
-	username := c.GetString("username")
 	var req models.VideoURIRequest
 	err := c.ShouldBindUri(&req)
 	if err != nil {
@@ -38,7 +36,7 @@ func (srv server) MarkVideoAsWatchedPage(c *gin.Context) {
 		return
 	}
 
-	err = srv.handler.MarkVideoAsWatched(c.Request.Context(), username, req.VideoID)
+	err = srv.handler.MarkVideoAsWatched(c.Request.Context(), req.VideoID)
 	if err != nil {
 		r.Component = pages.ErrorPage(err)
 		c.Render(http.StatusInternalServerError, r)

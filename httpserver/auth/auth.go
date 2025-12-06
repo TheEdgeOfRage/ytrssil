@@ -4,34 +4,38 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-
-	"github.com/TheEdgeOfRage/ytrssil-api/db"
-	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
-// AuthMiddleware will authenticate against a static API key
-func AuthMiddleware(db db.DB) gin.HandlerFunc {
+// PageAuthMiddleware will authenticate against a static auth token
+func PageAuthMiddleware(authToken string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		username, password, ok := c.Request.BasicAuth()
-		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid basic auth header"})
-			return
-		}
-		user := models.User{
-			Username: username,
-			Password: password,
-		}
-		authenticated, err := db.AuthenticateUser(c.Request.Context(), user)
+		tokenCookie, err := c.Request.Cookie("token")
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing auth token cookie"})
 			return
 		}
-		if !authenticated {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid username or password"})
+		if tokenCookie.Value != authToken {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid auth token"})
 			return
 		}
 
-		c.Set("username", username)
+		// handle request
+		c.Next()
+	}
+}
+
+// APIAuthMiddleware will authenticate API endpoints against a static auth token
+func APIAuthMiddleware(authToken string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token, ok := c.Request.Header["Authorization"]
+		if !ok || len(token) != 1 {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing Authorization header"})
+			return
+		}
+		if token[0] != authToken {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid auth token"})
+			return
+		}
 
 		// handle request
 		c.Next()

@@ -35,12 +35,13 @@ func setupTestServer(t *testing.T) *http.Server {
 	router, err := ytrssil.SetupGinRouter(
 		l,
 		handler,
-		auth.AuthMiddleware(nil),
+		auth.APIAuthMiddleware(""),
+		auth.PageAuthMiddleware(""),
 	)
 	assert.Nil(t, err)
 
 	return &http.Server{
-		Addr:    fmt.Sprintf(":%v", testConfig.Gin.Port),
+		Addr:    fmt.Sprintf(":%v", testConfig.Port),
 		Handler: router,
 	}
 }
