@@ -5,6 +5,7 @@ tmp_dir = "/tmp"
   args_bin = [
     "--db-uri=postgres://ytrssil:ytrssil@localhost:5432/ytrssil?sslmode=disable",
     "--auth-token=foo",
+    "--dev",
   ]
   entrypoint = "./dist/ytrssil"
   cmd = "make build"

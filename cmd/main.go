@@ -17,7 +17,6 @@ import (
 	"github.com/TheEdgeOfRage/ytrssil-api/db"
 	"github.com/TheEdgeOfRage/ytrssil-api/feedparser"
 	"github.com/TheEdgeOfRage/ytrssil-api/handler"
-	"github.com/TheEdgeOfRage/ytrssil-api/httpserver/auth"
 	"github.com/TheEdgeOfRage/ytrssil-api/httpserver/ytrssil"
 )
 
@@ -61,13 +60,12 @@ func main() {
 	}
 	parser := feedparser.NewParser(logger)
 	handler := handler.New(logger, cfg, db, parser)
-	gin.SetMode(gin.ReleaseMode)
-	router, err := ytrssil.SetupGinRouter(
-		logger,
-		handler,
-		auth.APIAuthMiddleware(cfg.AuthToken),
-		auth.PageAuthMiddleware(cfg.AuthToken),
-	)
+	if cfg.Dev {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
+	router, err := ytrssil.SetupGinRouter(logger, cfg, handler)
 	if err != nil {
 		logger.Error(
 			"Failed to set up gin server",

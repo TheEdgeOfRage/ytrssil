@@ -9,6 +9,7 @@ import (
 )
 
 type Config struct {
+	Dev           bool   `long:"dev" env:"DEV"`
 	Port          int    `long:"port" env:"PORT" default:"8080"`
 	DBURI         string `long:"db-uri" env:"DB_URI"`
 	AuthToken     string `long:"auth-token" env:"AUTH_TOKEN"`

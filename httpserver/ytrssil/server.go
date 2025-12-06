@@ -8,16 +8,19 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/TheEdgeOfRage/ytrssil-api/config"
 	"github.com/TheEdgeOfRage/ytrssil-api/handler"
+	"github.com/TheEdgeOfRage/ytrssil-api/httpserver/auth"
 )
 
 type server struct {
 	log     *slog.Logger
+	cfg     config.Config
 	handler handler.Handler
 }
 
-func NewServer(log *slog.Logger, handler handler.Handler) (*server, error) {
-	return &server{log: log, handler: handler}, nil
+func NewServer(log *slog.Logger, cfg config.Config, handler handler.Handler) (*server, error) {
+	return &server{log: log, cfg: cfg, handler: handler}, nil
 }
 
 func ginLogFormatter(param gin.LogFormatterParams) string {
@@ -39,9 +42,8 @@ func (srv *server) Healthz(c *gin.Context) {
 // SetupGinRouter sets up routes for all APIs on a Gin server (aka router)
 func SetupGinRouter(
 	l *slog.Logger,
+	cfg config.Config,
 	handler handler.Handler,
-	apiAuthMiddleware func(c *gin.Context),
-	pageAuthMiddleware func(c *gin.Context),
 ) (*gin.Engine, error) {
 	engine := gin.New()
 	// Middlewares are executed top to bottom in a stack-like manner
@@ -57,24 +59,26 @@ func SetupGinRouter(
 		c.AbortWithStatusJSON(http.StatusMethodNotAllowed, gin.H{"error": "HTTP method not allowed"})
 	})
 
-	srv, err := NewServer(l, handler)
+	srv, err := NewServer(l, cfg, handler)
 	if err != nil {
 		return nil, err
 	}
 	engine.GET("/healthz", srv.Healthz)
 	engine.POST("/fetch", srv.FetchVideosJSON)
 
+	engine.GET("/auth", srv.AuthPage)
+	engine.POST("/auth", srv.HandleAuth)
+
 	pages := engine.Group("")
-	pages.Use(pageAuthMiddleware)
+	pages.Use(auth.PageAuthMiddleware(cfg.AuthToken))
 	{
 		pages.GET("/", srv.NewVideosPage)
 		pages.PATCH("/videos/:video_id/watch", srv.MarkVideoAsWatchedPage)
 		pages.PATCH("/videos/:video_id/progress", srv.SetVideoProgressPage)
 	}
 
-	// all APIs go in this routing group and require authentication
 	api := engine.Group("/api")
-	api.Use(apiAuthMiddleware)
+	api.Use(auth.APIAuthMiddleware(cfg.AuthToken))
 	{
 		api.POST("channels/:channel_id/subscribe", srv.SubscribeToChannelJSON)
 		api.POST("channels/:channel_id/unsubscribe", srv.UnsubscribeFromChannelJSON)

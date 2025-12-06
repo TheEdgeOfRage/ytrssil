@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/TheEdgeOfRage/ytrssil-api/models"
 	"github.com/TheEdgeOfRage/ytrssil-api/pages"
 )
 
@@ -28,17 +27,9 @@ func (srv server) MarkVideoAsWatchedPage(c *gin.Context) {
 		Ctx: c.Request.Context(),
 	}
 
-	var req models.VideoURIRequest
-	err := c.ShouldBindUri(&req)
+	err := srv.handler.MarkVideoAsWatched(c.Request.Context(), c.Param("video_id"))
 	if err != nil {
-		r.Component = pages.ErrorPage(err)
-		c.Render(http.StatusBadRequest, r)
-		return
-	}
-
-	err = srv.handler.MarkVideoAsWatched(c.Request.Context(), req.VideoID)
-	if err != nil {
-		r.Component = pages.ErrorPage(err)
+		r.Component = pages.ErrorPage(err.Error())
 		c.Render(http.StatusInternalServerError, r)
 		return
 	}
@@ -50,26 +41,16 @@ func (srv server) SetVideoProgressPage(c *gin.Context) {
 	r := pages.TemplRenderer{
 		Ctx: c.Request.Context(),
 	}
-	var req struct {
-		models.VideoURIRequest
-		models.SetVideoProgressRequest
-	}
-	err := c.ShouldBindUri(&req.VideoURIRequest)
-	if err != nil {
-		r.Component = pages.ErrorPage(err)
-		c.Render(http.StatusBadRequest, r)
-		return
-	}
-	err = c.ShouldBind(&req.SetVideoProgressRequest)
-	if err != nil {
-		r.Component = pages.ErrorPage(err)
+	progress := c.PostForm("progress")
+	if progress == "" {
+		r.Component = pages.ErrorPage("missing progress")
 		c.Render(http.StatusBadRequest, r)
 		return
 	}
 
-	video, err := srv.handler.SetVideoProgress(c.Request.Context(), req.VideoID, req.Progress)
+	video, err := srv.handler.SetVideoProgress(c.Request.Context(), c.Param("video_id"), progress)
 	if err != nil {
-		r.Component = pages.ErrorPage(err)
+		r.Component = pages.ErrorPage(err.Error())
 		c.Render(http.StatusInternalServerError, r)
 		return
 	}

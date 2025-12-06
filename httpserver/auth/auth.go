@@ -11,15 +11,14 @@ func PageAuthMiddleware(authToken string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenCookie, err := c.Request.Cookie("token")
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing auth token cookie"})
+			c.Redirect(http.StatusFound, "/auth")
 			return
 		}
 		if tokenCookie.Value != authToken {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid auth token"})
+			c.Redirect(http.StatusFound, "/auth")
 			return
 		}
 
-		// handle request
 		c.Next()
 	}
 }
@@ -37,7 +36,6 @@ func APIAuthMiddleware(authToken string) gin.HandlerFunc {
 			return
 		}
 
-		// handle request
 		c.Next()
 	}
 }

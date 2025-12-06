@@ -2,11 +2,11 @@ package pages
 
 import "fmt"
 
-templ ErrorPage(err error) {
+templ ErrorPage(err string) {
 	<div class="toast align-items-center text-bg-danger border-0" role="alert">
 		<div class="d-flex">
 			<div class="toast-body">
-				{ fmt.Sprintf("Error: %s", err.Error()) }
+				{ fmt.Sprintf("Error: %s", err) }
 			</div>
 			<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
 		</div>

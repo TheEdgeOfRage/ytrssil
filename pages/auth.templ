@@ -1,0 +1,35 @@
+package pages
+
+templ AuthPage(errorMsg string) {
+	@BaseLayout("ytrssil - Authentication") {
+		<div class="row justify-content-center mt-5">
+			<div class="col-md-6 col-lg-4">
+				<div class="card">
+					<div class="card-body">
+						<h5 class="card-title mb-4">Authentication Required</h5>
+						if errorMsg != "" {
+							<div class="alert alert-danger" role="alert">
+								{ errorMsg }
+							</div>
+						}
+						<form method="POST" action="/auth">
+							<div class="mb-3">
+								<label for="token" class="form-label">Access Token</label>
+								<input
+									type="password"
+									class="form-control"
+									id="token"
+									name="token"
+									placeholder="Enter your token"
+									required
+									autofocus
+								/>
+							</div>
+							<button type="submit" class="btn btn-primary w-100">Submit</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+}
