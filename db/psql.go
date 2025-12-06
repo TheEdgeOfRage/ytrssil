@@ -6,7 +6,7 @@ import (
 
 	_ "github.com/lib/pq"
 
-	ytrssilConfig "gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/config"
+	ytrssilConfig "github.com/TheEdgeOfRage/ytrssil-api/config"
 )
 
 type postgresDB struct {

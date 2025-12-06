@@ -7,7 +7,7 @@ import (
 
 	"github.com/alexedwards/argon2id"
 
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/models"
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
 var authenticateUserQuery = `SELECT password FROM users WHERE username = $1`

@@ -1,0 +1,49 @@
+package ytrssil
+
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
+	"github.com/TheEdgeOfRage/ytrssil-api/pages"
+)
+
+func (srv server) NewVideosPage(c *gin.Context) {
+	username := c.GetString("username")
+	videos, err := srv.handler.GetNewVideos(c.Request.Context(), username, true)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	r := pages.TemplRenderer{
+		Ctx:       c.Request.Context(),
+		Component: pages.NewVideosPage(videos),
+	}
+	c.Render(http.StatusOK, r)
+}
+
+func (srv server) MarkVideoAsWatchedPage(c *gin.Context) {
+	r := pages.TemplRenderer{
+		Ctx: c.Request.Context(),
+	}
+
+	username := c.GetString("username")
+	var req models.VideoURIRequest
+	err := c.ShouldBindUri(&req)
+	if err != nil {
+		r.Component = pages.ErrorPage(err)
+		c.Render(http.StatusBadRequest, r)
+		return
+	}
+
+	err = srv.handler.MarkVideoAsWatched(c.Request.Context(), username, req.VideoID)
+	if err != nil {
+		r.Component = pages.ErrorPage(err)
+		c.Render(http.StatusInternalServerError, r)
+		return
+	}
+
+	c.String(http.StatusOK, "")
+}

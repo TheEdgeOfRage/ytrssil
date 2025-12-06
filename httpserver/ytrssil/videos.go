@@ -5,12 +5,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/models"
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
-func (s *server) GetNewVideos(c *gin.Context) {
+func (srv *server) GetNewVideosJSON(c *gin.Context) {
 	username := c.GetString("username")
-	videos, err := s.handler.GetNewVideos(c.Request.Context(), username)
+	videos, err := srv.handler.GetNewVideos(c.Request.Context(), username, false)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -21,9 +21,9 @@ func (s *server) GetNewVideos(c *gin.Context) {
 	})
 }
 
-func (s *server) GetWatchedVideos(c *gin.Context) {
+func (srv *server) GetWatchedVideosJSON(c *gin.Context) {
 	username := c.GetString("username")
-	videos, err := s.handler.GetWatchedVideos(c.Request.Context(), username)
+	videos, err := srv.handler.GetWatchedVideos(c.Request.Context(), username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -34,8 +34,8 @@ func (s *server) GetWatchedVideos(c *gin.Context) {
 	})
 }
 
-func (s *server) FetchVideos(c *gin.Context) {
-	err := s.handler.FetchVideos(c.Request.Context())
+func (srv *server) FetchVideosJSON(c *gin.Context) {
+	err := srv.handler.FetchVideos(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -44,7 +44,7 @@ func (s *server) FetchVideos(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"msg": "videos fetched successfully"})
 }
 
-func (s *server) MarkVideoAsWatched(c *gin.Context) {
+func (srv *server) MarkVideoAsWatchedJSON(c *gin.Context) {
 	username := c.GetString("username")
 	var req models.VideoURIRequest
 	err := c.ShouldBindUri(&req)
@@ -53,7 +53,7 @@ func (s *server) MarkVideoAsWatched(c *gin.Context) {
 		return
 	}
 
-	err = s.handler.MarkVideoAsWatched(c.Request.Context(), username, req.VideoID)
+	err = srv.handler.MarkVideoAsWatched(c.Request.Context(), username, req.VideoID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -62,7 +62,7 @@ func (s *server) MarkVideoAsWatched(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"msg": "marked video as watched"})
 }
 
-func (s *server) MarkVideoAsUnwatched(c *gin.Context) {
+func (srv *server) MarkVideoAsUnwatchedJSON(c *gin.Context) {
 	username := c.GetString("username")
 	var req models.VideoURIRequest
 	err := c.ShouldBindUri(&req)
@@ -71,7 +71,7 @@ func (s *server) MarkVideoAsUnwatched(c *gin.Context) {
 		return
 	}
 
-	err = s.handler.MarkVideoAsUnwatched(c.Request.Context(), username, req.VideoID)
+	err = srv.handler.MarkVideoAsUnwatched(c.Request.Context(), username, req.VideoID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

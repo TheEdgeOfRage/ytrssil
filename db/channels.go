@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/models"
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
 var createChannelQuery = `INSERT INTO channels (id, name) VALUES ($1, $2) ON CONFLICT DO NOTHING`

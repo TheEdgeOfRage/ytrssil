@@ -12,10 +12,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/config"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/handler"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/httpserver/auth"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/httpserver/ytrssil"
+	"github.com/TheEdgeOfRage/ytrssil-api/config"
+	"github.com/TheEdgeOfRage/ytrssil-api/handler"
+	"github.com/TheEdgeOfRage/ytrssil-api/httpserver/auth"
+	"github.com/TheEdgeOfRage/ytrssil-api/httpserver/ytrssil"
 )
 
 var testConfig config.Config

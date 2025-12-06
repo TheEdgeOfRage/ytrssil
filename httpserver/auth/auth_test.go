@@ -9,8 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
-	db_mock "gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/mocks/db"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/models"
+	db_mock "github.com/TheEdgeOfRage/ytrssil-api/mocks/db"
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
 func setupTestServer() *http.Server {

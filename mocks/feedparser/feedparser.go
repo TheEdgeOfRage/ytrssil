@@ -4,7 +4,7 @@
 package parser_mock
 
 import (
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/feedparser"
+	"github.com/TheEdgeOfRage/ytrssil-api/feedparser"
 	"sync"
 )
 

@@ -5,8 +5,8 @@ package db_mock
 
 import (
 	"context"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/db"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/models"
+	"github.com/TheEdgeOfRage/ytrssil-api/db"
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
 	"sync"
 	"time"
 )
@@ -42,7 +42,7 @@ var _ db.DB = &DBMock{}
 //			GetChannelSubscribersFunc: func(ctx context.Context, channelID string) ([]string, error) {
 //				panic("mock out the GetChannelSubscribers method")
 //			},
-//			GetNewVideosFunc: func(ctx context.Context, username string) ([]models.Video, error) {
+//			GetNewVideosFunc: func(ctx context.Context, username string, sortDesc bool) ([]models.Video, error) {
 //				panic("mock out the GetNewVideos method")
 //			},
 //			GetWatchedVideosFunc: func(ctx context.Context, username string) ([]models.Video, error) {
@@ -89,7 +89,7 @@ type DBMock struct {
 	GetChannelSubscribersFunc func(ctx context.Context, channelID string) ([]string, error)
 
 	// GetNewVideosFunc mocks the GetNewVideos method.
-	GetNewVideosFunc func(ctx context.Context, username string) ([]models.Video, error)
+	GetNewVideosFunc func(ctx context.Context, username string, sortDesc bool) ([]models.Video, error)
 
 	// GetWatchedVideosFunc mocks the GetWatchedVideos method.
 	GetWatchedVideosFunc func(ctx context.Context, username string) ([]models.Video, error)
@@ -167,6 +167,8 @@ type DBMock struct {
 			Ctx context.Context
 			// Username is the username argument value.
 			Username string
+			// SortDesc is the sortDesc argument value.
+			SortDesc bool
 		}
 		// GetWatchedVideos holds details about calls to the GetWatchedVideos method.
 		GetWatchedVideos []struct {
@@ -486,21 +488,23 @@ func (mock *DBMock) GetChannelSubscribersCalls() []struct {
 }
 
 // GetNewVideos calls GetNewVideosFunc.
-func (mock *DBMock) GetNewVideos(ctx context.Context, username string) ([]models.Video, error) {
+func (mock *DBMock) GetNewVideos(ctx context.Context, username string, sortDesc bool) ([]models.Video, error) {
 	if mock.GetNewVideosFunc == nil {
 		panic("DBMock.GetNewVideosFunc: method is nil but DB.GetNewVideos was just called")
 	}
 	callInfo := struct {
 		Ctx      context.Context
 		Username string
+		SortDesc bool
 	}{
 		Ctx:      ctx,
 		Username: username,
+		SortDesc: sortDesc,
 	}
 	mock.lockGetNewVideos.Lock()
 	mock.calls.GetNewVideos = append(mock.calls.GetNewVideos, callInfo)
 	mock.lockGetNewVideos.Unlock()
-	return mock.GetNewVideosFunc(ctx, username)
+	return mock.GetNewVideosFunc(ctx, username, sortDesc)
 }
 
 // GetNewVideosCalls gets all the calls that were made to GetNewVideos.
@@ -510,10 +514,12 @@ func (mock *DBMock) GetNewVideos(ctx context.Context, username string) ([]models
 func (mock *DBMock) GetNewVideosCalls() []struct {
 	Ctx      context.Context
 	Username string
+	SortDesc bool
 } {
 	var calls []struct {
 		Ctx      context.Context
 		Username string
+		SortDesc bool
 	}
 	mock.lockGetNewVideos.RLock()
 	calls = mock.calls.GetNewVideos

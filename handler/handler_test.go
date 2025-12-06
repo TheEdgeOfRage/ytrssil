@@ -9,10 +9,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/config"
-	db_mock "gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/mocks/db"
-	parser_mock "gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/mocks/feedparser"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/models"
+	"github.com/TheEdgeOfRage/ytrssil-api/config"
+	db_mock "github.com/TheEdgeOfRage/ytrssil-api/mocks/db"
+	parser_mock "github.com/TheEdgeOfRage/ytrssil-api/mocks/feedparser"
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
 var testConfig config.Config
@@ -24,19 +24,18 @@ func init() {
 func TestGetNewVideos(t *testing.T) {
 	l := slog.New(slog.NewTextHandler(io.Discard, nil))
 	handler := New(l, &db_mock.DBMock{
-		GetNewVideosFunc: func(ctx context.Context, username string) ([]models.Video, error) {
+		GetNewVideosFunc: func(ctx context.Context, username string, _ bool) ([]models.Video, error) {
 			return []models.Video{
 				{
 					ID:            "test",
 					ChannelName:   "test",
 					Title:         "test",
 					PublishedTime: time.Now(),
-					WatchTime:     nil,
 				},
 			}, nil
 		},
 	}, &parser_mock.ParserMock{})
-	resp, err := handler.GetNewVideos(context.TODO(), "username")
+	resp, err := handler.GetNewVideos(context.TODO(), "username", false)
 
 	if assert.NoError(t, err) {
 		if assert.NotNil(t, resp) {

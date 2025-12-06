@@ -14,13 +14,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/config"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/db"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/feedparser"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/handler"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/httpserver/auth"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/httpserver/ytrssil"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/models"
+	"github.com/TheEdgeOfRage/ytrssil-api/config"
+	"github.com/TheEdgeOfRage/ytrssil-api/db"
+	"github.com/TheEdgeOfRage/ytrssil-api/feedparser"
+	"github.com/TheEdgeOfRage/ytrssil-api/handler"
+	"github.com/TheEdgeOfRage/ytrssil-api/httpserver/auth"
+	"github.com/TheEdgeOfRage/ytrssil-api/httpserver/ytrssil"
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
 var testConfig config.Config

@@ -1,0 +1,115 @@
+package pages
+
+import (
+	"fmt"
+
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
+)
+
+templ thumbnail(video models.Video) {
+	<a
+		target="blank"
+		href={ templ.SafeURL(fmt.Sprintf("https://youtube.com/watch?v=%s", video.ID)) }
+		style="display: block; overflow: hidden;"
+		if video.IsShort {
+			class="pillarbox"
+		}
+	>
+		if video.IsShort {
+			<img
+				src={ fmt.Sprintf("https://img.youtube.com/vi/%s/0.jpg", video.ID) }
+				class="card-img-top"
+				alt={ video.Title }
+				style="width: 100%; aspect-ratio: 16/9; object-fit: contain;"
+			/>
+		} else {
+			<img
+				src={ fmt.Sprintf("https://img.youtube.com/vi/%s/0.jpg", video.ID) }
+				class="card-img-top"
+				alt={ video.Title }
+				style="width: 100%; aspect-ratio: 16/9; object-fit: cover;"
+			/>
+		}
+	</a>
+	// <div class="progress" role="progressbar" style="height: 6px">
+	// <div class="progress-bar w-75" style="background: #b11"></div>
+	// </div>
+}
+
+templ videoCard(video models.Video) {
+	<div class="card">
+		@thumbnail(video)
+		<div class="card-body">
+			if video.IsShort {
+				<p class="card-title text-truncate mb-0">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						height="24"
+						viewBox="0 0 24 24"
+						width="24"
+						focusable="false"
+						aria-hidden="true"
+						style="pointer-events: none; display: inherit; width: 2rem; height: 2rem;"
+						class="float-end"
+						fill="white"
+					><path d="m13.974 2.052-8 4.7a4 4 0 00.385 7.097l.942.423-1.327.78a4 4 0 004.052 6.897l8-4.7a4.001 4.001 0 00-.384-7.096L16.7 9.73l1.326-.78a4 4 0 10-4.052-6.897ZM10 15V9l5 3-5 3Z"></path></svg>
+					{ video.Title }
+				</p>
+			} else {
+				<p class="card-title text-truncate">{ video.Title }</p>
+			}
+			<p>
+				<a
+					target="blank"
+					href={ fmt.Sprintf("https://www.youtube.com/channel/%s", video.ChannelID) }
+					class="card-text fw-light link-light link-underline-opacity-0"
+				>{ video.ChannelName }</a>
+			</p>
+			<div class="d-flex justify-content-between">
+				// <form hx-post="/submit-form" hx-target="#response" class="d-flex">
+				// 	<input type="text" name="time" placeholder="hh:mm:ss" class="form-control "/>
+				// 	<button type="submit" class="btn btn-primary ms-3"><i class="bi bi-clock"></i> </button>
+				// </form>
+				<button
+					hx-post={ fmt.Sprintf("/videos/%s/watch", video.ID) }
+					hx-target="closest .video-card"
+					hx-swap="outerHTML"
+					class="btn btn-danger"
+				>
+					<i class="bi bi-check-circle"></i>
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
+templ NewVideosPage(videos []models.Video) {
+	<!DOCTYPE html>
+	<html lang="en" data-bs-theme="dark">
+		<head>
+			<title>ytrssil</title>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous"/>
+			<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"/>
+			<style>
+				.pillarbox { position: relative; }
+				.pillarbox::after { right: 0; }
+				.pillarbox::before,
+				.pillarbox::after { content: ''; position: absolute; top: 0; bottom: 0%; width: 36%; background: black; z-index: 1; }
+			</style>
+			<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
+		</head>
+		<body>
+			<div class="container-fluid">
+				<div class="row">
+					for _, video := range videos {
+						<div class="video-card col-md-3 p-2">
+							@videoCard(video)
+						</div>
+					}
+				</div>
+			</div>
+		</body>
+	</html>
+}

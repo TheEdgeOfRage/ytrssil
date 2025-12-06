@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/handler"
+	"github.com/TheEdgeOfRage/ytrssil-api/handler"
 )
 
 type server struct {
@@ -32,7 +32,7 @@ func ginLogFormatter(param gin.LogFormatterParams) string {
 	)
 }
 
-func (s *server) Healthz(c *gin.Context) {
+func (srv *server) Healthz(c *gin.Context) {
 	c.String(http.StatusOK, "healthy")
 }
 
@@ -44,25 +44,38 @@ func SetupGinRouter(l *slog.Logger, handler handler.Handler, authMiddleware func
 		gin.LoggerWithFormatter(ginLogFormatter),
 		gin.Recovery(), // Recovery needs to go before other middlewares to catch panics
 	)
+	engine.HandleMethodNotAllowed = true
+	engine.NoRoute(func(c *gin.Context) {
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "URL not found"})
+	})
+	engine.NoMethod(func(c *gin.Context) {
+		c.AbortWithStatusJSON(http.StatusMethodNotAllowed, gin.H{"error": "HTTP method not allowed"})
+	})
 
 	srv, err := NewServer(l, handler)
 	if err != nil {
 		return nil, err
 	}
 	engine.GET("/healthz", srv.Healthz)
-	engine.POST("/register", srv.CreateUser)
-	engine.POST("/fetch", srv.FetchVideos)
+	engine.POST("/register", srv.CreateUserJSON)
+	engine.POST("/fetch", srv.FetchVideosJSON)
+
+	pages := engine.Group("")
+	pages.Use(authMiddleware)
+
+	pages.GET("/", srv.NewVideosPage)
+	pages.POST("/videos/:video_id/watch", srv.MarkVideoAsWatchedPage)
 
 	// all APIs go in this routing group and require authentication
 	api := engine.Group("/api")
 	api.Use(authMiddleware)
 	{
-		api.POST("channels/:channel_id/subscribe", srv.SubscribeToChannel)
-		api.POST("channels/:channel_id/unsubscribe", srv.UnsubscribeFromChannel)
-		api.GET("videos/new", srv.GetNewVideos)
-		api.GET("videos/watched", srv.GetWatchedVideos)
-		api.POST("videos/:video_id/watch", srv.MarkVideoAsWatched)
-		api.POST("videos/:video_id/unwatch", srv.MarkVideoAsUnwatched)
+		api.POST("channels/:channel_id/subscribe", srv.SubscribeToChannelJSON)
+		api.POST("channels/:channel_id/unsubscribe", srv.UnsubscribeFromChannelJSON)
+		api.GET("videos/new", srv.GetNewVideosJSON)
+		api.GET("videos/watched", srv.GetWatchedVideosJSON)
+		api.POST("videos/:video_id/watch", srv.MarkVideoAsWatchedJSON)
+		api.POST("videos/:video_id/unwatch", srv.MarkVideoAsUnwatchedJSON)
 	}
 
 	return engine, nil

@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/db"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/models"
+	"github.com/TheEdgeOfRage/ytrssil-api/db"
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
 // AuthMiddleware will authenticate against a static API key

@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/db"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/models"
+	"github.com/TheEdgeOfRage/ytrssil-api/db"
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
 func (h *handler) SubscribeToChannel(ctx context.Context, username string, channelID string) error {

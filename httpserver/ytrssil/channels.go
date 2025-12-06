@@ -6,12 +6,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/db"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/feedparser"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/models"
+	"github.com/TheEdgeOfRage/ytrssil-api/db"
+	"github.com/TheEdgeOfRage/ytrssil-api/feedparser"
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
-func (s *server) SubscribeToChannel(c *gin.Context) {
+func (srv *server) SubscribeToChannelJSON(c *gin.Context) {
 	var channel models.Channel
 	err := c.ShouldBindUri(&channel)
 	if err != nil {
@@ -20,7 +20,7 @@ func (s *server) SubscribeToChannel(c *gin.Context) {
 	}
 	username := c.GetString("username")
 
-	err = s.handler.SubscribeToChannel(c.Request.Context(), username, channel.ID)
+	err = srv.handler.SubscribeToChannel(c.Request.Context(), username, channel.ID)
 	if err != nil {
 		if errors.Is(err, db.ErrAlreadySubscribed) {
 			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": err.Error()})
@@ -38,7 +38,7 @@ func (s *server) SubscribeToChannel(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"msg": "subscribed to channel successfully"})
 }
 
-func (s *server) UnsubscribeFromChannel(c *gin.Context) {
+func (srv *server) UnsubscribeFromChannelJSON(c *gin.Context) {
 	var channel models.Channel
 	err := c.ShouldBindUri(&channel)
 	if err != nil {
@@ -47,7 +47,7 @@ func (s *server) UnsubscribeFromChannel(c *gin.Context) {
 	}
 	username := c.GetString("username")
 
-	err = s.handler.UnsubscribeFromChannel(c.Request.Context(), username, channel.ID)
+	err = srv.handler.UnsubscribeFromChannel(c.Request.Context(), username, channel.ID)
 	if err != nil {
 		if errors.Is(err, db.ErrChannelNotFound) {
 			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err.Error()})

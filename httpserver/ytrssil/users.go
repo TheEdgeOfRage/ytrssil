@@ -6,11 +6,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/db"
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/models"
+	"github.com/TheEdgeOfRage/ytrssil-api/db"
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
-func (s *server) CreateUser(c *gin.Context) {
+func (srv *server) CreateUserJSON(c *gin.Context) {
 	var user models.User
 	err := c.ShouldBindJSON(&user)
 	if err != nil {
@@ -18,7 +18,7 @@ func (s *server) CreateUser(c *gin.Context) {
 		return
 	}
 
-	err = s.handler.CreateUser(c.Request.Context(), user)
+	err = srv.handler.CreateUser(c.Request.Context(), user)
 	if err != nil {
 		if errors.Is(err, db.ErrUserExists) {
 			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": err.Error()})

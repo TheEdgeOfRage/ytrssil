@@ -5,7 +5,7 @@ import (
 
 	"github.com/alexedwards/argon2id"
 
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/models"
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
 func (h *handler) CreateUser(ctx context.Context, user models.User) error {

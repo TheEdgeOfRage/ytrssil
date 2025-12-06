@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"gitea.theedgeofrage.com/TheEdgeOfRage/ytrssil-api/models"
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
 var (
@@ -37,7 +37,7 @@ type DB interface {
 	UnsubscribeUserFromChannel(ctx context.Context, username string, channelID string) error
 
 	// GetNewVideos returns a list of unwatched videos from all subscribed channels
-	GetNewVideos(ctx context.Context, username string) ([]models.Video, error)
+	GetNewVideos(ctx context.Context, username string, sortDesc bool) ([]models.Video, error)
 	// GetWatchedVideos returns a list of all watched videos for a user
 	GetWatchedVideos(ctx context.Context, username string) ([]models.Video, error)
 	// AddVideo adds a newly published video to the database
