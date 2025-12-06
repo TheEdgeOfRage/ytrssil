@@ -30,6 +30,8 @@ jobs:
           push: true
           tags: theedgeofrage/ytrssil:api
           target: api
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Build and push migrations image
         uses: docker/build-push-action@v6
@@ -37,3 +39,5 @@ jobs:
           push: true
           tags: theedgeofrage/ytrssil:migrations
           target: migrations
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
