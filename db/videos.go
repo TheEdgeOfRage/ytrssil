@@ -132,7 +132,7 @@ func (d *postgresDB) AddVideo(ctx context.Context, video models.Video, channelID
 	return nil
 }
 
-const setVideoWatchTimeQuery = `UPDATE videos SET watch_timestamp = $1 WHERE video_id = $2`
+const setVideoWatchTimeQuery = `UPDATE videos SET watch_timestamp = $1 WHERE id = $2`
 
 func (d *postgresDB) SetVideoWatchTime(
 	ctx context.Context,
