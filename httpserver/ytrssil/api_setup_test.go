@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 
 	"github.com/TheEdgeOfRage/ytrssil-api/config"
 	"github.com/TheEdgeOfRage/ytrssil-api/handler"
@@ -18,18 +18,27 @@ import (
 	"github.com/TheEdgeOfRage/ytrssil-api/httpserver/ytrssil"
 )
 
-var testConfig config.Config
-
 func init() {
 	// always use UTC
 	time.Local = time.UTC
-	testConfig = config.TestConfig()
 }
 
-func setupTestServer(t *testing.T) *http.Server {
-	l := slog.New(slog.NewTextHandler(io.Discard, nil))
+type APITestSuite struct {
+	suite.Suite
 
-	handler := handler.New(l, nil, nil)
+	cfg    config.Config
+	server *http.Server
+}
+
+func TestAPITestSuite(t *testing.T) {
+	suite.Run(t, new(APITestSuite))
+}
+
+func (s *APITestSuite) SetupSuite() {
+	l := slog.New(slog.NewTextHandler(io.Discard, nil))
+	s.cfg = config.TestConfig()
+
+	handler := handler.New(l, s.cfg, nil, nil)
 
 	gin.SetMode(gin.TestMode)
 	router, err := ytrssil.SetupGinRouter(
@@ -38,21 +47,19 @@ func setupTestServer(t *testing.T) *http.Server {
 		auth.APIAuthMiddleware(""),
 		auth.PageAuthMiddleware(""),
 	)
-	assert.Nil(t, err)
+	s.Require().NoError(err)
 
-	return &http.Server{
-		Addr:    fmt.Sprintf(":%v", testConfig.Port),
+	s.server = &http.Server{
+		Addr:    fmt.Sprintf(":%v", s.cfg.Port),
 		Handler: router,
 	}
 }
 
-func TestHealthz(t *testing.T) {
-	server := setupTestServer(t)
-
+func (s *APITestSuite) TestHealthz() {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/healthz", nil)
-	server.Handler.ServeHTTP(w, req)
+	s.server.Handler.ServeHTTP(w, req)
 
-	assert.Equal(t, 200, w.Code)
-	assert.Equal(t, "healthy", w.Body.String())
+	s.Equal(http.StatusOK, w.Code)
+	s.Equal("healthy", w.Body.String())
 }

@@ -7,6 +7,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/paulrosania/go-charset/charset"
@@ -74,6 +75,10 @@ func (p *parser) Parse(channelID string) (*Channel, error) {
 		return nil, fmt.Errorf("%w: %s", ErrParseFailed, err.Error())
 	}
 	channel.ID = channelID
+	for _, video := range channel.Videos {
+		video.IsShort = strings.Contains(video.Link.Href, "/shorts/")
+	}
+
 	return &channel, nil
 }
 

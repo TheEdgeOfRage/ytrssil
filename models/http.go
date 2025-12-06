@@ -7,3 +7,7 @@ type VideosResponse struct {
 type VideoURIRequest struct {
 	VideoID string `uri:"video_id" binding:"required"`
 }
+
+type SetVideoProgressRequest struct {
+	Progress string `form:"progress" binding:"required"`
+}

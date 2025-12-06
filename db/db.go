@@ -28,8 +28,12 @@ type DB interface {
 	GetNewVideos(ctx context.Context, sortDesc bool) ([]models.Video, error)
 	// GetWatchedVideos returns a list of all watched videos
 	GetWatchedVideos(ctx context.Context, sortDesc bool) ([]models.Video, error)
+	// HasVideo returns true if the video with the given ID exists in the DB
+	HasVideo(ctx context.Context, videoID string) (bool, error)
 	// AddVideo adds a newly published video to the database
 	AddVideo(ctx context.Context, video models.Video, channelID string) error
 	// SetVideoWatchTime sets or unsets the watch timestamp of a video
 	SetVideoWatchTime(ctx context.Context, videoID string, watchTime *time.Time) error
+	// SetVideoProgress sets or unsets the watch progress of a video
+	SetVideoProgress(ctx context.Context, videoID string, progress int) (*models.Video, error)
 }

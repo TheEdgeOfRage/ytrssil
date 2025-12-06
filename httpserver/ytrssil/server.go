@@ -66,9 +66,11 @@ func SetupGinRouter(
 
 	pages := engine.Group("")
 	pages.Use(pageAuthMiddleware)
-
-	pages.GET("/", srv.NewVideosPage)
-	pages.POST("/videos/:video_id/watch", srv.MarkVideoAsWatchedPage)
+	{
+		pages.GET("/", srv.NewVideosPage)
+		pages.PATCH("/videos/:video_id/watch", srv.MarkVideoAsWatchedPage)
+		pages.PATCH("/videos/:video_id/progress", srv.SetVideoProgressPage)
+	}
 
 	// all APIs go in this routing group and require authentication
 	api := engine.Group("/api")

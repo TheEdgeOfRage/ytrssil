@@ -6,6 +6,16 @@ import (
 	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
+templ ProgressBar(video models.Video) {
+	if video.ProgressSeconds > 0 {
+		<div id={ fmt.Sprintf("progress-%s", video.ID) } class="progress" role="progressbar" style="height: 6px">
+			<div class="progress-bar" style={ fmt.Sprintf("background: #b11; width: %d%%", video.ProgressPercentage()) }></div>
+		</div>
+	} else {
+		<div id={ fmt.Sprintf("progress-%s", video.ID) } style="height: 6px"></div>
+	}
+}
+
 templ thumbnail(video models.Video) {
 	<a
 		target="blank"
@@ -31,9 +41,7 @@ templ thumbnail(video models.Video) {
 			/>
 		}
 	</a>
-	// <div class="progress" role="progressbar" style="height: 6px">
-	// <div class="progress-bar w-75" style="background: #b11"></div>
-	// </div>
+	@ProgressBar(video)
 }
 
 templ videoCard(video models.Video) {
@@ -66,12 +74,17 @@ templ videoCard(video models.Video) {
 				>{ video.ChannelName }</a>
 			</p>
 			<div class="d-flex justify-content-between">
-				// <form hx-post="/submit-form" hx-target="#response" class="d-flex">
-				// 	<input type="text" name="time" placeholder="hh:mm:ss" class="form-control "/>
-				// 	<button type="submit" class="btn btn-primary ms-3"><i class="bi bi-clock"></i> </button>
-				// </form>
+				<form
+					hx-patch={ fmt.Sprintf("/videos/%s/progress", video.ID) }
+					hx-target={ fmt.Sprintf("#progress-%s", video.ID) }
+					hx-swap="outerHTML"
+					class="d-flex"
+				>
+					<input type="text" name="progress" placeholder="hh:mm:ss" class="form-control "/>
+					<button type="submit" class="btn btn-primary ms-3"><i class="bi bi-clock"></i> </button>
+				</form>
 				<button
-					hx-post={ fmt.Sprintf("/videos/%s/watch", video.ID) }
+					hx-patch={ fmt.Sprintf("/videos/%s/watch", video.ID) }
 					hx-target="closest .video-card"
 					hx-swap="outerHTML"
 					class="btn btn-danger"

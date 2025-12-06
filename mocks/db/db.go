@@ -30,8 +30,14 @@ var _ db.DB = &DBMock{}
 //			GetWatchedVideosFunc: func(ctx context.Context, sortDesc bool) ([]models.Video, error) {
 //				panic("mock out the GetWatchedVideos method")
 //			},
+//			HasVideoFunc: func(ctx context.Context, videoID string) (bool, error) {
+//				panic("mock out the HasVideo method")
+//			},
 //			ListChannelsFunc: func(ctx context.Context) ([]models.Channel, error) {
 //				panic("mock out the ListChannels method")
+//			},
+//			SetVideoProgressFunc: func(ctx context.Context, videoID string, progress int) (*models.Video, error) {
+//				panic("mock out the SetVideoProgress method")
 //			},
 //			SetVideoWatchTimeFunc: func(ctx context.Context, videoID string, watchTime *time.Time) error {
 //				panic("mock out the SetVideoWatchTime method")
@@ -58,8 +64,14 @@ type DBMock struct {
 	// GetWatchedVideosFunc mocks the GetWatchedVideos method.
 	GetWatchedVideosFunc func(ctx context.Context, sortDesc bool) ([]models.Video, error)
 
+	// HasVideoFunc mocks the HasVideo method.
+	HasVideoFunc func(ctx context.Context, videoID string) (bool, error)
+
 	// ListChannelsFunc mocks the ListChannels method.
 	ListChannelsFunc func(ctx context.Context) ([]models.Channel, error)
+
+	// SetVideoProgressFunc mocks the SetVideoProgress method.
+	SetVideoProgressFunc func(ctx context.Context, videoID string, progress int) (*models.Video, error)
 
 	// SetVideoWatchTimeFunc mocks the SetVideoWatchTime method.
 	SetVideoWatchTimeFunc func(ctx context.Context, videoID string, watchTime *time.Time) error
@@ -95,10 +107,26 @@ type DBMock struct {
 			// SortDesc is the sortDesc argument value.
 			SortDesc bool
 		}
+		// HasVideo holds details about calls to the HasVideo method.
+		HasVideo []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// VideoID is the videoID argument value.
+			VideoID string
+		}
 		// ListChannels holds details about calls to the ListChannels method.
 		ListChannels []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
+		}
+		// SetVideoProgress holds details about calls to the SetVideoProgress method.
+		SetVideoProgress []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// VideoID is the videoID argument value.
+			VideoID string
+			// Progress is the progress argument value.
+			Progress int
 		}
 		// SetVideoWatchTime holds details about calls to the SetVideoWatchTime method.
 		SetVideoWatchTime []struct {
@@ -127,7 +155,9 @@ type DBMock struct {
 	lockAddVideo               sync.RWMutex
 	lockGetNewVideos           sync.RWMutex
 	lockGetWatchedVideos       sync.RWMutex
+	lockHasVideo               sync.RWMutex
 	lockListChannels           sync.RWMutex
+	lockSetVideoProgress       sync.RWMutex
 	lockSetVideoWatchTime      sync.RWMutex
 	lockSubscribeToChannel     sync.RWMutex
 	lockUnsubscribeFromChannel sync.RWMutex
@@ -245,6 +275,42 @@ func (mock *DBMock) GetWatchedVideosCalls() []struct {
 	return calls
 }
 
+// HasVideo calls HasVideoFunc.
+func (mock *DBMock) HasVideo(ctx context.Context, videoID string) (bool, error) {
+	if mock.HasVideoFunc == nil {
+		panic("DBMock.HasVideoFunc: method is nil but DB.HasVideo was just called")
+	}
+	callInfo := struct {
+		Ctx     context.Context
+		VideoID string
+	}{
+		Ctx:     ctx,
+		VideoID: videoID,
+	}
+	mock.lockHasVideo.Lock()
+	mock.calls.HasVideo = append(mock.calls.HasVideo, callInfo)
+	mock.lockHasVideo.Unlock()
+	return mock.HasVideoFunc(ctx, videoID)
+}
+
+// HasVideoCalls gets all the calls that were made to HasVideo.
+// Check the length with:
+//
+//	len(mockedDB.HasVideoCalls())
+func (mock *DBMock) HasVideoCalls() []struct {
+	Ctx     context.Context
+	VideoID string
+} {
+	var calls []struct {
+		Ctx     context.Context
+		VideoID string
+	}
+	mock.lockHasVideo.RLock()
+	calls = mock.calls.HasVideo
+	mock.lockHasVideo.RUnlock()
+	return calls
+}
+
 // ListChannels calls ListChannelsFunc.
 func (mock *DBMock) ListChannels(ctx context.Context) ([]models.Channel, error) {
 	if mock.ListChannelsFunc == nil {
@@ -274,6 +340,46 @@ func (mock *DBMock) ListChannelsCalls() []struct {
 	mock.lockListChannels.RLock()
 	calls = mock.calls.ListChannels
 	mock.lockListChannels.RUnlock()
+	return calls
+}
+
+// SetVideoProgress calls SetVideoProgressFunc.
+func (mock *DBMock) SetVideoProgress(ctx context.Context, videoID string, progress int) (*models.Video, error) {
+	if mock.SetVideoProgressFunc == nil {
+		panic("DBMock.SetVideoProgressFunc: method is nil but DB.SetVideoProgress was just called")
+	}
+	callInfo := struct {
+		Ctx      context.Context
+		VideoID  string
+		Progress int
+	}{
+		Ctx:      ctx,
+		VideoID:  videoID,
+		Progress: progress,
+	}
+	mock.lockSetVideoProgress.Lock()
+	mock.calls.SetVideoProgress = append(mock.calls.SetVideoProgress, callInfo)
+	mock.lockSetVideoProgress.Unlock()
+	return mock.SetVideoProgressFunc(ctx, videoID, progress)
+}
+
+// SetVideoProgressCalls gets all the calls that were made to SetVideoProgress.
+// Check the length with:
+//
+//	len(mockedDB.SetVideoProgressCalls())
+func (mock *DBMock) SetVideoProgressCalls() []struct {
+	Ctx      context.Context
+	VideoID  string
+	Progress int
+} {
+	var calls []struct {
+		Ctx      context.Context
+		VideoID  string
+		Progress int
+	}
+	mock.lockSetVideoProgress.RLock()
+	calls = mock.calls.SetVideoProgress
+	mock.lockSetVideoProgress.RUnlock()
 	return calls
 }
 

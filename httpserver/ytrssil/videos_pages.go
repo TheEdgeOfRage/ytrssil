@@ -45,3 +45,35 @@ func (srv server) MarkVideoAsWatchedPage(c *gin.Context) {
 
 	c.String(http.StatusOK, "")
 }
+
+func (srv server) SetVideoProgressPage(c *gin.Context) {
+	r := pages.TemplRenderer{
+		Ctx: c.Request.Context(),
+	}
+	var req struct {
+		models.VideoURIRequest
+		models.SetVideoProgressRequest
+	}
+	err := c.ShouldBindUri(&req.VideoURIRequest)
+	if err != nil {
+		r.Component = pages.ErrorPage(err)
+		c.Render(http.StatusBadRequest, r)
+		return
+	}
+	err = c.ShouldBind(&req.SetVideoProgressRequest)
+	if err != nil {
+		r.Component = pages.ErrorPage(err)
+		c.Render(http.StatusBadRequest, r)
+		return
+	}
+
+	video, err := srv.handler.SetVideoProgress(c.Request.Context(), req.VideoID, req.Progress)
+	if err != nil {
+		r.Component = pages.ErrorPage(err)
+		c.Render(http.StatusInternalServerError, r)
+		return
+	}
+
+	r.Component = pages.ProgressBar(*video)
+	c.Render(http.StatusOK, r)
+}

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"math"
 	"time"
 )
 
@@ -17,8 +18,16 @@ type Video struct {
 	PublishedTime time.Time `json:"published_timestamp"`
 	// Video watch timestamp
 	WatchTime *time.Time `json:"watch_timestamp"`
+	// ProgressSeconds is the total duration of the video
+	DurationSeconds int `json:"duration"`
+	// ProgressSeconds is the saved progress of the video
+	ProgressSeconds int `json:"progress"`
 	// IsShort indicates if a video is a YouTube short
 	IsShort bool `json:"short"`
+}
+
+func (v Video) ProgressPercentage() int {
+	return int(math.Floor(100 * float64(v.ProgressSeconds) / float64(v.DurationSeconds)))
 }
 
 type PaginatedVideos struct {

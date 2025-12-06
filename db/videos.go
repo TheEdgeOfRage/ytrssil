@@ -14,6 +14,8 @@ func (d *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models.
 			, title
 			, published_timestamp
 			, is_short
+			, duration
+			, progress
 			, channels.name
 			, channels.id
 		FROM videos
@@ -40,6 +42,8 @@ func (d *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models.
 			&video.Title,
 			&video.PublishedTime,
 			&video.IsShort,
+			&video.DurationSeconds,
+			&video.ProgressSeconds,
 			&video.ChannelName,
 			&video.ChannelID,
 		)
@@ -61,6 +65,8 @@ func (d *postgresDB) GetWatchedVideos(ctx context.Context, sortDesc bool) ([]mod
 			, published_timestamp
 			, watch_timestamp
 			, is_short
+			, duration
+			, progress
 			, channels.name
 			, channels.id
 		FROM videos
@@ -88,7 +94,10 @@ func (d *postgresDB) GetWatchedVideos(ctx context.Context, sortDesc bool) ([]mod
 			&video.PublishedTime,
 			&video.WatchTime,
 			&video.IsShort,
+			&video.DurationSeconds,
+			&video.ProgressSeconds,
 			&video.ChannelName,
+			&video.ChannelID,
 		)
 		if err != nil {
 			d.l.Error("Failed to scan rows for watched videos", "call", "sql.Scan", "error", err)
@@ -100,15 +109,30 @@ func (d *postgresDB) GetWatchedVideos(ctx context.Context, sortDesc bool) ([]mod
 	return videos, nil
 }
 
+func (d *postgresDB) HasVideo(ctx context.Context, videoID string) (bool, error) {
+	query := `SELECT COUNT(1) FROM videos WHERE id = $1`
+	row := d.db.QueryRowContext(ctx, query, videoID)
+
+	var count int
+	err := row.Scan(&count)
+	if err != nil {
+		d.l.Error("Failed to query for video", "call", "sql.QueryRowContext", "error", err)
+		return false, err
+	}
+
+	return count == 1, nil
+}
+
 func (d *postgresDB) AddVideo(ctx context.Context, video models.Video, channelID string) error {
 	query := `
 		INSERT INTO videos (
 			id
 			, title
 			, published_timestamp
+			, duration
 			, is_short
 			, channel_id
-		) VALUES ($1, $2, $3, $4, $5)
+		) VALUES ($1, $2, $3, $4, $5, $6)
 		ON CONFLICT DO NOTHING
 	`
 
@@ -118,6 +142,7 @@ func (d *postgresDB) AddVideo(ctx context.Context, video models.Video, channelID
 		video.ID,
 		video.Title,
 		video.PublishedTime,
+		video.DurationSeconds,
 		video.IsShort,
 		channelID,
 	)
@@ -132,18 +157,55 @@ func (d *postgresDB) AddVideo(ctx context.Context, video models.Video, channelID
 	return nil
 }
 
-const setVideoWatchTimeQuery = `UPDATE videos SET watch_timestamp = $1 WHERE id = $2`
-
 func (d *postgresDB) SetVideoWatchTime(
 	ctx context.Context,
 	videoID string,
 	watchTime *time.Time,
 ) error {
-	_, err := d.db.ExecContext(ctx, setVideoWatchTimeQuery, watchTime, videoID)
+	const query = `UPDATE videos SET watch_timestamp = $1 WHERE id = $2`
+	_, err := d.db.ExecContext(ctx, query, watchTime, videoID)
 	if err != nil {
 		d.l.Error("", "error", err)
 		return err
 	}
 
 	return nil
+}
+
+func (d *postgresDB) SetVideoProgress(ctx context.Context, videoID string, progress int) (*models.Video, error) {
+	const query = `
+		WITH updated AS (
+			UPDATE videos SET progress = $1 WHERE id = $2 RETURNING *
+		)
+		SELECT
+			updated.id
+			, title
+			, published_timestamp
+			, is_short
+			, duration
+			, progress
+			, channels.name
+			, channels.id
+		FROM updated
+		LEFT JOIN channels ON updated.channel_id = channels.id
+	`
+
+	row := d.db.QueryRowContext(ctx, query, progress, videoID)
+	var video models.Video
+	err := row.Scan(
+		&video.ID,
+		&video.Title,
+		&video.PublishedTime,
+		&video.IsShort,
+		&video.DurationSeconds,
+		&video.ProgressSeconds,
+		&video.ChannelName,
+		&video.ChannelID,
+	)
+	if err != nil {
+		d.l.Error("Failed to scan rows for get new videos", "call", "sql.Scan", "error", err)
+		return nil, err
+	}
+
+	return &video, nil
 }

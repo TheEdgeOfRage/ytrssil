@@ -1,0 +1,2 @@
+ALTER TABLE videos DROP COLUMN IF EXISTS duration;
+ALTER TABLE videos DROP COLUMN IF EXISTS progress;

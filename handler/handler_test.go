@@ -23,7 +23,7 @@ func init() {
 
 func TestGetNewVideos(t *testing.T) {
 	l := slog.New(slog.NewTextHandler(io.Discard, nil))
-	handler := New(l, &db_mock.DBMock{
+	handler := New(l, testConfig, &db_mock.DBMock{
 		GetNewVideosFunc: func(ctx context.Context, _ bool) ([]models.Video, error) {
 			return []models.Video{
 				{

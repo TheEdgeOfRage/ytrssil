@@ -60,7 +60,7 @@ func main() {
 		return
 	}
 	parser := feedparser.NewParser(logger)
-	handler := handler.New(logger, db, parser)
+	handler := handler.New(logger, cfg, db, parser)
 	gin.SetMode(gin.ReleaseMode)
 	router, err := ytrssil.SetupGinRouter(
 		logger,

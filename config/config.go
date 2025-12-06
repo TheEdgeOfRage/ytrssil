@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -8,9 +9,10 @@ import (
 )
 
 type Config struct {
-	Port      int    `long:"port" env:"PORT" default:"8080"`
-	DBURI     string `long:"db-uri" env:"DB_URI"`
-	AuthToken string `long:"auth-token" env:"AUTH_TOKEN"`
+	Port          int    `long:"port" env:"PORT" default:"8080"`
+	DBURI         string `long:"db-uri" env:"DB_URI"`
+	AuthToken     string `long:"auth-token" env:"AUTH_TOKEN"`
+	YouTubeAPIKey string `long:"youtube-api-key" env:"YOUTUBE_API_KEY"`
 }
 
 func getenvOrDefault(key string, defaultValue string) string {
@@ -27,7 +29,18 @@ func Parse() (Config, error) {
 	var config Config
 	parser := flags.NewParser(&config, flags.Default)
 	_, err := parser.Parse()
-	return config, err
+	if err != nil {
+		return config, err
+	}
+
+	if config.AuthToken == "" {
+		return config, fmt.Errorf("missing AUTH_TOKEN env var")
+	}
+	if config.YouTubeAPIKey == "" {
+		return config, fmt.Errorf("missing YOUTUBE_API_KEY env var")
+	}
+
+	return config, nil
 }
 
 // TestConfig returns a mostly hardcoded configuration used for running tests
