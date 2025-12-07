@@ -65,6 +65,7 @@ func SetupGinRouter(
 	}
 	engine.GET("/healthz", srv.Healthz)
 	engine.POST("/fetch", srv.FetchVideosJSON)
+	engine.Static("/assets", "./assets")
 
 	engine.GET("/auth", srv.AuthPage)
 	engine.POST("/auth", srv.HandleAuth)
@@ -73,6 +74,7 @@ func SetupGinRouter(
 	pages.Use(auth.PageAuthMiddleware(cfg.AuthToken))
 	{
 		pages.GET("/", srv.NewVideosPage)
+		pages.POST("/subscribe", srv.SubscribeToChannelPage)
 		pages.PATCH("/videos/:video_id/watch", srv.MarkVideoAsWatchedPage)
 		pages.PATCH("/videos/:video_id/progress", srv.SetVideoProgressPage)
 	}

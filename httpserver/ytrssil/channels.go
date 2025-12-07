@@ -8,18 +8,10 @@ import (
 
 	"github.com/TheEdgeOfRage/ytrssil-api/db"
 	"github.com/TheEdgeOfRage/ytrssil-api/feedparser"
-	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
 func (srv *server) SubscribeToChannelJSON(c *gin.Context) {
-	var channel models.Channel
-	err := c.ShouldBindUri(&channel)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	err = srv.handler.SubscribeToChannel(c.Request.Context(), channel.ID)
+	err := srv.handler.SubscribeToChannel(c.Request.Context(), c.Param("channel_id"))
 	if err != nil {
 		if errors.Is(err, db.ErrAlreadySubscribed) {
 			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": err.Error()})
@@ -38,14 +30,7 @@ func (srv *server) SubscribeToChannelJSON(c *gin.Context) {
 }
 
 func (srv *server) UnsubscribeFromChannelJSON(c *gin.Context) {
-	var channel models.Channel
-	err := c.ShouldBindUri(&channel)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	err = srv.handler.UnsubscribeFromChannel(c.Request.Context(), channel.ID)
+	err := srv.handler.UnsubscribeFromChannel(c.Request.Context(), c.Param("channel_id"))
 	if err != nil {
 		if errors.Is(err, db.ErrChannelNotFound) {
 			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err.Error()})

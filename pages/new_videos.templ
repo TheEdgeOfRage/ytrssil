@@ -32,6 +32,15 @@ templ thumbnail(video models.Video) {
 				alt={ video.Title }
 				style="width: 100%; aspect-ratio: 16/9; object-fit: contain;"
 			/>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				height="24"
+				viewBox="0 0 24 24"
+				width="24"
+				focusable="false"
+				style="pointer-events: none; width: 2rem; height: 2rem; z-index: 2; position: absolute; bottom: 0.5rem; right: 0.5rem;"
+				fill="white"
+			><path d="m13.974 2.052-8 4.7a4 4 0 00.385 7.097l.942.423-1.327.78a4 4 0 004.052 6.897l8-4.7a4.001 4.001 0 00-.384-7.096L16.7 9.73l1.326-.78a4 4 0 10-4.052-6.897ZM10 15V9l5 3-5 3Z"></path></svg>
 		} else {
 			<img
 				src={ fmt.Sprintf("https://img.youtube.com/vi/%s/0.jpg", video.ID) }
@@ -48,24 +57,7 @@ templ videoCard(video models.Video) {
 	<div class="card">
 		@thumbnail(video)
 		<div class="card-body">
-			if video.IsShort {
-				<p class="card-title text-truncate mb-0">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						height="24"
-						viewBox="0 0 24 24"
-						width="24"
-						focusable="false"
-						aria-hidden="true"
-						style="pointer-events: none; display: inherit; width: 2rem; height: 2rem;"
-						class="float-end"
-						fill="white"
-					><path d="m13.974 2.052-8 4.7a4 4 0 00.385 7.097l.942.423-1.327.78a4 4 0 004.052 6.897l8-4.7a4.001 4.001 0 00-.384-7.096L16.7 9.73l1.326-.78a4 4 0 10-4.052-6.897ZM10 15V9l5 3-5 3Z"></path></svg>
-					{ video.Title }
-				</p>
-			} else {
-				<p class="card-title text-truncate">{ video.Title }</p>
-			}
+			<p class="card-title text-truncate mb-0">{ video.Title }</p>
 			<p>
 				<a
 					target="blank"
