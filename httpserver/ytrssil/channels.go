@@ -18,7 +18,7 @@ func (srv *server) SubscribeToChannelJSON(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, feedparser.ErrInvalidChannelID) {
-			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 

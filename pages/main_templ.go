@@ -42,11 +42,15 @@ func BaseLayout(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB\" crossorigin=\"anonymous\"><link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css\"><style>\n\t\t\t\t.pillarbox { position: relative; }\n\t\t\t\t.pillarbox::after { right: 0; }\n\t\t\t\t.pillarbox::before,\n\t\t\t\t.pillarbox::after { content: ''; position: absolute; top: 0; bottom: 0%; width: 36%; background: black; z-index: 1; }\n\t\t\t</style><script src=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js\" integrity=\"sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI\" crossorigin=\"anonymous\"></script><script src=\"https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js\"></script><script>\n\t\t\t\tdocument.addEventListener('htmx:responseError', event => {\n\t\t\t\t\tconst field = event.detail.elt.querySelector(`[name=\"channel_id\"]`);\n\t\t\t\t\tfield.setCustomValidity(event.detail.xhr.responseText);\n\t\t\t\t\tfield.onchange = () => field.setCustomValidity('');\n\t\t\t\t\tfield.reportValidity();\n\t\t\t\t});\n\t\t\t</script></head><body>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><link rel=\"icon\" type=\"image/png\" href=\"/assets/ytrssil.png\"><link rel=\"stylesheet\" href=\"/assets/vendor/bootstrap.min.css\"><link rel=\"stylesheet\" href=\"/assets/vendor/bootstrap-icons.min.css\"><style>\n\t\t\t\t.pillarbox { position: relative; }\n\t\t\t\t.pillarbox::after { right: 0; }\n\t\t\t\t.pillarbox::before,\n\t\t\t\t.pillarbox::after { content: ''; position: absolute; top: 0; bottom: 0%; width: 36%; background: black; z-index: 1; }\n\t\t\t</style><script src=\"/assets/vendor/bootstrap.bundle.min.js\"></script><script src=\"/assets/vendor/htmx.min.js\"></script><script src=\"/assets/vendor/fuse.js\"></script><script src=\"/assets/index.js\"></script></head><body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = subscriptionModal().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = addVideoModal().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

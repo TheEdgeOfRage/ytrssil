@@ -12,6 +12,7 @@ import (
 	"github.com/TheEdgeOfRage/ytrssil-api/config"
 	db_mock "github.com/TheEdgeOfRage/ytrssil-api/mocks/db"
 	parser_mock "github.com/TheEdgeOfRage/ytrssil-api/mocks/feedparser"
+	youtube_mock "github.com/TheEdgeOfRage/ytrssil-api/mocks/youtube"
 	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
@@ -23,18 +24,23 @@ func init() {
 
 func TestGetNewVideos(t *testing.T) {
 	l := slog.New(slog.NewTextHandler(io.Discard, nil))
-	handler := New(l, testConfig, &db_mock.DBMock{
-		GetNewVideosFunc: func(ctx context.Context, _ bool) ([]models.Video, error) {
-			return []models.Video{
-				{
-					ID:            "test",
-					ChannelName:   "test",
-					Title:         "test",
-					PublishedTime: time.Now(),
-				},
-			}, nil
+	handler := New(
+		l,
+		&db_mock.DBMock{
+			GetNewVideosFunc: func(ctx context.Context, _ bool) ([]models.Video, error) {
+				return []models.Video{
+					{
+						ID:            "test",
+						ChannelName:   "test",
+						Title:         "test",
+						PublishedTime: time.Now(),
+					},
+				}, nil
+			},
 		},
-	}, &parser_mock.ParserMock{})
+		&parser_mock.ParserMock{},
+		&youtube_mock.ClientMock{},
+	)
 	resp, err := handler.GetNewVideos(context.TODO(), false)
 
 	if assert.NoError(t, err) {

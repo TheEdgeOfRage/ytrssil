@@ -18,6 +18,7 @@ import (
 	"github.com/TheEdgeOfRage/ytrssil-api/feedparser"
 	"github.com/TheEdgeOfRage/ytrssil-api/handler"
 	"github.com/TheEdgeOfRage/ytrssil-api/httpserver/ytrssil"
+	"github.com/TheEdgeOfRage/ytrssil-api/lib/clients/youtube"
 )
 
 func init() {
@@ -59,7 +60,8 @@ func main() {
 		return
 	}
 	parser := feedparser.NewParser(logger)
-	handler := handler.New(logger, cfg, db, parser)
+	youTubeClient := youtube.NewYouTubeClient(logger, cfg.YouTubeAPIKey)
+	handler := handler.New(logger, db, parser, youTubeClient)
 	if cfg.Dev {
 		gin.SetMode(gin.DebugMode)
 	} else {

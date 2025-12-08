@@ -14,17 +14,17 @@ func (srv *server) SubscribeToChannelPage(c *gin.Context) {
 	err := srv.handler.SubscribeToChannel(c.Request.Context(), c.PostForm("channel_id"))
 	if err != nil {
 		if errors.Is(err, db.ErrAlreadySubscribed) {
-			c.String(http.StatusConflict, err.Error())
+			returnErr(c, http.StatusConflict, err)
 			return
 		}
 		if errors.Is(err, feedparser.ErrInvalidChannelID) {
-			c.Data(http.StatusNotFound, "text/html", []byte(err.Error()))
+			returnErr(c, http.StatusBadRequest, err)
 			return
 		}
 
-		c.String(http.StatusInternalServerError, err.Error())
+		returnErr(c, http.StatusInternalServerError, err)
 		return
 	}
 
-	c.String(http.StatusOK, "")
+	returnMsg(c, http.StatusAccepted, "")
 }

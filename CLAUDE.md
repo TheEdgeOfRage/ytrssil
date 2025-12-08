@@ -1,0 +1,1 @@
+- Don't use serena for templ files, it only supports normal go code. Also don't attempt to edit the generated templ code

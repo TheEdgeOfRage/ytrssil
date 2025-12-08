@@ -1,23 +1,30 @@
 FROM golang:1.25-trixie AS builder
 
-COPY go.mod go.sum /app/
 WORKDIR /app/
-RUN go mod download
+ENV GOCACHE="/cache"
+ENV PORT="80"
+
+COPY go.mod go.sum /app/
+RUN --mount=type=cache,target="/cache" go mod download
 
 COPY . /app/
-RUN go build -o dist/ytrssil-api cmd/main.go
+RUN --mount=type=cache,target="/cache" go build -o dist/ytrssil-api cmd/main.go
 
 FROM debian:trixie-slim AS api
 
 HEALTHCHECK --start-period=10s CMD exec curl -sf localhost:$PORT/healthz
-ENTRYPOINT ["/app/ytrssil-api"]
+WORKDIR /app/
+ENTRYPOINT ["./ytrssil-api"]
 
 RUN apt update \
 	&& apt install -y ca-certificates curl \
 	&& apt clean \
 	&& rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /app/dist/ /app/
+COPY ./assets/ ./assets/
+RUN assets/load.sh
+
+COPY --from=builder /app/dist/ ./
 
 FROM migrate/migrate:4 AS migrations
 COPY ./migrations/ /migrations/

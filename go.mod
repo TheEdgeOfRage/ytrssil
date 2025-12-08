@@ -4,6 +4,7 @@ go 1.25
 
 require (
 	github.com/a-h/templ v0.3.960
+	github.com/dustin/go-humanize v1.0.1
 	github.com/gin-gonic/gin v1.11.0
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/lib/pq v1.10.9

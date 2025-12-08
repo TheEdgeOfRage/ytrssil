@@ -1,8 +1,11 @@
 package models
 
 import (
+	"fmt"
 	"math"
 	"time"
+
+	"github.com/dustin/go-humanize"
 )
 
 type Video struct {
@@ -26,8 +29,29 @@ type Video struct {
 	IsShort bool `json:"short"`
 }
 
+// ProgressPercentage returns the current progress of the video as an integer from 0-100
 func (v Video) ProgressPercentage() int {
 	return int(math.Floor(100 * float64(v.ProgressSeconds) / float64(v.DurationSeconds)))
+}
+
+// Duration returns the total duration of the video in the hh:mm:ss format
+func (v Video) Duration() string {
+	duration := time.Duration(v.DurationSeconds) * time.Second
+	duration = duration.Round(time.Second)
+	h := duration / time.Hour
+	duration -= h * time.Hour
+	m := duration / time.Minute
+	duration -= m * time.Minute
+	s := duration / time.Second
+
+	if h > 0 {
+		return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
+	}
+	return fmt.Sprintf("%02d:%02d", m, s)
+}
+
+func (v Video) HumanizedPublishTime() string {
+	return humanize.Time(v.PublishedTime)
 }
 
 type PaginatedVideos struct {

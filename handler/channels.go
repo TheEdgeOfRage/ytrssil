@@ -15,8 +15,9 @@ func (h *handler) SubscribeToChannel(ctx context.Context, channelID string) erro
 	}
 
 	channel := models.Channel{
-		ID:   channelID,
-		Name: parsedChannel.Name,
+		ID:         channelID,
+		Name:       parsedChannel.Name,
+		Subscribed: true,
 	}
 
 	err = h.db.SubscribeToChannel(ctx, channel)

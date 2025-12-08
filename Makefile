@@ -31,6 +31,7 @@ build:
 gen-mocks: bin/moq
 	./bin/moq -pkg db_mock -out ./mocks/db/db.go ./db DB
 	./bin/moq -pkg parser_mock -out ./mocks/feedparser/feedparser.go ./feedparser Parser
+	./bin/moq -pkg youtube_mock -out ./mocks/youtube/youtube.go ./lib/clients/youtube Client
 	go fmt ./...
 
 migrate: bin/migrate

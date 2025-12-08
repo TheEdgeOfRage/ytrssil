@@ -2,13 +2,9 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"math"
-	"net/http"
-	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -28,79 +24,6 @@ func (h *handler) GetWatchedVideos(ctx context.Context, sortDesc bool) ([]models
 	return h.db.GetWatchedVideos(ctx, sortDesc)
 }
 
-type APIVideoListResponse struct {
-	Items []APIVideo `json:"items"`
-}
-
-type APIVideo struct {
-	ID             string            `json:"id"`
-	ContentDetails APIContentDetails `json:"contentDetails"`
-}
-
-type APIContentDetails struct {
-	Duration string `json:"duration"`
-}
-
-func (h *handler) getVideoDurations(ctx context.Context, videos map[string]*models.Video) error {
-	ids := strings.Builder{}
-	for id := range videos {
-		ids.WriteString(id)
-		ids.WriteString(",")
-	}
-	query := url.Values{}
-	query.Add("id", ids.String())
-	query.Add("part", "contentDetails")
-	query.Add("key", h.youTubeAPIKey)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "", nil)
-	if err != nil {
-		return fmt.Errorf("failed to set up request: %w", err)
-	}
-	req.URL = &url.URL{
-		Scheme:   "https",
-		Host:     "www.googleapis.com",
-		Path:     "/youtube/v3/videos",
-		RawQuery: query.Encode(),
-	}
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to fetch video details: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		body, err := io.ReadAll(resp.Body)
-		var bodyStr string
-		if err != nil {
-			h.log.Error("failed to decode error body", "error", err)
-			bodyStr = "failed to decode body"
-		} else {
-			bodyStr = string(body)
-		}
-		return fmt.Errorf("got non-200 status from YouTube API [%d]: %v", resp.StatusCode, bodyStr)
-	}
-
-	decoder := json.NewDecoder(resp.Body)
-	var respData APIVideoListResponse
-	err = decoder.Decode(&respData)
-	if err != nil {
-		return fmt.Errorf("failed to decode video details: %w", err)
-	}
-
-	for _, v := range respData.Items {
-		durationStr := strings.TrimPrefix(v.ContentDetails.Duration, "PT")
-		durationStr = strings.ToLower(durationStr)
-		duration, err := time.ParseDuration(durationStr)
-		if err != nil {
-			return fmt.Errorf("failed to parse video duration [%v]: %w", durationStr, err)
-		}
-		videos[v.ID].DurationSeconds = int(math.Round(duration.Seconds()))
-	}
-
-	return nil
-}
-
 func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedparser.Channel) {
 	var err error
 	videos := make(map[string]*models.Video, len(parsedChannel.Videos))
@@ -114,7 +37,7 @@ func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedpa
 		videoID := strings.Split(parsedVideo.ID, ":")[2]
 		exists, err := h.db.HasVideo(ctx, videoID)
 		if err != nil {
-			h.log.Error("Failed to save video to db", "call", "db.AddVideo", "err", err)
+			h.log.Error("Failed to check if video already exists", "call", "db.HasVideo", "err", err)
 			continue
 		}
 		if !exists {
@@ -127,7 +50,7 @@ func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedpa
 		}
 	}
 
-	err = h.getVideoDurations(ctx, videos)
+	err = h.youTubeClient.GetVideoDurations(ctx, videos)
 	if err != nil {
 		h.log.Error("Failed to get video durations", "call", "handler.getVideoDurations", "err", err)
 		return
@@ -194,4 +117,44 @@ func (h *handler) SetVideoProgress(ctx context.Context, videoID string, progress
 	}
 
 	return video, nil
+}
+
+func (h *handler) AddCustomVideo(ctx context.Context, videoID string) error {
+	exists, err := h.db.HasVideo(ctx, videoID)
+	if err != nil {
+		h.log.Error("Failed to check if video already exists", "call", "db.HasVideo", "err", err)
+		return err
+	}
+
+	if exists {
+		h.log.Warn("Video already in db", "call", "db.HasVideo")
+		return nil
+	}
+
+	video, err := h.youTubeClient.GetVideoMetadata(ctx, videoID)
+	if err != nil {
+		h.log.Error("Failed to get video metadata", "error", err)
+		return err
+	}
+
+	channel := models.Channel{
+		ID:         video.ChannelID,
+		Name:       video.ChannelName,
+		Subscribed: false,
+	}
+	err = h.db.SubscribeToChannel(ctx, channel)
+	if err != nil {
+		h.log.Error("Failed to insert channel", "error", err)
+		return err
+	}
+
+	err = h.db.AddVideo(ctx, *video, video.ChannelID)
+	if err != nil {
+		if !errors.Is(err, db.ErrVideoExists) {
+			h.log.Error("Failed to save video to db", "call", "db.AddVideo", "err", err)
+			return err
+		}
+	}
+
+	return nil
 }

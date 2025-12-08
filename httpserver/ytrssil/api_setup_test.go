@@ -14,7 +14,6 @@ import (
 
 	"github.com/TheEdgeOfRage/ytrssil-api/config"
 	"github.com/TheEdgeOfRage/ytrssil-api/handler"
-	"github.com/TheEdgeOfRage/ytrssil-api/httpserver/auth"
 	"github.com/TheEdgeOfRage/ytrssil-api/httpserver/ytrssil"
 )
 
@@ -38,15 +37,10 @@ func (s *APITestSuite) SetupSuite() {
 	l := slog.New(slog.NewTextHandler(io.Discard, nil))
 	s.cfg = config.TestConfig()
 
-	handler := handler.New(l, s.cfg, nil, nil)
+	handler := handler.New(l, nil, nil, nil)
 
 	gin.SetMode(gin.TestMode)
-	router, err := ytrssil.SetupGinRouter(
-		l,
-		handler,
-		auth.APIAuthMiddleware(""),
-		auth.PageAuthMiddleware(""),
-	)
+	router, err := ytrssil.SetupGinRouter(l, s.cfg, handler)
 	s.Require().NoError(err)
 
 	s.server = &http.Server{

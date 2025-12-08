@@ -11,50 +11,57 @@ import (
 func (srv server) NewVideosPage(c *gin.Context) {
 	videos, err := srv.handler.GetNewVideos(c.Request.Context(), true)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		returnErr(c, http.StatusInternalServerError, err)
 		return
 	}
 
-	r := pages.TemplRenderer{
+	c.Render(http.StatusOK, pages.TemplRenderer{
 		Ctx:       c.Request.Context(),
 		Component: pages.NewVideosPage(videos),
-	}
-	c.Render(http.StatusOK, r)
+	})
 }
 
 func (srv server) MarkVideoAsWatchedPage(c *gin.Context) {
-	r := pages.TemplRenderer{
-		Ctx: c.Request.Context(),
-	}
-
 	err := srv.handler.MarkVideoAsWatched(c.Request.Context(), c.Param("video_id"))
 	if err != nil {
-		r.Component = pages.ErrorPage(err.Error())
-		c.Render(http.StatusInternalServerError, r)
+		returnErr(c, http.StatusInternalServerError, err)
 		return
 	}
 
-	c.String(http.StatusOK, "")
+	returnMsg(c, http.StatusOK, "")
 }
 
 func (srv server) SetVideoProgressPage(c *gin.Context) {
-	r := pages.TemplRenderer{
-		Ctx: c.Request.Context(),
-	}
 	progress := c.PostForm("progress")
 	if progress == "" {
-		r.Component = pages.ErrorPage("missing progress")
-		c.Render(http.StatusBadRequest, r)
+		returnMsg(c, http.StatusBadRequest, "missing progress")
 		return
 	}
 
 	video, err := srv.handler.SetVideoProgress(c.Request.Context(), c.Param("video_id"), progress)
 	if err != nil {
-		r.Component = pages.ErrorPage(err.Error())
-		c.Render(http.StatusInternalServerError, r)
+		returnErr(c, http.StatusInternalServerError, err)
 		return
 	}
 
-	r.Component = pages.ProgressBar(*video)
-	c.Render(http.StatusOK, r)
+	c.Render(http.StatusOK, pages.TemplRenderer{
+		Ctx:       c.Request.Context(),
+		Component: pages.ProgressBar(*video),
+	})
+}
+
+func (srv server) AddVideoPage(c *gin.Context) {
+	videoID := c.PostForm("video_id")
+	if videoID == "" {
+		returnMsg(c, http.StatusBadRequest, "missing video ID")
+		return
+	}
+
+	err := srv.handler.AddCustomVideo(c.Request.Context(), videoID)
+	if err != nil {
+		returnErr(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	returnMsg(c, http.StatusAccepted, "")
 }

@@ -4,9 +4,9 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/TheEdgeOfRage/ytrssil-api/config"
 	"github.com/TheEdgeOfRage/ytrssil-api/db"
 	"github.com/TheEdgeOfRage/ytrssil-api/feedparser"
+	"github.com/TheEdgeOfRage/ytrssil-api/lib/clients/youtube"
 	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
@@ -19,25 +19,26 @@ type Handler interface {
 	MarkVideoAsWatched(ctx context.Context, videoID string) error
 	MarkVideoAsUnwatched(ctx context.Context, videoID string) error
 	SetVideoProgress(ctx context.Context, videoID string, progressTime string) (*models.Video, error)
+	AddCustomVideo(ctx context.Context, videoID string) error
 }
 
 type handler struct {
 	log           *slog.Logger
 	db            db.DB
 	parser        feedparser.Parser
-	youTubeAPIKey string
+	youTubeClient youtube.Client
 }
 
 func New(
 	log *slog.Logger,
-	cfg config.Config,
 	db db.DB,
 	parser feedparser.Parser,
+	youTubeClient youtube.Client,
 ) *handler {
 	return &handler{
 		log:           log,
 		db:            db,
 		parser:        parser,
-		youTubeAPIKey: cfg.YouTubeAPIKey,
+		youTubeClient: youTubeClient,
 	}
 }

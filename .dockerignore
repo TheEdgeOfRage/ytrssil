@@ -1,5 +1,6 @@
 bin
 dist
+assets/vendor/
 
 compose.yaml
 Dockerfile

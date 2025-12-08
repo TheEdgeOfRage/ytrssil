@@ -23,6 +23,7 @@ debug
 # Build artifacts and cache
 **/bin
 /dist/
+assets/vendor/
 
 # Visual studio code configuration
 .vscode/
