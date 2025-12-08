@@ -42,6 +42,10 @@ type APIContentDetails struct {
 }
 
 func (c *youTubeClient) GetVideoDurations(ctx context.Context, videos map[string]*models.Video) error {
+	if len(videos) == 0 {
+		return nil
+	}
+
 	ids := strings.Builder{}
 	for id := range videos {
 		ids.WriteString(id)

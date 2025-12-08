@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math"
 	"strings"
 	"sync"
 	"time"
@@ -48,6 +47,10 @@ func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedpa
 				IsShort:       parsedVideo.IsShort,
 			}
 		}
+	}
+
+	if len(videos) == 0 {
+		return
 	}
 
 	err = h.youTubeClient.GetVideoDurations(ctx, videos)
@@ -111,7 +114,7 @@ func (h *handler) SetVideoProgress(ctx context.Context, videoID string, progress
 		return nil, fmt.Errorf("%w: %v", ErrInvalidProgress, err.Error())
 	}
 
-	video, err := h.db.SetVideoProgress(ctx, videoID, int(math.Floor(progress.Seconds())))
+	video, err := h.db.SetVideoProgress(ctx, videoID, int(progress.Seconds()))
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrInvalidProgress, err.Error())
 	}

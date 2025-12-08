@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	"math"
 	"time"
 
 	"github.com/dustin/go-humanize"
@@ -31,7 +30,12 @@ type Video struct {
 
 // ProgressPercentage returns the current progress of the video as an integer from 0-100
 func (v Video) ProgressPercentage() int {
-	return int(math.Floor(100 * float64(v.ProgressSeconds) / float64(v.DurationSeconds)))
+	return int(100 * float64(v.ProgressSeconds) / float64(v.DurationSeconds))
+}
+
+// WatchURL returns the formatted YouTube watch URL including the timestamp pointing to  the current progress
+func (v Video) WatchURL() string {
+	return fmt.Sprintf("https://youtube.com/watch?v=%s&t=%d", v.ID, v.ProgressSeconds)
 }
 
 // Duration returns the total duration of the video in the hh:mm:ss format

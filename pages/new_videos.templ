@@ -19,7 +19,7 @@ templ ProgressBar(video models.Video) {
 templ thumbnail(video models.Video) {
 	<a
 		target="blank"
-		href={ templ.SafeURL(fmt.Sprintf("https://youtube.com/watch?v=%s", video.ID)) }
+		href={ templ.SafeURL(video.WatchURL()) }
 		style="display: block; overflow: hidden; position: relative"
 		if video.IsShort {
 			class="pillarbox"
