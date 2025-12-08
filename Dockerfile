@@ -12,7 +12,7 @@ RUN --mount=type=cache,target="/cache" go build -o dist/ytrssil-api cmd/main.go
 
 FROM debian:trixie-slim AS api
 
-HEALTHCHECK --start-period=10s CMD exec curl -sf localhost:$PORT/healthz
+HEALTHCHECK --start-period=2s --start-interval=2s CMD exec curl -sf localhost:$PORT/healthz
 WORKDIR /app/
 ENTRYPOINT ["./ytrssil-api"]
 
