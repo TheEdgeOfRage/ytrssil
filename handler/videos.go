@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -108,8 +109,49 @@ func (h *handler) MarkVideoAsUnwatched(ctx context.Context, videoID string) erro
 	return h.db.SetVideoWatchTime(ctx, videoID, nil)
 }
 
+// parseTimeProgress parses a duration string in  the Go duration format, hh:mm:ss, and mm:ss to a time.Duration
+func parseTimeProgress(progressTime string) (time.Duration, error) {
+	// Try Go duration format first
+	duration, err := time.ParseDuration(progressTime)
+	if err == nil {
+		return duration, nil
+	}
+
+	// Try hh:mm:ss or mm:ss format
+	parts := strings.Split(progressTime, ":")
+	if len(parts) == 2 {
+		// mm:ss format
+		minutes, err := strconv.Atoi(parts[0])
+		if err != nil {
+			return 0, fmt.Errorf("invalid mm:ss format")
+		}
+		seconds, err := strconv.Atoi(parts[1])
+		if err != nil {
+			return 0, fmt.Errorf("invalid mm:ss format")
+		}
+		return time.Duration(minutes)*time.Minute + time.Duration(seconds)*time.Second, nil
+	} else if len(parts) == 3 {
+		// hh:mm:ss format
+		hours, err := strconv.Atoi(parts[0])
+		if err != nil {
+			return 0, fmt.Errorf("invalid hh:mm:ss format")
+		}
+		minutes, err := strconv.Atoi(parts[1])
+		if err != nil {
+			return 0, fmt.Errorf("invalid hh:mm:ss format")
+		}
+		seconds, err := strconv.Atoi(parts[2])
+		if err != nil {
+			return 0, fmt.Errorf("invalid hh:mm:ss format")
+		}
+		return time.Duration(hours)*time.Hour + time.Duration(minutes)*time.Minute + time.Duration(seconds)*time.Second, nil
+	}
+
+	return 0, fmt.Errorf("unsupported time format: expected Go duration, hh:mm:ss, or mm:ss")
+}
+
 func (h *handler) SetVideoProgress(ctx context.Context, videoID string, progressTime string) (*models.Video, error) {
-	progress, err := time.ParseDuration(progressTime)
+	progress, err := parseTimeProgress(progressTime)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrInvalidProgress, err.Error())
 	}

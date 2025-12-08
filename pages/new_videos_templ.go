@@ -332,7 +332,7 @@ func videoCard(video models.Video) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\" hx-swap=\"outerHTML\" class=\"d-flex\"><input type=\"text\" name=\"progress\" placeholder=\"1h2m3s\" class=\"form-control\" style=\"width: 50%\"> <button type=\"submit\" class=\"btn btn-primary ms-3\"><i class=\"bi bi-clock\"></i></button></form><button hx-patch=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "\" hx-swap=\"outerHTML\" class=\"d-flex\"><input type=\"text\" name=\"progress\" placeholder=\"mm:ss/11m22s\" class=\"form-control\" style=\"width: 50%\"> <button type=\"submit\" class=\"btn btn-primary ms-3\"><i class=\"bi bi-clock\"></i></button></form><button hx-patch=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

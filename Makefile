@@ -12,6 +12,7 @@ bin/air: bin
 	GOBIN=$(PWD)/bin go install github.com/air-verse/air@v1.63.4
 
 lint: bin/golangci-lint
+	templ generate
 	go mod tidy
 	go vet ./...
 	bin/golangci-lint -c .golangci.yml fmt ./...
