@@ -22,7 +22,7 @@ RUN apt update \
 	&& rm -rf /var/lib/apt/lists/*
 
 COPY ./assets/ ./assets/
-RUN assets/load.sh
+RUN assets/load.sh && rm assets/load.sh
 
 COPY --from=builder /app/dist/ ./
 
