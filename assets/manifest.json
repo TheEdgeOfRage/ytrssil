@@ -1,0 +1,18 @@
+{
+	"name": "Ytrssil",
+	"short_name": "Ytrssil",
+	"description": "YouTube RSS subscription feed app",
+	"start_url": "/",
+	"display": "standalone",
+	"background_color": "#212529",
+	"theme_color": "#212529",
+	"orientation": "portrait-primary",
+	"icons": [
+		{
+			"src": "/assets/ytrssil-512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "any maskable"
+		}
+	]
+}
