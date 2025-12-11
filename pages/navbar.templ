@@ -1,6 +1,6 @@
 package pages
 
-templ navbar() {
+templ navbar(isWatchedPage bool) {
 	<nav class="navbar navbar-expand-lg bg-body-tertiary">
 		<div class="container-fluid">
 			<a class="navbar-brand" href="/">
@@ -31,6 +31,17 @@ templ navbar() {
 						<button type="button" data-bs-toggle="modal" data-bs-target="#add-video-modal" class="btn">
 							Add Video <i class="bi bi-camera-video"></i>
 						</button>
+					</li>
+					<li class="nav-item me-md-2 mt-2 mt-md-0">
+						if isWatchedPage {
+							<a href="/" class="btn btn-outline-secondary">
+								New Videos <i class="bi bi-collection-play"></i>
+							</a>
+						} else {
+							<a href="/watched" class="btn btn-outline-secondary">
+								Watched <i class="bi bi-check-circle"></i>
+							</a>
+						}
 					</li>
 				</ul>
 				<div class="d-flex" role="search">

@@ -74,9 +74,11 @@ func SetupGinRouter(
 	pages.Use(auth.PageAuthMiddleware(cfg.AuthToken))
 	{
 		pages.GET("/", srv.NewVideosPage)
+		pages.GET("/watched", srv.WatchedVideosPage)
 		pages.POST("/subscribe", srv.SubscribeToChannelPage)
 		pages.POST("/videos", srv.AddVideoPage)
 		pages.PATCH("/videos/:video_id/watch", srv.MarkVideoAsWatchedPage)
+		pages.PATCH("/videos/:video_id/unwatch", srv.MarkVideoAsUnwatchedPage)
 		pages.PATCH("/videos/:video_id/progress", srv.SetVideoProgressPage)
 	}
 

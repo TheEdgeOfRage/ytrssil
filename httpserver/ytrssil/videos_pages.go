@@ -21,8 +21,31 @@ func (srv server) NewVideosPage(c *gin.Context) {
 	})
 }
 
+func (srv server) WatchedVideosPage(c *gin.Context) {
+	videos, err := srv.handler.GetWatchedVideos(c.Request.Context(), true)
+	if err != nil {
+		returnErr(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	c.Render(http.StatusOK, pages.TemplRenderer{
+		Ctx:       c.Request.Context(),
+		Component: pages.WatchedVideosPage(videos),
+	})
+}
+
 func (srv server) MarkVideoAsWatchedPage(c *gin.Context) {
 	err := srv.handler.MarkVideoAsWatched(c.Request.Context(), c.Param("video_id"))
+	if err != nil {
+		returnErr(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	returnMsg(c, http.StatusOK, "")
+}
+
+func (srv server) MarkVideoAsUnwatchedPage(c *gin.Context) {
+	err := srv.handler.MarkVideoAsUnwatched(c.Request.Context(), c.Param("video_id"))
 	if err != nil {
 		returnErr(c, http.StatusInternalServerError, err)
 		return

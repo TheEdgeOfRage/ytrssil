@@ -72,7 +72,7 @@ func (d *postgresDB) GetWatchedVideos(ctx context.Context, sortDesc bool) ([]mod
 		FROM videos
 		LEFT JOIN channels ON videos.channel_id=channels.id
 		WHERE watch_timestamp IS NOT NULL
-		ORDER BY watch_timestamp DESC
+		ORDER BY watch_timestamp
 	`
 	if sortDesc {
 		query += " DESC"

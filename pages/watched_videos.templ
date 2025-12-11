@@ -1,0 +1,48 @@
+package pages
+
+import (
+	"fmt"
+
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
+)
+
+templ watchedVideoCard(video models.Video) {
+	<div class="card">
+		@thumbnail(video)
+		<div class="card-body">
+			<p class="card-title text-truncate mb-0">{ video.Title }</p>
+			<p class="d-flex justify-content-between">
+				<a
+					target="blank"
+					href={ fmt.Sprintf("https://www.youtube.com/channel/%s", video.ChannelID) }
+					class="card-text fw-light link-light link-underline-opacity-0"
+				>{ video.ChannelName }</a>
+				<span>
+					{ video.HumanizedPublishTime() }
+				</span>
+			</p>
+			<div class="d-flex justify-content-end">
+				<button
+					hx-patch={ fmt.Sprintf("/videos/%s/unwatch", video.ID) }
+					hx-target="closest .video-card"
+					hx-swap="outerHTML"
+					class="btn btn-secondary"
+				>
+					<i class="bi bi-arrow-counterclockwise"></i>
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
+templ WatchedVideosPage(videos []models.Video) {
+	@BaseLayout("ytrssil - Watched Videos", true) {
+		<div class="row">
+			for _, video := range videos {
+				<div class="video-card col-md-3 p-2" data-title={ video.Title } data-channel-name={ video.ChannelName }>
+					@watchedVideoCard(video)
+				</div>
+			}
+		</div>
+	}
+}
