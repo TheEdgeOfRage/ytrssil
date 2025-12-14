@@ -12,14 +12,21 @@ templ navbar(isWatchedPage bool) {
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
 				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 					<li class="nav-item me-md-2 mt-2 mt-md-0">
-						<button type="button" data-bs-toggle="modal" data-bs-target="#subscription-modal" class="btn btn-success">
+						<button
+							type="button"
+							class="btn btn-outline-secondary"
+							style="--bs-btn-color: var(--bs-body-color);"
+							data-bs-toggle="modal"
+							data-bs-target="#subscription-modal"
+						>
 							Subscribe <i class="bi bi-bookmark-plus"></i>
 						</button>
 					</li>
 					<li class="nav-item me-md-2 mt-2 mt-md-0">
 						<button
 							type="button"
-							class="btn btn-primary"
+							class="btn btn-outline-secondary"
+							style="--bs-btn-color: var(--bs-body-color);"
 							hx-post="/fetch"
 							hx-swap="none"
 							hx-on::after-settle="console.log(`AAAAA`); window.location.reload()"
@@ -28,17 +35,23 @@ templ navbar(isWatchedPage bool) {
 						</button>
 					</li>
 					<li class="nav-item me-md-2 mt-2 mt-md-0">
-						<button type="button" data-bs-toggle="modal" data-bs-target="#add-video-modal" class="btn">
+						<button
+							type="button"
+							class="btn btn-outline-secondary"
+							style="--bs-btn-color: var(--bs-body-color);"
+							data-bs-toggle="modal"
+							data-bs-target="#add-video-modal"
+						>
 							Add Video <i class="bi bi-camera-video"></i>
 						</button>
 					</li>
 					<li class="nav-item me-md-2 mt-2 mt-md-0">
 						if isWatchedPage {
-							<a href="/" class="btn btn-outline-secondary">
+							<a href="/" class="btn btn-outline-secondary" style="--bs-btn-color: var(--bs-body-color);">
 								New Videos <i class="bi bi-collection-play"></i>
 							</a>
 						} else {
-							<a href="/watched" class="btn btn-outline-secondary">
+							<a href="/watched" class="btn btn-outline-secondary" style="--bs-btn-color: var(--bs-body-color);">
 								Watched <i class="bi bi-check-circle"></i>
 							</a>
 						}

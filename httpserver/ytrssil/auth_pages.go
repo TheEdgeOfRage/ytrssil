@@ -31,7 +31,7 @@ func (srv server) HandleAuth(c *gin.Context) {
 	c.SetCookie(
 		"token",
 		token,
-		0,            // maxAge (0 = session cookie)
+		60*60*24*30,  // maxAge (30 days in seconds)
 		"/",          // path
 		"",           // domain (empty = current domain)
 		!srv.cfg.Dev, // secure (false = works on HTTP)

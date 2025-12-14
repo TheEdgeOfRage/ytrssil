@@ -88,9 +88,11 @@ func main() {
 
 	// start periodic fetch videos routine
 	fetcherContext, cancelFetcher := context.WithCancel(context.Background())
-	wg.Go(func() {
-		fetcherRoutine(fetcherContext, logger, handler)
-	})
+	if !cfg.Dev {
+		wg.Go(func() {
+			fetcherRoutine(fetcherContext, logger, handler)
+		})
+	}
 
 	wg.Go(func() {
 		logger.Info("ytrssil API is starting up", "port", cfg.Port)

@@ -29,17 +29,17 @@ func navbar(isWatchedPage bool) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"navbar navbar-expand-lg bg-body-tertiary\"><div class=\"container-fluid\"><a class=\"navbar-brand\" href=\"/\"><img src=\"/assets/ytrssil.png\" alt=\"ytrssil\" width=\"32\" height=\"32\"></a> <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbarSupportedContent\"><span class=\"navbar-toggler-icon\"></span></button><div class=\"collapse navbar-collapse\" id=\"navbarSupportedContent\"><ul class=\"navbar-nav me-auto mb-2 mb-lg-0\"><li class=\"nav-item me-md-2 mt-2 mt-md-0\"><button type=\"button\" data-bs-toggle=\"modal\" data-bs-target=\"#subscription-modal\" class=\"btn btn-success\">Subscribe <i class=\"bi bi-bookmark-plus\"></i></button></li><li class=\"nav-item me-md-2 mt-2 mt-md-0\"><button type=\"button\" class=\"btn btn-primary\" hx-post=\"/fetch\" hx-swap=\"none\" hx-on::after-settle=\"console.log(`AAAAA`); window.location.reload()\">Fetch <i class=\"bi bi-cloud-download\"></i></button></li><li class=\"nav-item me-md-2 mt-2 mt-md-0\"><button type=\"button\" data-bs-toggle=\"modal\" data-bs-target=\"#add-video-modal\" class=\"btn\">Add Video <i class=\"bi bi-camera-video\"></i></button></li><li class=\"nav-item me-md-2 mt-2 mt-md-0\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"navbar navbar-expand-lg bg-body-tertiary\"><div class=\"container-fluid\"><a class=\"navbar-brand\" href=\"/\"><img src=\"/assets/ytrssil.png\" alt=\"ytrssil\" width=\"32\" height=\"32\"></a> <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbarSupportedContent\"><span class=\"navbar-toggler-icon\"></span></button><div class=\"collapse navbar-collapse\" id=\"navbarSupportedContent\"><ul class=\"navbar-nav me-auto mb-2 mb-lg-0\"><li class=\"nav-item me-md-2 mt-2 mt-md-0\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" data-bs-toggle=\"modal\" data-bs-target=\"#subscription-modal\">Subscribe <i class=\"bi bi-bookmark-plus\"></i></button></li><li class=\"nav-item me-md-2 mt-2 mt-md-0\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" hx-post=\"/fetch\" hx-swap=\"none\" hx-on::after-settle=\"console.log(`AAAAA`); window.location.reload()\">Fetch <i class=\"bi bi-cloud-download\"></i></button></li><li class=\"nav-item me-md-2 mt-2 mt-md-0\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" data-bs-toggle=\"modal\" data-bs-target=\"#add-video-modal\">Add Video <i class=\"bi bi-camera-video\"></i></button></li><li class=\"nav-item me-md-2 mt-2 mt-md-0\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if isWatchedPage {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<a href=\"/\" class=\"btn btn-outline-secondary\">New Videos <i class=\"bi bi-collection-play\"></i></a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<a href=\"/\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\">New Videos <i class=\"bi bi-collection-play\"></i></a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<a href=\"/watched\" class=\"btn btn-outline-secondary\">Watched <i class=\"bi bi-check-circle\"></i></a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<a href=\"/watched\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\">Watched <i class=\"bi bi-check-circle\"></i></a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
