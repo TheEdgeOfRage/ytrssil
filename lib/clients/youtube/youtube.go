@@ -10,6 +10,7 @@ import (
 type Client interface {
 	GetVideoDurations(ctx context.Context, videos map[string]*models.Video) error
 	GetVideoMetadata(ctx context.Context, videoID string) (*models.Video, error)
+	GetChannelImageURL(ctx context.Context, channelID string) (string, error)
 }
 
 type youTubeClient struct {

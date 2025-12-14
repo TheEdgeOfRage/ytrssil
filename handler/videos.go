@@ -88,10 +88,11 @@ func (h *handler) FetchVideos(ctx context.Context) error {
 	}
 	wg.Wait()
 
-	for range channels {
+	for _, c := range channels {
 		parsedChannel := <-parsedChannels
 		err = <-errors
 		if err != nil {
+			h.log.Error("failed to parse channel feed", "channelID", c.ID, "error", err)
 			continue
 		}
 		h.addVideosForChannel(ctx, parsedChannel)

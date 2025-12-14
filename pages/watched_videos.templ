@@ -36,7 +36,7 @@ templ watchedVideoCard(video models.Video) {
 }
 
 templ WatchedVideosPage(videos []models.Video) {
-	@BaseLayout("ytrssil - Watched Videos", true) {
+	@BaseLayout("ytrssil - Watched Videos", "watched") {
 		<div class="row">
 			for _, video := range videos {
 				<div class="video-card col-md-3 p-2" data-title={ video.Title } data-channel-name={ video.ChannelName }>

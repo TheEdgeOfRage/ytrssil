@@ -1,6 +1,6 @@
 package pages
 
-templ BaseLayout(title string, isWatchedPage bool) {
+templ BaseLayout(title string, route string) {
 	<!DOCTYPE html>
 	<html lang="en" data-bs-theme="dark">
 		<head>
@@ -28,7 +28,7 @@ templ BaseLayout(title string, isWatchedPage bool) {
 		<body>
 			@subscriptionModal()
 			@addVideoModal()
-			@navbar(isWatchedPage)
+			@navbar(route)
 			<div class="container-fluid">
 				{ children... }
 			</div>

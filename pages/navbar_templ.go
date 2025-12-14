@@ -8,7 +8,31 @@ package pages
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func navbar(isWatchedPage bool) templ.Component {
+import "fmt"
+
+type NavButton struct {
+	link string
+	text string
+	icon string
+}
+
+func navButtons(route string) []*NavButton {
+	newVideos := &NavButton{"/", "New Videos", "collection-play"}
+	watched := &NavButton{"/watched", "Watched", "check-circle"}
+	channels := &NavButton{"/channels", "Channels", "people"}
+	switch route {
+	case "channels":
+		return []*NavButton{newVideos, watched}
+	case "new":
+		return []*NavButton{channels, watched}
+	case "watched":
+		return []*NavButton{channels, newVideos}
+	default:
+		return []*NavButton{channels, newVideos, watched}
+	}
+}
+
+func navbar(route string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,22 +53,65 @@ func navbar(isWatchedPage bool) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"navbar navbar-expand-lg bg-body-tertiary\"><div class=\"container-fluid\"><a class=\"navbar-brand\" href=\"/\"><img src=\"/assets/ytrssil.png\" alt=\"ytrssil\" width=\"32\" height=\"32\"></a> <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbarSupportedContent\"><span class=\"navbar-toggler-icon\"></span></button><div class=\"collapse navbar-collapse\" id=\"navbarSupportedContent\"><ul class=\"navbar-nav me-auto mb-2 mb-lg-0\"><li class=\"nav-item me-md-2 mt-2 mt-md-0\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" data-bs-toggle=\"modal\" data-bs-target=\"#subscription-modal\">Subscribe <i class=\"bi bi-bookmark-plus\"></i></button></li><li class=\"nav-item me-md-2 mt-2 mt-md-0\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" hx-post=\"/fetch\" hx-swap=\"none\" hx-on::after-settle=\"console.log(`AAAAA`); window.location.reload()\">Fetch <i class=\"bi bi-cloud-download\"></i></button></li><li class=\"nav-item me-md-2 mt-2 mt-md-0\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" data-bs-toggle=\"modal\" data-bs-target=\"#add-video-modal\">Add Video <i class=\"bi bi-camera-video\"></i></button></li><li class=\"nav-item me-md-2 mt-2 mt-md-0\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"navbar navbar-expand-lg bg-body-tertiary\"><div class=\"container-fluid\"><a class=\"navbar-brand\" href=\"/\"><img src=\"/assets/ytrssil.png\" alt=\"ytrssil\" width=\"32\" height=\"32\"></a> <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbarSupportedContent\"><span class=\"navbar-toggler-icon\"></span></button><div class=\"collapse navbar-collapse\" id=\"navbarSupportedContent\"><ul class=\"navbar-nav me-auto mb-2 mb-lg-0\"><li class=\"nav-item me-md-2 mt-2 mt-md-0\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" data-bs-toggle=\"modal\" data-bs-target=\"#subscription-modal\">Subscribe <i class=\"bi bi-bookmark-plus\"></i></button></li><li class=\"nav-item me-md-2 mt-2 mt-md-0\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" hx-post=\"/fetch\" hx-swap=\"none\" hx-on::after-settle=\"console.log(`AAAAA`); window.location.reload()\">Fetch <i class=\"bi bi-cloud-download\"></i></button></li><li class=\"nav-item me-md-2 mt-2 mt-md-0\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" data-bs-toggle=\"modal\" data-bs-target=\"#add-video-modal\">Add Video <i class=\"bi bi-camera-video\"></i></button></li>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if isWatchedPage {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<a href=\"/\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\">New Videos <i class=\"bi bi-collection-play\"></i></a>")
+		for _, button := range navButtons(route) {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<li class=\"nav-item me-md-2 mt-2 mt-md-0\"><a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<a href=\"/watched\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\">Watched <i class=\"bi bi-check-circle\"></i></a>")
+			var templ_7745c5c3_Var2 templ.SafeURL
+			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(button.link)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/navbar.templ`, Line: 74, Col: 28}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(button.text)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/navbar.templ`, Line: 75, Col: 21}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 = []any{fmt.Sprintf("bi bi-%s", button.icon)}
+			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var4...)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<i class=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var4).String())
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/navbar.templ`, Line: 1, Col: 0}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\"></i></a></li>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</li></ul><div class=\"d-flex\" role=\"search\"><input id=\"video-search\" class=\"form-control\" type=\"search\" placeholder=\"Search videos...\"></div></div></div></nav>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</ul><div class=\"d-flex\" role=\"search\"><input id=\"video-search\" class=\"form-control\" type=\"search\" placeholder=\"Search videos...\"></div></div></div></nav>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

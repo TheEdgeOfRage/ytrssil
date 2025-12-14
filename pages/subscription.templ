@@ -13,7 +13,8 @@ templ subscriptionModal() {
 						id="subscription-form"
 						class="d-flex"
 						hx-post="/subscribe"
-						hx-swap="none"
+						hx-target="#channels-list"
+						hx-swap="beforeend"
 						hx-on::after-request="subscribeHandler(event)"
 					>
 						<input

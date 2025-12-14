@@ -75,7 +75,9 @@ func SetupGinRouter(
 	{
 		pages.GET("/", srv.NewVideosPage)
 		pages.GET("/watched", srv.WatchedVideosPage)
+		pages.GET("/channels", srv.ChannelsPage)
 		pages.POST("/subscribe", srv.SubscribeToChannelPage)
+		pages.POST("/channels/:channel_id/unsubscribe", srv.UnsubscribeFromChannelPage)
 		pages.POST("/videos", srv.AddVideoPage)
 		pages.PATCH("/videos/:video_id/watch", srv.MarkVideoAsWatchedPage)
 		pages.PATCH("/videos/:video_id/unwatch", srv.MarkVideoAsUnwatchedPage)

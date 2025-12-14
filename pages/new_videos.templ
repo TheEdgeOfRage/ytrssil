@@ -100,7 +100,7 @@ templ videoCard(video models.Video) {
 }
 
 templ NewVideosPage(videos []models.Video) {
-	@BaseLayout("ytrssil - New Videos", false) {
+	@BaseLayout("ytrssil - New Videos", "new") {
 		<div class="row">
 			for _, video := range videos {
 				<div class="video-card col-md-3 p-2" data-title={ video.Title } data-channel-name={ video.ChannelName }>

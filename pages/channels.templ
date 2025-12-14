@@ -1,0 +1,85 @@
+package pages
+
+import (
+	"fmt"
+
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
+)
+
+templ unsubscribeModal(channelID string) {
+	<div class="modal fade" id={ fmt.Sprintf("unsubscribe-modal-%s", channelID) } tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5">Confirm Unsubscribe</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<p>Are you sure you want to unsubscribe from this channel?</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+					<button
+						type="button"
+						class="btn btn-danger"
+						data-bs-dismiss="modal"
+						hx-post={ fmt.Sprintf("/channels/%s/unsubscribe", channelID) }
+						hx-target={ fmt.Sprintf("#channel-card-%s", channelID) }
+						hx-swap="outerHTML"
+					>
+						Unsubscribe
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+templ ChannelCard(channel models.Channel) {
+	<div id={ fmt.Sprintf("channel-card-%s", channel.ID) } class="channel-card col-md-3 p-2">
+		@unsubscribeModal(channel.ID)
+		<div class="card">
+			<div class="card-body d-flex align-items-center">
+				if channel.ImageURL != "" {
+					<img
+						src={ channel.ImageURL }
+						alt={ channel.Name }
+						class="rounded-circle me-3"
+						style="width: 48px; height: 48px; object-fit: cover;"
+					/>
+				}
+				<div class="flex-grow-1">
+					<h5 class="card-title mb-1">
+						<a
+							href={ templ.SafeURL(fmt.Sprintf("https://www.youtube.com/channel/%s", channel.ID)) }
+							target="_blank"
+							class="link-light link-underline-opacity-0"
+						>
+							{ channel.Name }
+						</a>
+					</h5>
+					<p class="card-text mb-0 text-muted">
+						{ fmt.Sprintf("%d", channel.UnwatchedCount) } unwatched
+					</p>
+				</div>
+				<button
+					class="btn btn-danger ms-2"
+					data-bs-toggle="modal"
+					data-bs-target={ fmt.Sprintf("#unsubscribe-modal-%s", channel.ID) }
+				>
+					<i class="bi bi-bookmark-dash"></i>
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
+templ ChannelsPage(channels []models.Channel) {
+	@BaseLayout("ytrssil - Channels", "channels") {
+		<div id="channels-list" class="row">
+			for _, channel := range channels {
+				@ChannelCard(channel)
+			}
+		</div>
+	}
+}

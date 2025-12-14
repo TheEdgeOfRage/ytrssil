@@ -1,6 +1,30 @@
 package pages
 
-templ navbar(isWatchedPage bool) {
+import "fmt"
+
+type NavButton struct {
+	link string
+	text string
+	icon string
+}
+
+func navButtons(route string) []*NavButton {
+	newVideos := &NavButton{"/", "New Videos", "collection-play"}
+	watched := &NavButton{"/watched", "Watched", "check-circle"}
+	channels := &NavButton{"/channels", "Channels", "people"}
+	switch route {
+	case "channels":
+		return []*NavButton{newVideos, watched}
+	case "new":
+		return []*NavButton{channels, watched}
+	case "watched":
+		return []*NavButton{channels, newVideos}
+	default:
+		return []*NavButton{channels, newVideos, watched}
+	}
+}
+
+templ navbar(route string) {
 	<nav class="navbar navbar-expand-lg bg-body-tertiary">
 		<div class="container-fluid">
 			<a class="navbar-brand" href="/">
@@ -45,17 +69,13 @@ templ navbar(isWatchedPage bool) {
 							Add Video <i class="bi bi-camera-video"></i>
 						</button>
 					</li>
-					<li class="nav-item me-md-2 mt-2 mt-md-0">
-						if isWatchedPage {
-							<a href="/" class="btn btn-outline-secondary" style="--bs-btn-color: var(--bs-body-color);">
-								New Videos <i class="bi bi-collection-play"></i>
+					for _, button := range navButtons(route) {
+						<li class="nav-item me-md-2 mt-2 mt-md-0">
+							<a href={ button.link } class="btn btn-outline-secondary" style="--bs-btn-color: var(--bs-body-color);">
+								{ button.text } <i class={ fmt.Sprintf("bi bi-%s", button.icon) }></i>
 							</a>
-						} else {
-							<a href="/watched" class="btn btn-outline-secondary" style="--bs-btn-color: var(--bs-body-color);">
-								Watched <i class="bi bi-check-circle"></i>
-							</a>
-						}
-					</li>
+						</li>
+					}
 				</ul>
 				<div class="d-flex" role="search">
 					<input id="video-search" class="form-control" type="search" placeholder="Search videos..."/>

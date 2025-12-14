@@ -8,10 +8,25 @@ import (
 
 	"github.com/TheEdgeOfRage/ytrssil-api/db"
 	"github.com/TheEdgeOfRage/ytrssil-api/feedparser"
+	"github.com/TheEdgeOfRage/ytrssil-api/pages"
 )
 
+func (srv *server) ChannelsPage(c *gin.Context) {
+	channels, err := srv.handler.ListChannels(c.Request.Context())
+	if err != nil {
+		returnErr(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	r := pages.TemplRenderer{
+		Ctx:       c.Request.Context(),
+		Component: pages.ChannelsPage(channels),
+	}
+	c.Render(http.StatusOK, r)
+}
+
 func (srv *server) SubscribeToChannelPage(c *gin.Context) {
-	err := srv.handler.SubscribeToChannel(c.Request.Context(), c.PostForm("channel_id"))
+	channel, err := srv.handler.SubscribeToChannel(c.Request.Context(), c.PostForm("channel_id"))
 	if err != nil {
 		if errors.Is(err, db.ErrAlreadySubscribed) {
 			returnErr(c, http.StatusConflict, err)
@@ -26,5 +41,24 @@ func (srv *server) SubscribeToChannelPage(c *gin.Context) {
 		return
 	}
 
-	returnMsg(c, http.StatusAccepted, "")
+	r := pages.TemplRenderer{
+		Ctx:       c.Request.Context(),
+		Component: pages.ChannelCard(*channel),
+	}
+	c.Render(http.StatusOK, r)
+}
+
+func (srv *server) UnsubscribeFromChannelPage(c *gin.Context) {
+	err := srv.handler.UnsubscribeFromChannel(c.Request.Context(), c.Param("channel_id"))
+	if err != nil {
+		if errors.Is(err, db.ErrChannelNotFound) {
+			returnErr(c, http.StatusNotFound, err)
+			return
+		}
+
+		returnErr(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	returnMsg(c, http.StatusOK, "")
 }

@@ -20,6 +20,9 @@ var _ youtube.Client = &ClientMock{}
 //
 //		// make and configure a mocked youtube.Client
 //		mockedClient := &ClientMock{
+//			GetChannelImageURLFunc: func(ctx context.Context, channelID string) (string, error) {
+//				panic("mock out the GetChannelImageURL method")
+//			},
 //			GetVideoDurationsFunc: func(ctx context.Context, videos map[string]*models.Video) error {
 //				panic("mock out the GetVideoDurations method")
 //			},
@@ -33,6 +36,9 @@ var _ youtube.Client = &ClientMock{}
 //
 //	}
 type ClientMock struct {
+	// GetChannelImageURLFunc mocks the GetChannelImageURL method.
+	GetChannelImageURLFunc func(ctx context.Context, channelID string) (string, error)
+
 	// GetVideoDurationsFunc mocks the GetVideoDurations method.
 	GetVideoDurationsFunc func(ctx context.Context, videos map[string]*models.Video) error
 
@@ -41,6 +47,13 @@ type ClientMock struct {
 
 	// calls tracks calls to the methods.
 	calls struct {
+		// GetChannelImageURL holds details about calls to the GetChannelImageURL method.
+		GetChannelImageURL []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ChannelID is the channelID argument value.
+			ChannelID string
+		}
 		// GetVideoDurations holds details about calls to the GetVideoDurations method.
 		GetVideoDurations []struct {
 			// Ctx is the ctx argument value.
@@ -56,8 +69,45 @@ type ClientMock struct {
 			VideoID string
 		}
 	}
-	lockGetVideoDurations sync.RWMutex
-	lockGetVideoMetadata  sync.RWMutex
+	lockGetChannelImageURL sync.RWMutex
+	lockGetVideoDurations  sync.RWMutex
+	lockGetVideoMetadata   sync.RWMutex
+}
+
+// GetChannelImageURL calls GetChannelImageURLFunc.
+func (mock *ClientMock) GetChannelImageURL(ctx context.Context, channelID string) (string, error) {
+	if mock.GetChannelImageURLFunc == nil {
+		panic("ClientMock.GetChannelImageURLFunc: method is nil but Client.GetChannelImageURL was just called")
+	}
+	callInfo := struct {
+		Ctx       context.Context
+		ChannelID string
+	}{
+		Ctx:       ctx,
+		ChannelID: channelID,
+	}
+	mock.lockGetChannelImageURL.Lock()
+	mock.calls.GetChannelImageURL = append(mock.calls.GetChannelImageURL, callInfo)
+	mock.lockGetChannelImageURL.Unlock()
+	return mock.GetChannelImageURLFunc(ctx, channelID)
+}
+
+// GetChannelImageURLCalls gets all the calls that were made to GetChannelImageURL.
+// Check the length with:
+//
+//	len(mockedClient.GetChannelImageURLCalls())
+func (mock *ClientMock) GetChannelImageURLCalls() []struct {
+	Ctx       context.Context
+	ChannelID string
+} {
+	var calls []struct {
+		Ctx       context.Context
+		ChannelID string
+	}
+	mock.lockGetChannelImageURL.RLock()
+	calls = mock.calls.GetChannelImageURL
+	mock.lockGetChannelImageURL.RUnlock()
+	return calls
 }
 
 // GetVideoDurations calls GetVideoDurationsFunc.

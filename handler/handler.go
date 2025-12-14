@@ -11,8 +11,9 @@ import (
 )
 
 type Handler interface {
-	SubscribeToChannel(ctx context.Context, channelID string) error
+	SubscribeToChannel(ctx context.Context, channelID string) (*models.Channel, error)
 	UnsubscribeFromChannel(ctx context.Context, channelID string) error
+	ListChannels(ctx context.Context) ([]models.Channel, error)
 	GetNewVideos(ctx context.Context, sortDesc bool) ([]models.Video, error)
 	GetWatchedVideos(ctx context.Context, sortDesc bool) ([]models.Video, error)
 	FetchVideos(ctx context.Context) error
