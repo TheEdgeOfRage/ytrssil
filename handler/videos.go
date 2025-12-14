@@ -71,6 +71,11 @@ func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedpa
 	}
 }
 
+type parseResult struct {
+	channel *feedparser.Channel
+	err     error
+}
+
 func (h *handler) FetchVideos(ctx context.Context) error {
 	h.log.Info("Fetching new videos for all channels")
 
@@ -78,24 +83,27 @@ func (h *handler) FetchVideos(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	parsedChannels := make(chan *feedparser.Channel, len(channels))
-	errors := make(chan error, len(channels))
-	var wg sync.WaitGroup
-	var mu sync.Mutex
-	for _, channel := range channels {
-		wg.Add(1)
-		go h.parser.ParseThreadSafe(channel.ID, parsedChannels, errors, &mu, &wg)
-	}
-	wg.Wait()
 
-	for _, c := range channels {
-		parsedChannel := <-parsedChannels
-		err = <-errors
-		if err != nil {
-			h.log.Error("failed to parse channel feed", "channelID", c.ID, "error", err)
+	var wg sync.WaitGroup
+	results := make(chan parseResult, 1)
+	for _, channel := range channels {
+		wg.Go(func() {
+			parsedChannel, err := h.parser.Parse(channel.ID)
+			results <- parseResult{channel: parsedChannel, err: err}
+		})
+	}
+
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+
+	for result := range results {
+		if result.err != nil {
+			h.log.Error("failed to parse channel feed", "error", result.err)
 			continue
 		}
-		h.addVideosForChannel(ctx, parsedChannel)
+		h.addVideosForChannel(ctx, result.channel)
 	}
 
 	return nil

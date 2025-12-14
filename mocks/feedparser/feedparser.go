@@ -21,9 +21,6 @@ var _ feedparser.Parser = &ParserMock{}
 //			ParseFunc: func(channelID string) (*feedparser.Channel, error) {
 //				panic("mock out the Parse method")
 //			},
-//			ParseThreadSafeFunc: func(channelID string, channelChan chan *feedparser.Channel, errChan chan error, mu *sync.Mutex, wg *sync.WaitGroup)  {
-//				panic("mock out the ParseThreadSafe method")
-//			},
 //		}
 //
 //		// use mockedParser in code that requires feedparser.Parser
@@ -34,9 +31,6 @@ type ParserMock struct {
 	// ParseFunc mocks the Parse method.
 	ParseFunc func(channelID string) (*feedparser.Channel, error)
 
-	// ParseThreadSafeFunc mocks the ParseThreadSafe method.
-	ParseThreadSafeFunc func(channelID string, channelChan chan *feedparser.Channel, errChan chan error, mu *sync.Mutex, wg *sync.WaitGroup)
-
 	// calls tracks calls to the methods.
 	calls struct {
 		// Parse holds details about calls to the Parse method.
@@ -44,22 +38,8 @@ type ParserMock struct {
 			// ChannelID is the channelID argument value.
 			ChannelID string
 		}
-		// ParseThreadSafe holds details about calls to the ParseThreadSafe method.
-		ParseThreadSafe []struct {
-			// ChannelID is the channelID argument value.
-			ChannelID string
-			// ChannelChan is the channelChan argument value.
-			ChannelChan chan *feedparser.Channel
-			// ErrChan is the errChan argument value.
-			ErrChan chan error
-			// Mu is the mu argument value.
-			Mu *sync.Mutex
-			// Wg is the wg argument value.
-			Wg *sync.WaitGroup
-		}
 	}
-	lockParse           sync.RWMutex
-	lockParseThreadSafe sync.RWMutex
+	lockParse sync.RWMutex
 }
 
 // Parse calls ParseFunc.
@@ -91,53 +71,5 @@ func (mock *ParserMock) ParseCalls() []struct {
 	mock.lockParse.RLock()
 	calls = mock.calls.Parse
 	mock.lockParse.RUnlock()
-	return calls
-}
-
-// ParseThreadSafe calls ParseThreadSafeFunc.
-func (mock *ParserMock) ParseThreadSafe(channelID string, channelChan chan *feedparser.Channel, errChan chan error, mu *sync.Mutex, wg *sync.WaitGroup) {
-	if mock.ParseThreadSafeFunc == nil {
-		panic("ParserMock.ParseThreadSafeFunc: method is nil but Parser.ParseThreadSafe was just called")
-	}
-	callInfo := struct {
-		ChannelID   string
-		ChannelChan chan *feedparser.Channel
-		ErrChan     chan error
-		Mu          *sync.Mutex
-		Wg          *sync.WaitGroup
-	}{
-		ChannelID:   channelID,
-		ChannelChan: channelChan,
-		ErrChan:     errChan,
-		Mu:          mu,
-		Wg:          wg,
-	}
-	mock.lockParseThreadSafe.Lock()
-	mock.calls.ParseThreadSafe = append(mock.calls.ParseThreadSafe, callInfo)
-	mock.lockParseThreadSafe.Unlock()
-	mock.ParseThreadSafeFunc(channelID, channelChan, errChan, mu, wg)
-}
-
-// ParseThreadSafeCalls gets all the calls that were made to ParseThreadSafe.
-// Check the length with:
-//
-//	len(mockedParser.ParseThreadSafeCalls())
-func (mock *ParserMock) ParseThreadSafeCalls() []struct {
-	ChannelID   string
-	ChannelChan chan *feedparser.Channel
-	ErrChan     chan error
-	Mu          *sync.Mutex
-	Wg          *sync.WaitGroup
-} {
-	var calls []struct {
-		ChannelID   string
-		ChannelChan chan *feedparser.Channel
-		ErrChan     chan error
-		Mu          *sync.Mutex
-		Wg          *sync.WaitGroup
-	}
-	mock.lockParseThreadSafe.RLock()
-	calls = mock.calls.ParseThreadSafe
-	mock.lockParseThreadSafe.RUnlock()
 	return calls
 }

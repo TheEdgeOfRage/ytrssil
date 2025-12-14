@@ -8,7 +8,6 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
-	"sync"
 
 	"github.com/paulrosania/go-charset/charset"
 )
@@ -22,7 +21,6 @@ var urlFormat = "https://www.youtube.com/feeds/videos.xml?channel_id=%s"
 
 type Parser interface {
 	Parse(channelID string) (*Channel, error)
-	ParseThreadSafe(channelID string, channelChan chan *Channel, errChan chan error, mu *sync.Mutex, wg *sync.WaitGroup)
 }
 
 type parser struct {
@@ -80,18 +78,4 @@ func (p *parser) Parse(channelID string) (*Channel, error) {
 	}
 
 	return &channel, nil
-}
-
-// ParseThreadSafe calls Parse, but additionally accepts an out parameter to store the result,
-// as well as a mutex and wait group to run multiple fetches in parallel
-func (p *parser) ParseThreadSafe(
-	channelID string, channelChan chan *Channel, errChan chan error, mu *sync.Mutex, wg *sync.WaitGroup,
-) {
-	channel, err := p.Parse(channelID)
-
-	mu.Lock()
-	channelChan <- channel
-	errChan <- err
-	mu.Unlock()
-	wg.Done()
 }

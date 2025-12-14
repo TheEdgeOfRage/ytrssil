@@ -33,54 +33,56 @@ templ navbar(route string) {
 			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
 				<span class="navbar-toggler-icon"></span>
 			</button>
-			<div class="collapse navbar-collapse" id="navbarSupportedContent">
-				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-					<li class="nav-item me-md-2 mt-2 mt-md-0">
-						<button
-							type="button"
-							class="btn btn-outline-secondary"
-							style="--bs-btn-color: var(--bs-body-color);"
-							data-bs-toggle="modal"
-							data-bs-target="#subscription-modal"
-						>
-							Subscribe <i class="bi bi-bookmark-plus"></i>
-						</button>
-					</li>
-					<li class="nav-item me-md-2 mt-2 mt-md-0">
-						<button
-							type="button"
-							class="btn btn-outline-secondary"
-							style="--bs-btn-color: var(--bs-body-color);"
-							hx-post="/fetch"
-							hx-swap="none"
-							hx-on::after-settle="console.log(`AAAAA`); window.location.reload()"
-						>
-							Fetch <i class="bi bi-cloud-download"></i>
-						</button>
-					</li>
-					<li class="nav-item me-md-2 mt-2 mt-md-0">
-						<button
-							type="button"
-							class="btn btn-outline-secondary"
-							style="--bs-btn-color: var(--bs-body-color);"
-							data-bs-toggle="modal"
-							data-bs-target="#add-video-modal"
-						>
-							Add Video <i class="bi bi-camera-video"></i>
-						</button>
-					</li>
-					for _, button := range navButtons(route) {
+			if route != "auth" {
+				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 						<li class="nav-item me-md-2 mt-2 mt-md-0">
-							<a href={ button.link } class="btn btn-outline-secondary" style="--bs-btn-color: var(--bs-body-color);">
-								{ button.text } <i class={ fmt.Sprintf("bi bi-%s", button.icon) }></i>
-							</a>
+							<button
+								type="button"
+								class="btn btn-outline-secondary"
+								style="--bs-btn-color: var(--bs-body-color);"
+								data-bs-toggle="modal"
+								data-bs-target="#subscription-modal"
+							>
+								Subscribe <i class="bi bi-bookmark-plus"></i>
+							</button>
 						</li>
-					}
-				</ul>
-				<div class="d-flex" role="search">
-					<input id="video-search" class="form-control" type="search" placeholder="Search videos..."/>
+						<li class="nav-item me-md-2 mt-2 mt-md-0">
+							<button
+								type="button"
+								class="btn btn-outline-secondary"
+								style="--bs-btn-color: var(--bs-body-color);"
+								hx-post="/fetch"
+								hx-swap="none"
+								hx-on::after-settle="console.log(`AAAAA`); window.location.reload()"
+							>
+								Fetch <i class="bi bi-cloud-download"></i>
+							</button>
+						</li>
+						<li class="nav-item me-md-2 mt-2 mt-md-0">
+							<button
+								type="button"
+								class="btn btn-outline-secondary"
+								style="--bs-btn-color: var(--bs-body-color);"
+								data-bs-toggle="modal"
+								data-bs-target="#add-video-modal"
+							>
+								Add Video <i class="bi bi-camera-video"></i>
+							</button>
+						</li>
+						for _, button := range navButtons(route) {
+							<li class="nav-item me-md-2 mt-2 mt-md-0">
+								<a href={ button.link } class="btn btn-outline-secondary" style="--bs-btn-color: var(--bs-body-color);">
+									{ button.text } <i class={ fmt.Sprintf("bi bi-%s", button.icon) }></i>
+								</a>
+							</li>
+						}
+					</ul>
+					<div class="d-flex" role="search">
+						<input id="video-search" class="form-control" type="search" placeholder="Search videos..."/>
+					</div>
 				</div>
-			</div>
+			}
 		</div>
 	</nav>
 }
