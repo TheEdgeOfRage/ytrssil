@@ -27,7 +27,7 @@ var _ db.DB = &DBMock{}
 //			GetNewVideosFunc: func(ctx context.Context, sortDesc bool) ([]models.Video, error) {
 //				panic("mock out the GetNewVideos method")
 //			},
-//			GetWatchedVideosFunc: func(ctx context.Context, sortDesc bool) ([]models.Video, error) {
+//			GetWatchedVideosFunc: func(ctx context.Context, sortDesc bool, limit int, offset int) ([]models.Video, error) {
 //				panic("mock out the GetWatchedVideos method")
 //			},
 //			HasVideoFunc: func(ctx context.Context, videoID string) (bool, error) {
@@ -62,7 +62,7 @@ type DBMock struct {
 	GetNewVideosFunc func(ctx context.Context, sortDesc bool) ([]models.Video, error)
 
 	// GetWatchedVideosFunc mocks the GetWatchedVideos method.
-	GetWatchedVideosFunc func(ctx context.Context, sortDesc bool) ([]models.Video, error)
+	GetWatchedVideosFunc func(ctx context.Context, sortDesc bool, limit int, offset int) ([]models.Video, error)
 
 	// HasVideoFunc mocks the HasVideo method.
 	HasVideoFunc func(ctx context.Context, videoID string) (bool, error)
@@ -106,6 +106,10 @@ type DBMock struct {
 			Ctx context.Context
 			// SortDesc is the sortDesc argument value.
 			SortDesc bool
+			// Limit is the limit argument value.
+			Limit int
+			// Offset is the offset argument value.
+			Offset int
 		}
 		// HasVideo holds details about calls to the HasVideo method.
 		HasVideo []struct {
@@ -240,21 +244,25 @@ func (mock *DBMock) GetNewVideosCalls() []struct {
 }
 
 // GetWatchedVideos calls GetWatchedVideosFunc.
-func (mock *DBMock) GetWatchedVideos(ctx context.Context, sortDesc bool) ([]models.Video, error) {
+func (mock *DBMock) GetWatchedVideos(ctx context.Context, sortDesc bool, limit int, offset int) ([]models.Video, error) {
 	if mock.GetWatchedVideosFunc == nil {
 		panic("DBMock.GetWatchedVideosFunc: method is nil but DB.GetWatchedVideos was just called")
 	}
 	callInfo := struct {
 		Ctx      context.Context
 		SortDesc bool
+		Limit    int
+		Offset   int
 	}{
 		Ctx:      ctx,
 		SortDesc: sortDesc,
+		Limit:    limit,
+		Offset:   offset,
 	}
 	mock.lockGetWatchedVideos.Lock()
 	mock.calls.GetWatchedVideos = append(mock.calls.GetWatchedVideos, callInfo)
 	mock.lockGetWatchedVideos.Unlock()
-	return mock.GetWatchedVideosFunc(ctx, sortDesc)
+	return mock.GetWatchedVideosFunc(ctx, sortDesc, limit, offset)
 }
 
 // GetWatchedVideosCalls gets all the calls that were made to GetWatchedVideos.
@@ -264,10 +272,14 @@ func (mock *DBMock) GetWatchedVideos(ctx context.Context, sortDesc bool) ([]mode
 func (mock *DBMock) GetWatchedVideosCalls() []struct {
 	Ctx      context.Context
 	SortDesc bool
+	Limit    int
+	Offset   int
 } {
 	var calls []struct {
 		Ctx      context.Context
 		SortDesc bool
+		Limit    int
+		Offset   int
 	}
 	mock.lockGetWatchedVideos.RLock()
 	calls = mock.calls.GetWatchedVideos

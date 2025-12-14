@@ -15,7 +15,7 @@ type Handler interface {
 	UnsubscribeFromChannel(ctx context.Context, channelID string) error
 	ListChannels(ctx context.Context) ([]models.Channel, error)
 	GetNewVideos(ctx context.Context, sortDesc bool) ([]models.Video, error)
-	GetWatchedVideos(ctx context.Context, sortDesc bool) ([]models.Video, error)
+	GetWatchedVideos(ctx context.Context, sortDesc bool, page int) ([]models.Video, error)
 	FetchVideos(ctx context.Context) error
 	MarkVideoAsWatched(ctx context.Context, videoID string) error
 	MarkVideoAsUnwatched(ctx context.Context, videoID string) error

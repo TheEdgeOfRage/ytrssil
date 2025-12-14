@@ -20,8 +20,14 @@ func (h *handler) GetNewVideos(ctx context.Context, sortDesc bool) ([]models.Vid
 	return h.db.GetNewVideos(ctx, sortDesc)
 }
 
-func (h *handler) GetWatchedVideos(ctx context.Context, sortDesc bool) ([]models.Video, error) {
-	return h.db.GetWatchedVideos(ctx, sortDesc)
+const WatchedVideosPageSize = 100
+
+func (h *handler) GetWatchedVideos(ctx context.Context, sortDesc bool, page int) ([]models.Video, error) {
+	if page < 1 {
+		page = 1
+	}
+	offset := (page - 1) * WatchedVideosPageSize
+	return h.db.GetWatchedVideos(ctx, sortDesc, WatchedVideosPageSize, offset)
 }
 
 func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedparser.Channel) {

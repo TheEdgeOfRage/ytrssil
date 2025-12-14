@@ -17,7 +17,7 @@ func (srv *server) GetNewVideosJSON(c *gin.Context) {
 }
 
 func (srv *server) GetWatchedVideosJSON(c *gin.Context) {
-	videos, err := srv.handler.GetWatchedVideos(c.Request.Context(), false)
+	videos, err := srv.handler.GetWatchedVideos(c.Request.Context(), false, 1)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

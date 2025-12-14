@@ -57,7 +57,9 @@ func (d *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models.
 	return videos, nil
 }
 
-func (d *postgresDB) GetWatchedVideos(ctx context.Context, sortDesc bool) ([]models.Video, error) {
+func (d *postgresDB) GetWatchedVideos(
+	ctx context.Context, sortDesc bool, limit int, offset int,
+) ([]models.Video, error) {
 	query := `
 		SELECT
 			videos.id
@@ -77,8 +79,9 @@ func (d *postgresDB) GetWatchedVideos(ctx context.Context, sortDesc bool) ([]mod
 	if sortDesc {
 		query += " DESC"
 	}
+	query += " LIMIT $1 OFFSET $2"
 
-	rows, err := d.db.QueryContext(ctx, query)
+	rows, err := d.db.QueryContext(ctx, query, limit, offset)
 	if err != nil {
 		d.l.Error("Failed to query for watched videos", "call", "sql.QueryContext", "error", err)
 		return nil, err

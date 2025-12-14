@@ -2,6 +2,7 @@ package ytrssil
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -22,7 +23,14 @@ func (srv server) NewVideosPage(c *gin.Context) {
 }
 
 func (srv server) WatchedVideosPage(c *gin.Context) {
-	videos, err := srv.handler.GetWatchedVideos(c.Request.Context(), true)
+	page := 1
+	if pageParam := c.Query("page"); pageParam != "" {
+		if parsedPage, err := strconv.Atoi(pageParam); err == nil && parsedPage > 0 {
+			page = parsedPage
+		}
+	}
+
+	videos, err := srv.handler.GetWatchedVideos(c.Request.Context(), true, page)
 	if err != nil {
 		returnErr(c, http.StatusInternalServerError, err)
 		return
@@ -30,7 +38,7 @@ func (srv server) WatchedVideosPage(c *gin.Context) {
 
 	c.Render(http.StatusOK, pages.TemplRenderer{
 		Ctx:       c.Request.Context(),
-		Component: pages.WatchedVideosPage(videos),
+		Component: pages.WatchedVideosPage(videos, page),
 	})
 }
 

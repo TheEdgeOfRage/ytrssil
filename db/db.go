@@ -27,7 +27,7 @@ type DB interface {
 	// GetNewVideos returns a list of unwatched videos from all subscribed channels
 	GetNewVideos(ctx context.Context, sortDesc bool) ([]models.Video, error)
 	// GetWatchedVideos returns a list of all watched videos
-	GetWatchedVideos(ctx context.Context, sortDesc bool) ([]models.Video, error)
+	GetWatchedVideos(ctx context.Context, sortDesc bool, limit int, offset int) ([]models.Video, error)
 	// HasVideo returns true if the video with the given ID exists in the DB
 	HasVideo(ctx context.Context, videoID string) (bool, error)
 	// AddVideo adds a newly published video to the database

@@ -35,7 +35,7 @@ templ watchedVideoCard(video models.Video) {
 	</div>
 }
 
-templ WatchedVideosPage(videos []models.Video) {
+templ WatchedVideosPage(videos []models.Video, currentPage int) {
 	@BaseLayout("ytrssil - Watched Videos", "watched") {
 		<div class="row">
 			for _, video := range videos {
@@ -43,6 +43,29 @@ templ WatchedVideosPage(videos []models.Video) {
 					@watchedVideoCard(video)
 				</div>
 			}
+		</div>
+		<div class="row mt-4 mb-4">
+			<div class="col-12 d-flex justify-content-center align-items-center gap-3">
+				if currentPage > 1 {
+					<a href={ templ.SafeURL(fmt.Sprintf("/watched?page=%d", currentPage-1)) } class="btn btn-primary">
+						<i class="bi bi-arrow-left"></i> Previous
+					</a>
+				} else {
+					<button class="btn btn-primary" disabled>
+						<i class="bi bi-arrow-left"></i> Previous
+					</button>
+				}
+				<span class="text-light">Page { fmt.Sprintf("%d", currentPage) }</span>
+				if len(videos) == 100 {
+					<a href={ templ.SafeURL(fmt.Sprintf("/watched?page=%d", currentPage+1)) } class="btn btn-primary">
+						Next <i class="bi bi-arrow-right"></i>
+					</a>
+				} else {
+					<button class="btn btn-primary" disabled>
+						Next <i class="bi bi-arrow-right"></i>
+					</button>
+				}
+			</div>
 		</div>
 	}
 }
