@@ -36,4 +36,7 @@ type DB interface {
 	SetVideoWatchTime(ctx context.Context, videoID string, watchTime *time.Time) error
 	// SetVideoProgress sets or unsets the watch progress of a video
 	SetVideoProgress(ctx context.Context, videoID string, progress int) (*models.Video, error)
+
+	// Close closes the DB connection
+	Close()
 }

@@ -59,6 +59,7 @@ func main() {
 		)
 		return
 	}
+	defer db.Close()
 	parser := feedparser.NewParser(logger)
 	youTubeClient := youtube.NewYouTubeClient(logger, cfg.YouTubeAPIKey)
 	handler := handler.New(logger, db, parser, youTubeClient)

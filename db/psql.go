@@ -1,21 +1,21 @@
 package db
 
 import (
-	"database/sql"
+	"context"
 	"log/slog"
 
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type postgresDB struct {
 	l  *slog.Logger
-	db *sql.DB
+	db *pgxpool.Pool
 }
 
 var _ DB = (*postgresDB)(nil)
 
 func NewPostgresDB(log *slog.Logger, dbURI string) (*postgresDB, error) {
-	db, err := sql.Open("postgres", dbURI)
+	db, err := pgxpool.New(context.Background(), dbURI)
 	if err != nil {
 		return nil, err
 	}
@@ -24,4 +24,8 @@ func NewPostgresDB(log *slog.Logger, dbURI string) (*postgresDB, error) {
 		l:  log,
 		db: db,
 	}, nil
+}
+
+func (db *postgresDB) Close() {
+	db.db.Close()
 }

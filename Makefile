@@ -19,8 +19,7 @@ lint: bin/golangci-lint
 	bin/golangci-lint -c .golangci.yml run ./...
 
 test:
-	go mod tidy
-	go test -timeout=10s -race -benchmem ./...
+	go test -timeout=30s -race ./...
 
 air: bin/air
 	@./bin/air -c .air.toml

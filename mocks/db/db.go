@@ -24,6 +24,9 @@ var _ db.DB = &DBMock{}
 //			AddVideoFunc: func(ctx context.Context, video models.Video, channelID string) error {
 //				panic("mock out the AddVideo method")
 //			},
+//			CloseFunc: func()  {
+//				panic("mock out the Close method")
+//			},
 //			GetNewVideosFunc: func(ctx context.Context, sortDesc bool) ([]models.Video, error) {
 //				panic("mock out the GetNewVideos method")
 //			},
@@ -57,6 +60,9 @@ var _ db.DB = &DBMock{}
 type DBMock struct {
 	// AddVideoFunc mocks the AddVideo method.
 	AddVideoFunc func(ctx context.Context, video models.Video, channelID string) error
+
+	// CloseFunc mocks the Close method.
+	CloseFunc func()
 
 	// GetNewVideosFunc mocks the GetNewVideos method.
 	GetNewVideosFunc func(ctx context.Context, sortDesc bool) ([]models.Video, error)
@@ -92,6 +98,9 @@ type DBMock struct {
 			Video models.Video
 			// ChannelID is the channelID argument value.
 			ChannelID string
+		}
+		// Close holds details about calls to the Close method.
+		Close []struct {
 		}
 		// GetNewVideos holds details about calls to the GetNewVideos method.
 		GetNewVideos []struct {
@@ -157,6 +166,7 @@ type DBMock struct {
 		}
 	}
 	lockAddVideo               sync.RWMutex
+	lockClose                  sync.RWMutex
 	lockGetNewVideos           sync.RWMutex
 	lockGetWatchedVideos       sync.RWMutex
 	lockHasVideo               sync.RWMutex
@@ -204,6 +214,33 @@ func (mock *DBMock) AddVideoCalls() []struct {
 	mock.lockAddVideo.RLock()
 	calls = mock.calls.AddVideo
 	mock.lockAddVideo.RUnlock()
+	return calls
+}
+
+// Close calls CloseFunc.
+func (mock *DBMock) Close() {
+	if mock.CloseFunc == nil {
+		panic("DBMock.CloseFunc: method is nil but DB.Close was just called")
+	}
+	callInfo := struct {
+	}{}
+	mock.lockClose.Lock()
+	mock.calls.Close = append(mock.calls.Close, callInfo)
+	mock.lockClose.Unlock()
+	mock.CloseFunc()
+}
+
+// CloseCalls gets all the calls that were made to Close.
+// Check the length with:
+//
+//	len(mockedDB.CloseCalls())
+func (mock *DBMock) CloseCalls() []struct {
+} {
+	var calls []struct {
+	}
+	mock.lockClose.RLock()
+	calls = mock.calls.Close
+	mock.lockClose.RUnlock()
 	return calls
 }
 

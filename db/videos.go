@@ -7,7 +7,7 @@ import (
 	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
-func (d *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models.Video, error) {
+func (db *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models.Video, error) {
 	query := `
 		SELECT
 			videos.id
@@ -27,9 +27,9 @@ func (d *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models.
 		query += " DESC"
 	}
 
-	rows, err := d.db.QueryContext(ctx, query)
+	rows, err := db.db.Query(ctx, query)
 	if err != nil {
-		d.l.Error("Failed to query new videos", "call", "sql.QueryContext", "error", err)
+		db.l.Error("Failed to query new videos", "call", "sql.QueryContext", "error", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -48,7 +48,7 @@ func (d *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models.
 			&video.ChannelID,
 		)
 		if err != nil {
-			d.l.Error("Failed to scan rows for get new videos", "call", "sql.Scan", "error", err)
+			db.l.Error("Failed to scan rows for get new videos", "call", "sql.Scan", "error", err)
 			return nil, err
 		}
 		videos = append(videos, video)
@@ -57,7 +57,7 @@ func (d *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models.
 	return videos, nil
 }
 
-func (d *postgresDB) GetWatchedVideos(
+func (db *postgresDB) GetWatchedVideos(
 	ctx context.Context, sortDesc bool, limit int, offset int,
 ) ([]models.Video, error) {
 	query := `
@@ -81,9 +81,9 @@ func (d *postgresDB) GetWatchedVideos(
 	}
 	query += " LIMIT $1 OFFSET $2"
 
-	rows, err := d.db.QueryContext(ctx, query, limit, offset)
+	rows, err := db.db.Query(ctx, query, limit, offset)
 	if err != nil {
-		d.l.Error("Failed to query for watched videos", "call", "sql.QueryContext", "error", err)
+		db.l.Error("Failed to query for watched videos", "call", "sql.QueryContext", "error", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -103,7 +103,7 @@ func (d *postgresDB) GetWatchedVideos(
 			&video.ChannelID,
 		)
 		if err != nil {
-			d.l.Error("Failed to scan rows for watched videos", "call", "sql.Scan", "error", err)
+			db.l.Error("Failed to scan rows for watched videos", "call", "sql.Scan", "error", err)
 			return nil, err
 		}
 		videos = append(videos, video)
@@ -112,21 +112,21 @@ func (d *postgresDB) GetWatchedVideos(
 	return videos, nil
 }
 
-func (d *postgresDB) HasVideo(ctx context.Context, videoID string) (bool, error) {
+func (db *postgresDB) HasVideo(ctx context.Context, videoID string) (bool, error) {
 	query := `SELECT COUNT(1) FROM videos WHERE id = $1`
-	row := d.db.QueryRowContext(ctx, query, videoID)
+	row := db.db.QueryRow(ctx, query, videoID)
 
 	var count int
 	err := row.Scan(&count)
 	if err != nil {
-		d.l.Error("Failed to query for video", "call", "sql.QueryRowContext", "error", err)
+		db.l.Error("Failed to query for video", "call", "sql.QueryRowContext", "error", err)
 		return false, err
 	}
 
 	return count == 1, nil
 }
 
-func (d *postgresDB) AddVideo(ctx context.Context, video models.Video, channelID string) error {
+func (db *postgresDB) AddVideo(ctx context.Context, video models.Video, channelID string) error {
 	query := `
 		INSERT INTO videos (
 			id
@@ -139,7 +139,7 @@ func (d *postgresDB) AddVideo(ctx context.Context, video models.Video, channelID
 		ON CONFLICT DO NOTHING
 	`
 
-	resp, err := d.db.ExecContext(
+	resp, err := db.db.Exec(
 		ctx,
 		query,
 		video.ID,
@@ -150,32 +150,32 @@ func (d *postgresDB) AddVideo(ctx context.Context, video models.Video, channelID
 		channelID,
 	)
 	if err != nil {
-		d.l.Error("Failed to add video", "call", "sql.Exec", "error", err)
+		db.l.Error("Failed to add video", "call", "sql.Exec", "error", err)
 		return err
 	}
-	if affected, _ := resp.RowsAffected(); affected == 0 {
+	if resp.RowsAffected() == 0 {
 		return ErrVideoExists
 	}
 
 	return nil
 }
 
-func (d *postgresDB) SetVideoWatchTime(
+func (db *postgresDB) SetVideoWatchTime(
 	ctx context.Context,
 	videoID string,
 	watchTime *time.Time,
 ) error {
 	const query = `UPDATE videos SET watch_timestamp = $1 WHERE id = $2`
-	_, err := d.db.ExecContext(ctx, query, watchTime, videoID)
+	_, err := db.db.Exec(ctx, query, watchTime, videoID)
 	if err != nil {
-		d.l.Error("", "error", err)
+		db.l.Error("", "error", err)
 		return err
 	}
 
 	return nil
 }
 
-func (d *postgresDB) SetVideoProgress(ctx context.Context, videoID string, progress int) (*models.Video, error) {
+func (db *postgresDB) SetVideoProgress(ctx context.Context, videoID string, progress int) (*models.Video, error) {
 	const query = `
 		WITH updated AS (
 			UPDATE videos SET progress = $1 WHERE id = $2 RETURNING *
@@ -193,7 +193,7 @@ func (d *postgresDB) SetVideoProgress(ctx context.Context, videoID string, progr
 		LEFT JOIN channels ON updated.channel_id = channels.id
 	`
 
-	row := d.db.QueryRowContext(ctx, query, progress, videoID)
+	row := db.db.QueryRow(ctx, query, progress, videoID)
 	var video models.Video
 	err := row.Scan(
 		&video.ID,
@@ -206,7 +206,7 @@ func (d *postgresDB) SetVideoProgress(ctx context.Context, videoID string, progr
 		&video.ChannelID,
 	)
 	if err != nil {
-		d.l.Error("Failed to scan rows for get new videos", "call", "sql.Scan", "error", err)
+		db.l.Error("Failed to scan rows for get new videos", "call", "sql.Scan", "error", err)
 		return nil, err
 	}
 

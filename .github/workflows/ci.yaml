@@ -1,0 +1,62 @@
+---
+name: "Go CI"
+
+"on":
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: "Run linter and tests"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 2s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      - name: Linter
+        run: make lint
+
+      - name: Tests
+        env:
+          DB_URI: postgresql://postgres:postgres@postgres:5432/postgres?sslmode=disable
+        run: make test
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: theedgeofrage/ytrssil:api
+          target: api
+
+      - name: Build and push migrations image
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: theedgeofrage/ytrssil:migrations
+          target: migrations

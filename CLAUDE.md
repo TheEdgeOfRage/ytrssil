@@ -1,1 +1,3 @@
-- Don't use serena for templ files, it only supports normal go code. Also don't attempt to edit the generated templ code
+- Don't use serena for templ files, it only supports normal go code.
+- Don't attempt to edit the generated templ code
+- Don't invoke ANY go commands other than `go vet` and `go mod tidy`
