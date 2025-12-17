@@ -35,6 +35,9 @@ jobs:
       - name: Linter
         run: make lint
 
+      - name: Install migrate CLI
+        run: make bin/migrate
+
       - name: Tests
         env:
           DB_URI: postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable
