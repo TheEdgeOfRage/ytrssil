@@ -1,4 +1,4 @@
-.PHONY: all setup ytrssil-api build gen-mocks lint yamllint test migrate image-build image-push
+.PHONY: all lint test air templ build gen-mocks migrate image-build
 
 DB_URI ?= postgres://ytrssil:ytrssil@localhost:5432/ytrssil?sslmode=disable
 
@@ -23,8 +23,10 @@ test:
 air: bin/air
 	@./bin/air -c .air.toml
 
-build:
+templ:
 	templ generate
+
+build: templ
 	go build -o dist/ytrssil ./cmd/main.go
 
 gen-mocks: bin/moq
