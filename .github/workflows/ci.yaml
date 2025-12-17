@@ -21,6 +21,8 @@ jobs:
           --health-interval 5s
           --health-timeout 2s
           --health-retries 5
+        ports:
+          - 5432:5432
 
     steps:
       - uses: actions/checkout@v6
@@ -35,7 +37,7 @@ jobs:
 
       - name: Tests
         env:
-          DB_URI: postgresql://postgres:postgres@postgres:5432/postgres?sslmode=disable
+          DB_URI: postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable
         run: make test
 
       - name: Set up Docker Buildx
