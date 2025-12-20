@@ -53,7 +53,7 @@ func navbar(route string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"navbar navbar-expand-lg bg-body-tertiary\"><div class=\"container-fluid\"><a class=\"navbar-brand\" href=\"/\"><img src=\"/assets/ytrssil.png\" alt=\"ytrssil\" width=\"32\" height=\"32\"></a> <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbarSupportedContent\"><span class=\"navbar-toggler-icon\"></span></button> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"navbar navbar-expand-lg bg-body-tertiary\"><div class=\"container-fluid\"><a class=\"navbar-brand\" href=\"/\"><img src=\"/assets/ytrssil.png\" alt=\"ytrssil\" width=\"32\" height=\"32\"></a> <button type=\"button\" class=\"btn btn-primary me-auto me-lg-2\" onClick=\"window.location.reload();\"><i class=\"bi bi-arrow-clockwise\"></i></button> <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbarSupportedContent\"><span class=\"navbar-toggler-icon\"></span></button> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -70,7 +70,7 @@ func navbar(route string) templ.Component {
 				var templ_7745c5c3_Var2 templ.SafeURL
 				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(button.link)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/navbar.templ`, Line: 75, Col: 29}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/navbar.templ`, Line: 80, Col: 29}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 				if templ_7745c5c3_Err != nil {
@@ -83,7 +83,7 @@ func navbar(route string) templ.Component {
 				var templ_7745c5c3_Var3 string
 				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(button.text)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/navbar.templ`, Line: 76, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/navbar.templ`, Line: 81, Col: 22}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
