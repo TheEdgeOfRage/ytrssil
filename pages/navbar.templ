@@ -59,7 +59,7 @@ templ navbar(route string) {
 								style="--bs-btn-color: var(--bs-body-color);"
 								hx-post="/fetch"
 								hx-swap="none"
-								hx-on::after-settle="console.log(`AAAAA`); window.location.reload()"
+								hx-on::after-settle="window.location.reload()"
 							>
 								Fetch <i class="bi bi-cloud-download"></i>
 							</button>
