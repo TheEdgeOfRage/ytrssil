@@ -12,13 +12,13 @@ RUN --mount=type=cache,target="/cache" go build -o dist/ytrssil-api cmd/main.go;
 
 FROM debian:trixie-slim AS api
 
-HEALTHCHECK --start-period=2s --start-interval=2s CMD exec curl -sf localhost:$PORT/healthz
+HEALTHCHECK --start-period=2s --start-interval=2s CMD exec curl -sf localhost:$PORT/healthz;
 WORKDIR /app/
 ENTRYPOINT ["./ytrssil-api"]
 VOLUME /var/lib/ytrssil/downloads
 
 RUN apt update \
-	&& apt install -y ca-certificates curl \
+	&& apt install -y ca-certificates curl yt-dlp \
 	&& apt clean \
 	&& rm -rf /var/lib/apt/lists/*;
 
