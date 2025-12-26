@@ -82,6 +82,9 @@ func SetupGinRouter(
 		pages.PATCH("/videos/:video_id/watch", srv.MarkVideoAsWatchedPage)
 		pages.PATCH("/videos/:video_id/unwatch", srv.MarkVideoAsUnwatchedPage)
 		pages.PATCH("/videos/:video_id/progress", srv.SetVideoProgressPage)
+		pages.POST("/videos/:video_id/download", srv.DownloadVideoPage)
+		pages.GET("/videos/:video_id/card", srv.GetVideoCardPage)
+		pages.GET("/videos/:video_id/file", srv.ServeVideoFilePage)
 	}
 
 	api := engine.Group("/api")

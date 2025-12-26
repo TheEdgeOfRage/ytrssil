@@ -7,6 +7,7 @@ import (
 	"github.com/TheEdgeOfRage/ytrssil-api/db"
 	"github.com/TheEdgeOfRage/ytrssil-api/feedparser"
 	"github.com/TheEdgeOfRage/ytrssil-api/lib/clients/youtube"
+	"github.com/TheEdgeOfRage/ytrssil-api/lib/downloader"
 	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
@@ -21,6 +22,9 @@ type Handler interface {
 	MarkVideoAsUnwatched(ctx context.Context, videoID string) error
 	SetVideoProgress(ctx context.Context, videoID string, progressTime string) (*models.Video, error)
 	AddCustomVideo(ctx context.Context, videoID string) error
+	DownloadVideo(ctx context.Context, videoID string) error
+	ServeVideoFile(ctx context.Context, videoID string) (filePath string, filename string, err error)
+	CleanupRoutine(ctx context.Context)
 }
 
 type handler struct {
@@ -28,6 +32,8 @@ type handler struct {
 	db            db.DB
 	parser        feedparser.Parser
 	youTubeClient youtube.Client
+	downloader    downloader.Downloader
+	downloadsDir  string
 }
 
 func New(
@@ -35,11 +41,15 @@ func New(
 	db db.DB,
 	parser feedparser.Parser,
 	youTubeClient youtube.Client,
+	downloader downloader.Downloader,
+	downloadsDir string,
 ) *handler {
 	return &handler{
 		log:           log,
 		db:            db,
 		parser:        parser,
 		youTubeClient: youTubeClient,
+		downloader:    downloader,
+		downloadsDir:  downloadsDir,
 	}
 }

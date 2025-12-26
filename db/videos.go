@@ -16,6 +16,10 @@ func (db *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models
 			, is_short
 			, duration
 			, progress
+			, downloaded_at
+			, file_path
+			, download_status
+			, download_error
 			, channels.name
 			, channels.id
 		FROM videos
@@ -44,6 +48,10 @@ func (db *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models
 			&video.IsShort,
 			&video.DurationSeconds,
 			&video.ProgressSeconds,
+			&video.DownloadedAt,
+			&video.FilePath,
+			&video.DownloadStatus,
+			&video.DownloadError,
 			&video.ChannelName,
 			&video.ChannelID,
 		)
@@ -69,6 +77,10 @@ func (db *postgresDB) GetWatchedVideos(
 			, is_short
 			, duration
 			, progress
+			, downloaded_at
+			, file_path
+			, download_status
+			, download_error
 			, channels.name
 			, channels.id
 		FROM videos
@@ -99,6 +111,10 @@ func (db *postgresDB) GetWatchedVideos(
 			&video.IsShort,
 			&video.DurationSeconds,
 			&video.ProgressSeconds,
+			&video.DownloadedAt,
+			&video.FilePath,
+			&video.DownloadStatus,
+			&video.DownloadError,
 			&video.ChannelName,
 			&video.ChannelID,
 		)
@@ -211,4 +227,144 @@ func (db *postgresDB) SetVideoProgress(ctx context.Context, videoID string, prog
 	}
 
 	return &video, nil
+}
+
+func (db *postgresDB) GetVideo(ctx context.Context, videoID string) (*models.Video, error) {
+	query := `
+		SELECT
+			videos.id
+			, title
+			, published_timestamp
+			, is_short
+			, duration
+			, progress
+			, watch_timestamp
+			, downloaded_at
+			, file_path
+			, download_status
+			, download_error
+			, channels.name
+			, channels.id
+		FROM videos
+		LEFT JOIN channels ON videos.channel_id = channels.id
+		WHERE videos.id = $1
+	`
+
+	row := db.db.QueryRow(ctx, query, videoID)
+	var video models.Video
+	err := row.Scan(
+		&video.ID,
+		&video.Title,
+		&video.PublishedTime,
+		&video.IsShort,
+		&video.DurationSeconds,
+		&video.ProgressSeconds,
+		&video.WatchTime,
+		&video.DownloadedAt,
+		&video.FilePath,
+		&video.DownloadStatus,
+		&video.DownloadError,
+		&video.ChannelName,
+		&video.ChannelID,
+	)
+	if err != nil {
+		db.l.Error("Failed to query video", "call", "sql.QueryRow", "error", err)
+		return nil, err
+	}
+
+	return &video, nil
+}
+
+func (db *postgresDB) SetVideoDownloadStatus(ctx context.Context, videoID string, status string) error {
+	query := `UPDATE videos SET download_status = $1 WHERE id = $2`
+	_, err := db.db.Exec(ctx, query, status, videoID)
+	if err != nil {
+		db.l.Error("Failed to set video download status", "error", err)
+		return err
+	}
+	return nil
+}
+
+func (db *postgresDB) SetVideoDownloadCompleted(ctx context.Context, videoID string, filePath string) error {
+	query := `
+		UPDATE videos
+		SET
+			downloaded_at = $1,
+			file_path = $2,
+			download_status = $3,
+			download_error = NULL
+		WHERE id = $4
+	`
+	now := time.Now()
+	_, err := db.db.Exec(ctx, query, now, filePath, "completed", videoID)
+	if err != nil {
+		db.l.Error("Failed to mark video as downloaded", "error", err)
+		return err
+	}
+	return nil
+}
+
+func (db *postgresDB) SetVideoDownloadFailed(ctx context.Context, videoID string, errorMsg string) error {
+	query := `UPDATE videos SET download_status = $1, download_error = $2 WHERE id = $3`
+	_, err := db.db.Exec(ctx, query, "failed", errorMsg, videoID)
+	if err != nil {
+		db.l.Error("Failed to mark video download as failed", "error", err)
+		return err
+	}
+	return nil
+}
+
+func (db *postgresDB) GetVideosForCleanup(ctx context.Context, olderThan time.Duration) ([]models.Video, error) {
+	query := `
+		SELECT
+			id
+			, file_path
+			, downloaded_at
+			, watch_timestamp
+		FROM videos
+		WHERE downloaded_at IS NOT NULL
+			AND file_path IS NOT NULL
+			AND download_status = 'completed'
+			AND watch_timestamp IS NOT NULL
+			AND watch_timestamp < $1
+	`
+	cutoffTime := time.Now().Add(-olderThan)
+
+	rows, err := db.db.Query(ctx, query, cutoffTime)
+	if err != nil {
+		db.l.Error("Failed to query videos for cleanup", "error", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	videos := make([]models.Video, 0)
+	for rows.Next() {
+		var video models.Video
+		err = rows.Scan(&video.ID, &video.FilePath, &video.DownloadedAt, &video.WatchTime)
+		if err != nil {
+			db.l.Error("Failed to scan cleanup video", "error", err)
+			continue
+		}
+		videos = append(videos, video)
+	}
+
+	return videos, nil
+}
+
+func (db *postgresDB) DeleteVideoFile(ctx context.Context, videoID string) error {
+	query := `
+		UPDATE videos
+		SET
+			downloaded_at = NULL,
+			file_path = NULL,
+			download_status = NULL,
+			download_error = NULL
+		WHERE id = $1
+	`
+	_, err := db.db.Exec(ctx, query, videoID)
+	if err != nil {
+		db.l.Error("Failed to clear video download fields", "error", err)
+		return err
+	}
+	return nil
 }

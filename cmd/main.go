@@ -19,6 +19,7 @@ import (
 	"github.com/TheEdgeOfRage/ytrssil-api/handler"
 	"github.com/TheEdgeOfRage/ytrssil-api/httpserver/ytrssil"
 	"github.com/TheEdgeOfRage/ytrssil-api/lib/clients/youtube"
+	"github.com/TheEdgeOfRage/ytrssil-api/lib/downloader"
 )
 
 func init() {
@@ -62,7 +63,12 @@ func main() {
 	defer db.Close()
 	parser := feedparser.NewParser(logger)
 	youTubeClient := youtube.NewYouTubeClient(logger, cfg.YouTubeAPIKey)
-	handler := handler.New(logger, db, parser, youTubeClient)
+	downloader := downloader.NewYtdlpDownloader(logger)
+	if err := downloader.ValidateInstallation(); err != nil {
+		logger.Error("yt-dlp validation failed", "error", err)
+		return
+	}
+	handler := handler.New(logger, db, parser, youTubeClient, downloader, cfg.DownloadsDir)
 	if cfg.Dev {
 		gin.SetMode(gin.DebugMode)
 	} else {
@@ -95,6 +101,13 @@ func main() {
 		})
 	}
 
+	cleanupContext, cancelCleanup := context.WithCancel(context.Background())
+	if !cfg.Dev {
+		wg.Go(func() {
+			handler.CleanupRoutine(cleanupContext)
+		})
+	}
+
 	wg.Go(func() {
 		logger.Info("ytrssil API is starting up", "port", cfg.Port)
 		if err := server.ListenAndServe(); err != nil {
@@ -116,6 +129,9 @@ func main() {
 		)
 	}
 	cancelFetcher()
+	if !cfg.Dev {
+		cancelCleanup()
+	}
 
 	wg.Wait()
 	logger.Info("exit complete")

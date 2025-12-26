@@ -14,6 +14,7 @@ type Config struct {
 	DBURI         string `long:"db-uri" env:"DB_URI"`
 	AuthToken     string `long:"auth-token" env:"AUTH_TOKEN"`
 	YouTubeAPIKey string `long:"youtube-api-key" env:"YOUTUBE_API_KEY"`
+	DownloadsDir  string `long:"downloads-dir" env:"DOWNLOADS_DIR" default:"/var/lib/ytrssil/downloads"`
 }
 
 func getenvOrDefault(key string, defaultValue string) string {
@@ -41,6 +42,13 @@ func Parse() (Config, error) {
 		return config, fmt.Errorf("missing YOUTUBE_API_KEY env var")
 	}
 
+	if config.DownloadsDir == "" {
+		return config, fmt.Errorf("missing DOWNLOADS_DIR env var")
+	}
+	if err := os.MkdirAll(config.DownloadsDir, 0o755); err != nil {
+		return config, fmt.Errorf("failed to create downloads directory: %w", err)
+	}
+
 	return config, nil
 }
 
@@ -52,9 +60,10 @@ func TestConfig() Config {
 	}
 
 	config := Config{
-		Port:      8080,
-		DBURI:     dbURI,
-		AuthToken: "foo",
+		Port:         8080,
+		DBURI:        dbURI,
+		AuthToken:    "foo",
+		DownloadsDir: "/tmp/ytrssil-test-downloads",
 	}
 
 	return config

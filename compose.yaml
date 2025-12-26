@@ -28,6 +28,8 @@ services:
       PORT: "80"
     ports:
       - "8080:80"
+    volumes:
+      - data:/var/lib/ytrssil
 
   migrations:
     image: theedgeofrage/ytrssil:migrations
@@ -42,3 +44,4 @@ services:
 
 volumes:
   postgres:
+  data:

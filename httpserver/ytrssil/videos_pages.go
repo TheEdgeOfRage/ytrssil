@@ -1,11 +1,13 @@
 package ytrssil
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/TheEdgeOfRage/ytrssil-api/models"
 	"github.com/TheEdgeOfRage/ytrssil-api/pages"
 )
 
@@ -95,4 +97,79 @@ func (srv server) AddVideoPage(c *gin.Context) {
 	}
 
 	returnMsg(c, http.StatusAccepted, "")
+}
+
+func (srv server) DownloadVideoPage(c *gin.Context) {
+	videoID := c.Param("video_id")
+
+	err := srv.handler.DownloadVideo(c.Request.Context(), videoID)
+	if err != nil {
+		returnErr(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	videos, err := srv.handler.GetNewVideos(c.Request.Context(), true)
+	if err != nil {
+		returnErr(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	var targetVideo *models.Video
+	for _, v := range videos {
+		if v.ID == videoID {
+			targetVideo = &v
+			break
+		}
+	}
+
+	if targetVideo == nil {
+		returnErr(c, http.StatusNotFound, fmt.Errorf("video not found"))
+		return
+	}
+
+	c.Render(http.StatusOK, pages.TemplRenderer{
+		Ctx:       c.Request.Context(),
+		Component: pages.VideoCard(*targetVideo),
+	})
+}
+
+func (srv server) GetVideoCardPage(c *gin.Context) {
+	videoID := c.Param("video_id")
+
+	videos, err := srv.handler.GetNewVideos(c.Request.Context(), true)
+	if err != nil {
+		returnErr(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	var targetVideo *models.Video
+	for _, v := range videos {
+		if v.ID == videoID {
+			targetVideo = &v
+			break
+		}
+	}
+
+	if targetVideo == nil {
+		returnErr(c, http.StatusNotFound, fmt.Errorf("video not found"))
+		return
+	}
+
+	c.Render(http.StatusOK, pages.TemplRenderer{
+		Ctx:       c.Request.Context(),
+		Component: pages.VideoCard(*targetVideo),
+	})
+}
+
+func (srv server) ServeVideoFilePage(c *gin.Context) {
+	videoID := c.Param("video_id")
+
+	filePath, filename, err := srv.handler.ServeVideoFile(c.Request.Context(), videoID)
+	if err != nil {
+		returnErr(c, http.StatusNotFound, err)
+		return
+	}
+
+	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%q", filename))
+	c.File(filePath)
 }

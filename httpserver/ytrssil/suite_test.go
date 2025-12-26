@@ -108,7 +108,7 @@ func (s *EndpointsTestSuite) SetupSuite() {
 		},
 	}
 
-	h := handler.New(l, s.db, s.parser, s.youtubeClient)
+	h := handler.New(l, s.db, s.parser, s.youtubeClient, nil, s.cfg.DownloadsDir)
 
 	gin.SetMode(gin.TestMode)
 	router, err := ytrssil.SetupGinRouter(l, s.cfg, h)

@@ -37,7 +37,7 @@ func (s *APITestSuite) SetupSuite() {
 	l := slog.New(slog.NewTextHandler(io.Discard, nil))
 	s.cfg = config.TestConfig()
 
-	handler := handler.New(l, nil, nil, nil)
+	handler := handler.New(l, nil, nil, nil, nil, s.cfg.DownloadsDir)
 
 	gin.SetMode(gin.TestMode)
 	router, err := ytrssil.SetupGinRouter(l, s.cfg, handler)

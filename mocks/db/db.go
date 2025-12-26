@@ -27,8 +27,17 @@ var _ db.DB = &DBMock{}
 //			CloseFunc: func()  {
 //				panic("mock out the Close method")
 //			},
+//			DeleteVideoFileFunc: func(ctx context.Context, videoID string) error {
+//				panic("mock out the DeleteVideoFile method")
+//			},
 //			GetNewVideosFunc: func(ctx context.Context, sortDesc bool) ([]models.Video, error) {
 //				panic("mock out the GetNewVideos method")
+//			},
+//			GetVideoFunc: func(ctx context.Context, videoID string) (*models.Video, error) {
+//				panic("mock out the GetVideo method")
+//			},
+//			GetVideosForCleanupFunc: func(ctx context.Context, olderThan time.Duration) ([]models.Video, error) {
+//				panic("mock out the GetVideosForCleanup method")
 //			},
 //			GetWatchedVideosFunc: func(ctx context.Context, sortDesc bool, limit int, offset int) ([]models.Video, error) {
 //				panic("mock out the GetWatchedVideos method")
@@ -38,6 +47,15 @@ var _ db.DB = &DBMock{}
 //			},
 //			ListChannelsFunc: func(ctx context.Context) ([]models.Channel, error) {
 //				panic("mock out the ListChannels method")
+//			},
+//			SetVideoDownloadCompletedFunc: func(ctx context.Context, videoID string, filePath string) error {
+//				panic("mock out the SetVideoDownloadCompleted method")
+//			},
+//			SetVideoDownloadFailedFunc: func(ctx context.Context, videoID string, errorMsg string) error {
+//				panic("mock out the SetVideoDownloadFailed method")
+//			},
+//			SetVideoDownloadStatusFunc: func(ctx context.Context, videoID string, status string) error {
+//				panic("mock out the SetVideoDownloadStatus method")
 //			},
 //			SetVideoProgressFunc: func(ctx context.Context, videoID string, progress int) (*models.Video, error) {
 //				panic("mock out the SetVideoProgress method")
@@ -64,8 +82,17 @@ type DBMock struct {
 	// CloseFunc mocks the Close method.
 	CloseFunc func()
 
+	// DeleteVideoFileFunc mocks the DeleteVideoFile method.
+	DeleteVideoFileFunc func(ctx context.Context, videoID string) error
+
 	// GetNewVideosFunc mocks the GetNewVideos method.
 	GetNewVideosFunc func(ctx context.Context, sortDesc bool) ([]models.Video, error)
+
+	// GetVideoFunc mocks the GetVideo method.
+	GetVideoFunc func(ctx context.Context, videoID string) (*models.Video, error)
+
+	// GetVideosForCleanupFunc mocks the GetVideosForCleanup method.
+	GetVideosForCleanupFunc func(ctx context.Context, olderThan time.Duration) ([]models.Video, error)
 
 	// GetWatchedVideosFunc mocks the GetWatchedVideos method.
 	GetWatchedVideosFunc func(ctx context.Context, sortDesc bool, limit int, offset int) ([]models.Video, error)
@@ -75,6 +102,15 @@ type DBMock struct {
 
 	// ListChannelsFunc mocks the ListChannels method.
 	ListChannelsFunc func(ctx context.Context) ([]models.Channel, error)
+
+	// SetVideoDownloadCompletedFunc mocks the SetVideoDownloadCompleted method.
+	SetVideoDownloadCompletedFunc func(ctx context.Context, videoID string, filePath string) error
+
+	// SetVideoDownloadFailedFunc mocks the SetVideoDownloadFailed method.
+	SetVideoDownloadFailedFunc func(ctx context.Context, videoID string, errorMsg string) error
+
+	// SetVideoDownloadStatusFunc mocks the SetVideoDownloadStatus method.
+	SetVideoDownloadStatusFunc func(ctx context.Context, videoID string, status string) error
 
 	// SetVideoProgressFunc mocks the SetVideoProgress method.
 	SetVideoProgressFunc func(ctx context.Context, videoID string, progress int) (*models.Video, error)
@@ -102,12 +138,33 @@ type DBMock struct {
 		// Close holds details about calls to the Close method.
 		Close []struct {
 		}
+		// DeleteVideoFile holds details about calls to the DeleteVideoFile method.
+		DeleteVideoFile []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// VideoID is the videoID argument value.
+			VideoID string
+		}
 		// GetNewVideos holds details about calls to the GetNewVideos method.
 		GetNewVideos []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// SortDesc is the sortDesc argument value.
 			SortDesc bool
+		}
+		// GetVideo holds details about calls to the GetVideo method.
+		GetVideo []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// VideoID is the videoID argument value.
+			VideoID string
+		}
+		// GetVideosForCleanup holds details about calls to the GetVideosForCleanup method.
+		GetVideosForCleanup []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// OlderThan is the olderThan argument value.
+			OlderThan time.Duration
 		}
 		// GetWatchedVideos holds details about calls to the GetWatchedVideos method.
 		GetWatchedVideos []struct {
@@ -131,6 +188,33 @@ type DBMock struct {
 		ListChannels []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
+		}
+		// SetVideoDownloadCompleted holds details about calls to the SetVideoDownloadCompleted method.
+		SetVideoDownloadCompleted []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// VideoID is the videoID argument value.
+			VideoID string
+			// FilePath is the filePath argument value.
+			FilePath string
+		}
+		// SetVideoDownloadFailed holds details about calls to the SetVideoDownloadFailed method.
+		SetVideoDownloadFailed []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// VideoID is the videoID argument value.
+			VideoID string
+			// ErrorMsg is the errorMsg argument value.
+			ErrorMsg string
+		}
+		// SetVideoDownloadStatus holds details about calls to the SetVideoDownloadStatus method.
+		SetVideoDownloadStatus []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// VideoID is the videoID argument value.
+			VideoID string
+			// Status is the status argument value.
+			Status string
 		}
 		// SetVideoProgress holds details about calls to the SetVideoProgress method.
 		SetVideoProgress []struct {
@@ -165,16 +249,22 @@ type DBMock struct {
 			ChannelID string
 		}
 	}
-	lockAddVideo               sync.RWMutex
-	lockClose                  sync.RWMutex
-	lockGetNewVideos           sync.RWMutex
-	lockGetWatchedVideos       sync.RWMutex
-	lockHasVideo               sync.RWMutex
-	lockListChannels           sync.RWMutex
-	lockSetVideoProgress       sync.RWMutex
-	lockSetVideoWatchTime      sync.RWMutex
-	lockSubscribeToChannel     sync.RWMutex
-	lockUnsubscribeFromChannel sync.RWMutex
+	lockAddVideo                  sync.RWMutex
+	lockClose                     sync.RWMutex
+	lockDeleteVideoFile           sync.RWMutex
+	lockGetNewVideos              sync.RWMutex
+	lockGetVideo                  sync.RWMutex
+	lockGetVideosForCleanup       sync.RWMutex
+	lockGetWatchedVideos          sync.RWMutex
+	lockHasVideo                  sync.RWMutex
+	lockListChannels              sync.RWMutex
+	lockSetVideoDownloadCompleted sync.RWMutex
+	lockSetVideoDownloadFailed    sync.RWMutex
+	lockSetVideoDownloadStatus    sync.RWMutex
+	lockSetVideoProgress          sync.RWMutex
+	lockSetVideoWatchTime         sync.RWMutex
+	lockSubscribeToChannel        sync.RWMutex
+	lockUnsubscribeFromChannel    sync.RWMutex
 }
 
 // AddVideo calls AddVideoFunc.
@@ -244,6 +334,42 @@ func (mock *DBMock) CloseCalls() []struct {
 	return calls
 }
 
+// DeleteVideoFile calls DeleteVideoFileFunc.
+func (mock *DBMock) DeleteVideoFile(ctx context.Context, videoID string) error {
+	if mock.DeleteVideoFileFunc == nil {
+		panic("DBMock.DeleteVideoFileFunc: method is nil but DB.DeleteVideoFile was just called")
+	}
+	callInfo := struct {
+		Ctx     context.Context
+		VideoID string
+	}{
+		Ctx:     ctx,
+		VideoID: videoID,
+	}
+	mock.lockDeleteVideoFile.Lock()
+	mock.calls.DeleteVideoFile = append(mock.calls.DeleteVideoFile, callInfo)
+	mock.lockDeleteVideoFile.Unlock()
+	return mock.DeleteVideoFileFunc(ctx, videoID)
+}
+
+// DeleteVideoFileCalls gets all the calls that were made to DeleteVideoFile.
+// Check the length with:
+//
+//	len(mockedDB.DeleteVideoFileCalls())
+func (mock *DBMock) DeleteVideoFileCalls() []struct {
+	Ctx     context.Context
+	VideoID string
+} {
+	var calls []struct {
+		Ctx     context.Context
+		VideoID string
+	}
+	mock.lockDeleteVideoFile.RLock()
+	calls = mock.calls.DeleteVideoFile
+	mock.lockDeleteVideoFile.RUnlock()
+	return calls
+}
+
 // GetNewVideos calls GetNewVideosFunc.
 func (mock *DBMock) GetNewVideos(ctx context.Context, sortDesc bool) ([]models.Video, error) {
 	if mock.GetNewVideosFunc == nil {
@@ -277,6 +403,78 @@ func (mock *DBMock) GetNewVideosCalls() []struct {
 	mock.lockGetNewVideos.RLock()
 	calls = mock.calls.GetNewVideos
 	mock.lockGetNewVideos.RUnlock()
+	return calls
+}
+
+// GetVideo calls GetVideoFunc.
+func (mock *DBMock) GetVideo(ctx context.Context, videoID string) (*models.Video, error) {
+	if mock.GetVideoFunc == nil {
+		panic("DBMock.GetVideoFunc: method is nil but DB.GetVideo was just called")
+	}
+	callInfo := struct {
+		Ctx     context.Context
+		VideoID string
+	}{
+		Ctx:     ctx,
+		VideoID: videoID,
+	}
+	mock.lockGetVideo.Lock()
+	mock.calls.GetVideo = append(mock.calls.GetVideo, callInfo)
+	mock.lockGetVideo.Unlock()
+	return mock.GetVideoFunc(ctx, videoID)
+}
+
+// GetVideoCalls gets all the calls that were made to GetVideo.
+// Check the length with:
+//
+//	len(mockedDB.GetVideoCalls())
+func (mock *DBMock) GetVideoCalls() []struct {
+	Ctx     context.Context
+	VideoID string
+} {
+	var calls []struct {
+		Ctx     context.Context
+		VideoID string
+	}
+	mock.lockGetVideo.RLock()
+	calls = mock.calls.GetVideo
+	mock.lockGetVideo.RUnlock()
+	return calls
+}
+
+// GetVideosForCleanup calls GetVideosForCleanupFunc.
+func (mock *DBMock) GetVideosForCleanup(ctx context.Context, olderThan time.Duration) ([]models.Video, error) {
+	if mock.GetVideosForCleanupFunc == nil {
+		panic("DBMock.GetVideosForCleanupFunc: method is nil but DB.GetVideosForCleanup was just called")
+	}
+	callInfo := struct {
+		Ctx       context.Context
+		OlderThan time.Duration
+	}{
+		Ctx:       ctx,
+		OlderThan: olderThan,
+	}
+	mock.lockGetVideosForCleanup.Lock()
+	mock.calls.GetVideosForCleanup = append(mock.calls.GetVideosForCleanup, callInfo)
+	mock.lockGetVideosForCleanup.Unlock()
+	return mock.GetVideosForCleanupFunc(ctx, olderThan)
+}
+
+// GetVideosForCleanupCalls gets all the calls that were made to GetVideosForCleanup.
+// Check the length with:
+//
+//	len(mockedDB.GetVideosForCleanupCalls())
+func (mock *DBMock) GetVideosForCleanupCalls() []struct {
+	Ctx       context.Context
+	OlderThan time.Duration
+} {
+	var calls []struct {
+		Ctx       context.Context
+		OlderThan time.Duration
+	}
+	mock.lockGetVideosForCleanup.RLock()
+	calls = mock.calls.GetVideosForCleanup
+	mock.lockGetVideosForCleanup.RUnlock()
 	return calls
 }
 
@@ -389,6 +587,126 @@ func (mock *DBMock) ListChannelsCalls() []struct {
 	mock.lockListChannels.RLock()
 	calls = mock.calls.ListChannels
 	mock.lockListChannels.RUnlock()
+	return calls
+}
+
+// SetVideoDownloadCompleted calls SetVideoDownloadCompletedFunc.
+func (mock *DBMock) SetVideoDownloadCompleted(ctx context.Context, videoID string, filePath string) error {
+	if mock.SetVideoDownloadCompletedFunc == nil {
+		panic("DBMock.SetVideoDownloadCompletedFunc: method is nil but DB.SetVideoDownloadCompleted was just called")
+	}
+	callInfo := struct {
+		Ctx      context.Context
+		VideoID  string
+		FilePath string
+	}{
+		Ctx:      ctx,
+		VideoID:  videoID,
+		FilePath: filePath,
+	}
+	mock.lockSetVideoDownloadCompleted.Lock()
+	mock.calls.SetVideoDownloadCompleted = append(mock.calls.SetVideoDownloadCompleted, callInfo)
+	mock.lockSetVideoDownloadCompleted.Unlock()
+	return mock.SetVideoDownloadCompletedFunc(ctx, videoID, filePath)
+}
+
+// SetVideoDownloadCompletedCalls gets all the calls that were made to SetVideoDownloadCompleted.
+// Check the length with:
+//
+//	len(mockedDB.SetVideoDownloadCompletedCalls())
+func (mock *DBMock) SetVideoDownloadCompletedCalls() []struct {
+	Ctx      context.Context
+	VideoID  string
+	FilePath string
+} {
+	var calls []struct {
+		Ctx      context.Context
+		VideoID  string
+		FilePath string
+	}
+	mock.lockSetVideoDownloadCompleted.RLock()
+	calls = mock.calls.SetVideoDownloadCompleted
+	mock.lockSetVideoDownloadCompleted.RUnlock()
+	return calls
+}
+
+// SetVideoDownloadFailed calls SetVideoDownloadFailedFunc.
+func (mock *DBMock) SetVideoDownloadFailed(ctx context.Context, videoID string, errorMsg string) error {
+	if mock.SetVideoDownloadFailedFunc == nil {
+		panic("DBMock.SetVideoDownloadFailedFunc: method is nil but DB.SetVideoDownloadFailed was just called")
+	}
+	callInfo := struct {
+		Ctx      context.Context
+		VideoID  string
+		ErrorMsg string
+	}{
+		Ctx:      ctx,
+		VideoID:  videoID,
+		ErrorMsg: errorMsg,
+	}
+	mock.lockSetVideoDownloadFailed.Lock()
+	mock.calls.SetVideoDownloadFailed = append(mock.calls.SetVideoDownloadFailed, callInfo)
+	mock.lockSetVideoDownloadFailed.Unlock()
+	return mock.SetVideoDownloadFailedFunc(ctx, videoID, errorMsg)
+}
+
+// SetVideoDownloadFailedCalls gets all the calls that were made to SetVideoDownloadFailed.
+// Check the length with:
+//
+//	len(mockedDB.SetVideoDownloadFailedCalls())
+func (mock *DBMock) SetVideoDownloadFailedCalls() []struct {
+	Ctx      context.Context
+	VideoID  string
+	ErrorMsg string
+} {
+	var calls []struct {
+		Ctx      context.Context
+		VideoID  string
+		ErrorMsg string
+	}
+	mock.lockSetVideoDownloadFailed.RLock()
+	calls = mock.calls.SetVideoDownloadFailed
+	mock.lockSetVideoDownloadFailed.RUnlock()
+	return calls
+}
+
+// SetVideoDownloadStatus calls SetVideoDownloadStatusFunc.
+func (mock *DBMock) SetVideoDownloadStatus(ctx context.Context, videoID string, status string) error {
+	if mock.SetVideoDownloadStatusFunc == nil {
+		panic("DBMock.SetVideoDownloadStatusFunc: method is nil but DB.SetVideoDownloadStatus was just called")
+	}
+	callInfo := struct {
+		Ctx     context.Context
+		VideoID string
+		Status  string
+	}{
+		Ctx:     ctx,
+		VideoID: videoID,
+		Status:  status,
+	}
+	mock.lockSetVideoDownloadStatus.Lock()
+	mock.calls.SetVideoDownloadStatus = append(mock.calls.SetVideoDownloadStatus, callInfo)
+	mock.lockSetVideoDownloadStatus.Unlock()
+	return mock.SetVideoDownloadStatusFunc(ctx, videoID, status)
+}
+
+// SetVideoDownloadStatusCalls gets all the calls that were made to SetVideoDownloadStatus.
+// Check the length with:
+//
+//	len(mockedDB.SetVideoDownloadStatusCalls())
+func (mock *DBMock) SetVideoDownloadStatusCalls() []struct {
+	Ctx     context.Context
+	VideoID string
+	Status  string
+} {
+	var calls []struct {
+		Ctx     context.Context
+		VideoID string
+		Status  string
+	}
+	mock.lockSetVideoDownloadStatus.RLock()
+	calls = mock.calls.SetVideoDownloadStatus
+	mock.lockSetVideoDownloadStatus.RUnlock()
 	return calls
 }
 

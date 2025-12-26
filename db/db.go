@@ -36,6 +36,18 @@ type DB interface {
 	SetVideoWatchTime(ctx context.Context, videoID string, watchTime *time.Time) error
 	// SetVideoProgress sets or unsets the watch progress of a video
 	SetVideoProgress(ctx context.Context, videoID string, progress int) (*models.Video, error)
+	// GetVideo returns a single video by ID
+	GetVideo(ctx context.Context, videoID string) (*models.Video, error)
+	// SetVideoDownloadStatus sets the download status for a video
+	SetVideoDownloadStatus(ctx context.Context, videoID string, status string) error
+	// SetVideoDownloadCompleted marks a video download as completed
+	SetVideoDownloadCompleted(ctx context.Context, videoID string, filePath string) error
+	// SetVideoDownloadFailed marks a video download as failed with an error message
+	SetVideoDownloadFailed(ctx context.Context, videoID string, errorMsg string) error
+	// GetVideosForCleanup returns videos that were downloaded and watched older than the given duration
+	GetVideosForCleanup(ctx context.Context, olderThan time.Duration) ([]models.Video, error)
+	// DeleteVideoFile clears the download fields for a video
+	DeleteVideoFile(ctx context.Context, videoID string) error
 
 	// Close closes the DB connection
 	Close()

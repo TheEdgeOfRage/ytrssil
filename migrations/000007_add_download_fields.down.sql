@@ -1,0 +1,4 @@
+ALTER TABLE videos DROP COLUMN IF EXISTS download_error;
+ALTER TABLE videos DROP COLUMN IF EXISTS download_status;
+ALTER TABLE videos DROP COLUMN IF EXISTS file_path;
+ALTER TABLE videos DROP COLUMN IF EXISTS downloaded_at;

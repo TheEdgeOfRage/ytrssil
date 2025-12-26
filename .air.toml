@@ -5,6 +5,7 @@ tmp_dir = "/tmp"
   args_bin = [
     "--db-uri=postgres://ytrssil:ytrssil@localhost:5432/ytrssil?sslmode=disable",
     "--auth-token=foo",
+    "--downloads-dir=/tmp/ytrssil",
     "--dev",
   ]
   entrypoint = "./dist/ytrssil"

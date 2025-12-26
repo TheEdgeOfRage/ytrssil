@@ -61,39 +61,82 @@ templ thumbnail(video models.Video) {
 	@ProgressBar(video)
 }
 
-templ videoCard(video models.Video) {
-	<div class="card">
-		@thumbnail(video)
-		<div class="card-body">
-			<p class="card-title text-truncate mb-0">{ video.Title }</p>
-			<p class="d-flex justify-content-between">
-				<a
-					target="blank"
-					href={ fmt.Sprintf("https://www.youtube.com/channel/%s", video.ChannelID) }
-					class="card-text fw-light link-light link-underline-opacity-0"
-				>{ video.ChannelName }</a>
-				<span>
-					{ video.HumanizedPublishTime() }
-				</span>
-			</p>
-			<div class="d-flex justify-content-between">
-				<form
-					hx-patch={ fmt.Sprintf("/videos/%s/progress", video.ID) }
-					hx-target={ fmt.Sprintf("#progress-%s", video.ID) }
-					hx-swap="outerHTML"
-					class="d-flex"
-				>
-					<input type="text" name="progress" placeholder="mm:ss/11m22s" class="form-control" style="width: 50%"/>
-					<button type="submit" class="btn btn-primary ms-3"><i class="bi bi-clock"></i></button>
-				</form>
-				<button
-					hx-patch={ fmt.Sprintf("/videos/%s/watch", video.ID) }
-					hx-target="closest .video-card"
-					hx-swap="outerHTML"
-					class="btn btn-danger"
-				>
-					<i class="bi bi-check-circle"></i>
-				</button>
+templ VideoCard(video models.Video) {
+	<div class="video-card col-md-3 p-2" data-title={ video.Title } data-channel-name={ video.ChannelName }>
+		<div class="card">
+			@thumbnail(video)
+			<div class="card-body">
+				<p class="card-title text-truncate mb-0">{ video.Title }</p>
+				<p class="d-flex justify-content-between">
+					<a
+						target="blank"
+						href={ fmt.Sprintf("https://www.youtube.com/channel/%s", video.ChannelID) }
+						class="card-text fw-light link-light link-underline-opacity-0"
+					>{ video.ChannelName }</a>
+					<span>
+						{ video.HumanizedPublishTime() }
+					</span>
+				</p>
+				<div class="d-flex justify-content-between">
+					<form
+						hx-patch={ fmt.Sprintf("/videos/%s/progress", video.ID) }
+						hx-target={ fmt.Sprintf("#progress-%s", video.ID) }
+						hx-swap="outerHTML"
+						class="d-flex"
+					>
+						<input type="text" name="progress" placeholder="mm:ss/11m22s" class="form-control" style="width: 50%"/>
+						<button type="submit" class="btn btn-primary ms-3"><i class="bi bi-clock"></i></button>
+					</form>
+					<div class="d-flex gap-2">
+						if video.IsDownloaded() {
+							<a
+								href={ templ.SafeURL(fmt.Sprintf("/videos/%s/file", video.ID)) }
+								class="btn btn-success"
+								download
+							>
+								<i class="bi bi-download"></i>
+							</a>
+						} else if video.IsDownloading() {
+							<button
+								class="btn btn-primary"
+								disabled
+								hx-get={ fmt.Sprintf("/videos/%s/card", video.ID) }
+								hx-trigger="every 2s"
+								hx-target="closest .video-card"
+								hx-swap="outerHTML"
+							>
+								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+							</button>
+						} else if video.DownloadFailed() {
+							<button
+								class="btn btn-danger"
+								title={ fmt.Sprintf("Download failed: %s", *video.DownloadError) }
+								hx-post={ fmt.Sprintf("/videos/%s/download", video.ID) }
+								hx-target="closest .video-card"
+								hx-swap="outerHTML"
+							>
+								<i class="bi bi-exclamation-triangle"></i>
+							</button>
+						} else {
+							<button
+								hx-post={ fmt.Sprintf("/videos/%s/download", video.ID) }
+								hx-target="closest .video-card"
+								hx-swap="outerHTML"
+								class="btn btn-outline-primary"
+							>
+								<i class="bi bi-download"></i>
+							</button>
+						}
+						<button
+							hx-patch={ fmt.Sprintf("/videos/%s/watch", video.ID) }
+							hx-target="closest .video-card"
+							hx-swap="outerHTML"
+							class="btn btn-danger"
+						>
+							<i class="bi bi-check-circle"></i>
+						</button>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -103,9 +146,7 @@ templ NewVideosPage(videos []models.Video) {
 	@BaseLayout("ytrssil - New Videos", "new") {
 		<div class="row">
 			for _, video := range videos {
-				<div class="video-card col-md-3 p-2" data-title={ video.Title } data-channel-name={ video.ChannelName }>
-					@videoCard(video)
-				</div>
+				@VideoCard(video)
 			}
 		</div>
 	}
