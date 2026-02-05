@@ -32,16 +32,20 @@ jobs:
           go-version-file: "go.mod"
           cache: true
 
-      - name: Linter
-        run: make lint
+      - name: go vet
+        run: go vet ./...
 
-      - name: Install migrate CLI
-        run: make bin/migrate
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.8.0
 
       - name: Tests
         env:
           DB_URI: postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable
-        run: make test
+        run: |-
+          make migrate
+          make test
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
