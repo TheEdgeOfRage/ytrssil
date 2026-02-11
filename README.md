@@ -1,7 +1,7 @@
 <p align="center">
   <a href="https://github.com/TheEdgeOfRage/ytrssil">
     <picture>
-      <img src="assets/complex.svg" alt="ytrssil logo">
+      <img src="assets/ytrssil.svg" alt="ytrssil logo">
     </picture>
   </a>
 </p>

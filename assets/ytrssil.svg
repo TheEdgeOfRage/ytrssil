@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Layer_1"
+   data-name="Layer 1"
+   viewBox="0 0 725.46 559.32"
+   version="1.1"
+   sodipodi:docname="ytrssil-05.svg"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview10"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="2.0632196"
+     inkscape:cx="268.75472"
+     inkscape:cy="312.13352"
+     inkscape:window-width="2560"
+     inkscape:window-height="1362"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_1" />
+  <defs
+     id="defs1">
+    <style
+       id="style1">
+      .cls-1 {
+        stroke-width: 32px;
+      }
+
+      .cls-1, .cls-2 {
+        fill: none;
+        stroke: red;
+        stroke-linecap: round;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-2 {
+        stroke-width: 26px;
+      }
+
+      .cls-3 {
+        fill: red;
+      }
+    </style>
+  </defs>
+  <g
+     id="g3">
+    <path
+       class="cls-2"
+       d="M479.74,379.9l9.62-8.95c25.09-29.13,40.26-67.04,40.26-108.5,0-91.86-74.47-166.33-166.33-166.33s-166.33,74.47-166.33,166.33c0,41.46,15.17,79.37,40.26,108.5l10.87,10.32"
+       id="path1"
+       style="stroke:#e62900;stroke-opacity:1;stroke-width:20;stroke-dasharray:none" />
+    <path
+       class="cls-2"
+       d="M275.3,355.43c-24.65-23.33-40.02-56.36-40.02-92.97,0-70.7,57.31-128.01,128.01-128.01s128.01,57.31,128.01,128.01c0,36.63-15.38,69.66-40.04,92.99"
+       id="path2"
+       style="stroke:#e62900;stroke-opacity:1;stroke-width:20;stroke-dasharray:none" />
+    <path
+       class="cls-2"
+       d="M294.42,319.92c-13-15.56-20.82-35.6-20.82-57.46,0-49.53,40.15-89.68,89.68-89.68s89.68,40.15,89.68,89.68c0,21.9-7.85,41.97-20.89,57.55"
+       id="path3"
+       style="stroke:#e62900;stroke-opacity:1;stroke-width:20;stroke-dasharray:none" />
+  </g>
+  <g
+     id="g5">
+    <path
+       style="fill:none;stroke:#e62900;stroke-width:20;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 234.34248,418.27831 c 44.34816,0.24234 76.57935,-42.40944 91.11973,-80.69912"
+       id="path11"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#e62900;stroke-width:20;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 312.13352,366.65996 c -2.90807,42.65177 35.13926,87.48463 55.49579,85.78824"
+       id="path12"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#e62900;stroke-width:20;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 290.80763,443.23929 c 42.16711,2.4234 71.00553,-68.58213 72.21723,-94.51248"
+       id="path13"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#e62900;stroke-width:20;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 435.24209,442.99695 c -45.80221,0 -70.27851,-65.91639 -71.73255,-94.51247"
+       id="path14"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#e62900;stroke-width:20;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 398.64879,423.12511 c 10.97265,-10.97265 17.67901,-34.40046 17.93314,-52.58772"
+       id="path15"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#e62900;stroke-width:20;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 401.07219,337.09451 c 11.63231,33.44288 46.52922,81.66848 90.63504,81.1838"
+       id="path16"
+       sodipodi:nodetypes="cc" />
+  </g>
+  <path
+     class="cls-3"
+     d="M327.03,303.29v-85.92c0-4.23,4.57-6.88,8.24-4.77l74.89,42.96c3.69,2.12,3.69,7.43,0,9.55l-74.89,42.96c-3.67,2.11-8.24-.54-8.24-4.77Z"
+     id="path6"
+     style="fill:#e62900;fill-opacity:1"
+     inkscape:export-filename="complex.png"
+     inkscape:export-xdpi="130.59"
+     inkscape:export-ydpi="130.59" />
+</svg>
