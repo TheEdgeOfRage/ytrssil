@@ -11,7 +11,7 @@ bin/golangci-lint: bin
 bin/migrate: bin
 	GOBIN=$(PWD)/bin go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.19.0
 bin/air: bin
-	GOBIN=$(PWD)/bin go install github.com/air-verse/air@v1.63.4
+	GOBIN=$(PWD)/bin go install github.com/air-verse/air@v1.64.5
 
 lint: bin/golangci-lint
 	go mod tidy

@@ -1,1 +1,10 @@
-# Ytrssil API
+<p align="center">
+  <a href="https://github.com/TheEdgeOfRage/ytrssil">
+    <picture>
+      <img src="assets/complex.svg" alt="ytrssil logo">
+    </picture>
+  </a>
+</p>
+<p align="center">YouTube subscription feed, but better</p>
+
+---
