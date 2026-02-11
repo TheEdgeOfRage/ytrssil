@@ -99,6 +99,12 @@ func (c *youTubeClient) GetVideoDurations(ctx context.Context, videos map[string
 		durationStr = strings.ToLower(durationStr)
 		duration, err := time.ParseDuration(durationStr)
 		if err != nil {
+			c.log.Error(
+				"Failed to parse video duration",
+				"error", err,
+				"durationString", durationStr,
+				"videoID", v.ID,
+			)
 			return fmt.Errorf("failed to parse video duration [%v]: %w", durationStr, err)
 		}
 		videos[v.ID].DurationSeconds = int(math.Round(duration.Seconds()))
