@@ -2,10 +2,15 @@
 <svg
    id="Layer_1"
    data-name="Layer 1"
-   viewBox="0 0 725.46 559.32"
+   viewBox="0 0 511.99998 511.99999"
    version="1.1"
-   sodipodi:docname="ytrssil-05.svg"
+   sodipodi:docname="ytrssil.svg"
    inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   width="512"
+   height="512"
+   inkscape:export-filename="ytrssil.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -21,10 +26,10 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
      inkscape:zoom="2.0632196"
-     inkscape:cx="268.75472"
-     inkscape:cy="312.13352"
+     inkscape:cx="268.27004"
+     inkscape:cy="253.972"
      inkscape:window-width="2560"
-     inkscape:window-height="1362"
+     inkscape:window-height="1388"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -54,25 +59,27 @@
     </style>
   </defs>
   <g
-     id="g3">
+     id="g3"
+     transform="matrix(1.2061529,0,0,1.2061529,-182.18331,-74.863584)">
     <path
        class="cls-2"
-       d="M479.74,379.9l9.62-8.95c25.09-29.13,40.26-67.04,40.26-108.5,0-91.86-74.47-166.33-166.33-166.33s-166.33,74.47-166.33,166.33c0,41.46,15.17,79.37,40.26,108.5l10.87,10.32"
+       d="m 479.74,379.9 9.62,-8.95 c 25.09,-29.13 40.26,-67.04 40.26,-108.5 0,-91.86 -74.47,-166.33 -166.33,-166.33 -91.86,0 -166.33,74.47 -166.33,166.33 0,41.46 15.17,79.37 40.26,108.5 l 10.87,10.32"
        id="path1"
-       style="stroke:#e62900;stroke-opacity:1;stroke-width:20;stroke-dasharray:none" />
+       style="stroke:#e62900;stroke-width:20;stroke-dasharray:none;stroke-opacity:1" />
     <path
        class="cls-2"
-       d="M275.3,355.43c-24.65-23.33-40.02-56.36-40.02-92.97,0-70.7,57.31-128.01,128.01-128.01s128.01,57.31,128.01,128.01c0,36.63-15.38,69.66-40.04,92.99"
+       d="m 275.3,355.43 c -24.65,-23.33 -40.02,-56.36 -40.02,-92.97 0,-70.7 57.31,-128.01 128.01,-128.01 70.7,0 128.01,57.31 128.01,128.01 0,36.63 -15.38,69.66 -40.04,92.99"
        id="path2"
-       style="stroke:#e62900;stroke-opacity:1;stroke-width:20;stroke-dasharray:none" />
+       style="stroke:#e62900;stroke-width:20;stroke-dasharray:none;stroke-opacity:1" />
     <path
        class="cls-2"
-       d="M294.42,319.92c-13-15.56-20.82-35.6-20.82-57.46,0-49.53,40.15-89.68,89.68-89.68s89.68,40.15,89.68,89.68c0,21.9-7.85,41.97-20.89,57.55"
+       d="m 294.42,319.92 c -13,-15.56 -20.82,-35.6 -20.82,-57.46 0,-49.53 40.15,-89.68 89.68,-89.68 49.53,0 89.68,40.15 89.68,89.68 0,21.9 -7.85,41.97 -20.89,57.55"
        id="path3"
-       style="stroke:#e62900;stroke-opacity:1;stroke-width:20;stroke-dasharray:none" />
+       style="stroke:#e62900;stroke-width:20;stroke-dasharray:none;stroke-opacity:1" />
   </g>
   <g
-     id="g5">
+     id="g5"
+     transform="matrix(1.2061529,0,0,1.2061529,-182.18331,-74.863584)">
     <path
        style="fill:none;stroke:#e62900;stroke-width:20;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
        d="m 234.34248,418.27831 c 44.34816,0.24234 76.57935,-42.40944 91.11973,-80.69912"
@@ -106,9 +113,9 @@
   </g>
   <path
      class="cls-3"
-     d="M327.03,303.29v-85.92c0-4.23,4.57-6.88,8.24-4.77l74.89,42.96c3.69,2.12,3.69,7.43,0,9.55l-74.89,42.96c-3.67,2.11-8.24-.54-8.24-4.77Z"
+     d="M 212.26489,290.95055 V 187.31789 c 0,-5.10203 5.51212,-8.29834 9.93871,-5.75336 l 90.32879,51.81634 c 4.4507,2.55705 4.4507,8.96172 0,11.51876 l -90.32879,51.81633 c -4.42659,2.54498 -9.93871,-0.65132 -9.93871,-5.75334 z"
      id="path6"
-     style="fill:#e62900;fill-opacity:1"
+     style="fill:#e62900;fill-opacity:1;stroke-width:1.20615"
      inkscape:export-filename="complex.png"
      inkscape:export-xdpi="130.59"
      inkscape:export-ydpi="130.59" />

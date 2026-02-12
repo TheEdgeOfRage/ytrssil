@@ -9,7 +9,7 @@
 	"orientation": "portrait-primary",
 	"icons": [
 		{
-			"src": "/assets/ytrssil-512.png",
+			"src": "/assets/ytrssil.png",
 			"sizes": "512x512",
 			"type": "image/png",
 			"purpose": "any maskable"

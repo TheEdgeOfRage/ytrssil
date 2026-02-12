@@ -53,43 +53,43 @@ func navbar(route string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"navbar navbar-expand-lg bg-body-tertiary\"><div class=\"container-fluid\"><a class=\"navbar-brand\" href=\"/\"><img src=\"/assets/ytrssil.png\" alt=\"ytrssil\" width=\"32\" height=\"32\"></a> <button type=\"button\" class=\"btn btn-primary me-auto me-lg-2\" onClick=\"window.location.reload();\"><i class=\"bi bi-arrow-clockwise\"></i></button> <button class=\"navbar-toggler\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#navbarSupportedContent\"><span class=\"navbar-toggler-icon\"></span></button> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"navbar navbar-expand-lg bg-body-tertiary\"><div class=\"container-fluid\"><a class=\"navbar-brand\" href=\"/\"><img src=\"/assets/ytrssil.svg\" alt=\"ytrssil\" width=\"32\" height=\"32\"></a> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if route != "auth" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"collapse navbar-collapse\" id=\"navbarSupportedContent\"><ul class=\"navbar-nav me-auto mb-2 mb-lg-0\"><li class=\"nav-item me-md-2 mt-2 mt-md-0\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" data-bs-toggle=\"modal\" data-bs-target=\"#subscription-modal\">Subscribe <i class=\"bi bi-bookmark-plus\"></i></button></li><li class=\"nav-item me-md-2 mt-2 mt-md-0\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" hx-post=\"/fetch\" hx-swap=\"none\" hx-on::after-settle=\"window.location.reload()\">Fetch <i class=\"bi bi-cloud-download\"></i></button></li><li class=\"nav-item me-md-2 mt-2 mt-md-0\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" data-bs-toggle=\"modal\" data-bs-target=\"#add-video-modal\">Add Video <i class=\"bi bi-camera-video\"></i></button></li>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<ul id=\"nav-buttons\" class=\"navbar-nav me-auto mb-0 flex-row\"><li class=\"nav-item me-1 me-lg-2\"><button type=\"button\" class=\"btn btn-primary\" onClick=\"window.location.reload();\"><i class=\"bi bi-arrow-clockwise\"></i></button></li><li class=\"nav-item me-1 me-lg-2\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" data-bs-toggle=\"modal\" data-bs-target=\"#subscription-modal\"><span class=\"d-none d-lg-inline\">Subscribe </span><i class=\"bi bi-bookmark-plus\"></i></button></li><li class=\"nav-item me-1 me-lg-2\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" hx-post=\"/fetch\" hx-swap=\"none\" hx-on::after-settle=\"window.location.reload()\"><span class=\"d-none d-lg-inline\">Fetch </span><i class=\"bi bi-cloud-download\"></i></button></li><li class=\"nav-item me-1 me-lg-2\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" data-bs-toggle=\"modal\" data-bs-target=\"#add-video-modal\"><span class=\"d-none d-lg-inline\">Add Video </span><i class=\"bi bi-camera-video\"></i></button></li>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, button := range navButtons(route) {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<li class=\"nav-item me-md-2 mt-2 mt-md-0\"><a href=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<li class=\"nav-item me-1 me-lg-2\"><a href=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var2 templ.SafeURL
 				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(button.link)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/navbar.templ`, Line: 80, Col: 29}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/navbar.templ`, Line: 78, Col: 28}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\"><span class=\"d-none d-lg-inline\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var3 string
 				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(button.text)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/navbar.templ`, Line: 81, Col: 22}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/navbar.templ`, Line: 79, Col: 54}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, " ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -116,7 +116,7 @@ func navbar(route string) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</ul><div class=\"d-flex\" role=\"search\"><input id=\"video-search\" class=\"form-control\" type=\"search\" placeholder=\"Search videos...\"></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</ul><div class=\"d-flex\" role=\"search\"><input id=\"video-search\" class=\"form-control me-2 d-lg-block d-none\" type=\"search\" placeholder=\"Search videos...\"> <button type=\"button\" class=\"btn btn-outline-secondary d-lg-none\" style=\"--bs-btn-color: var(--bs-body-color);\" onclick=\"\n\t\t\t\t\t\t\tconst buttons = document.getElementById('nav-buttons');\n\t\t\t\t\t\t\tconst search = document.getElementById('video-search');\n\t\t\t\t\t\t\tif (search.classList.contains('d-none')) {\n\t\t\t\t\t\t\t\tbuttons.classList.add('d-none');\n\t\t\t\t\t\t\t\tsearch.classList.remove('d-none');\n\t\t\t\t\t\t\t\tsearch.focus();\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\tbuttons.classList.remove('d-none');\n\t\t\t\t\t\t\t\tsearch.classList.add('d-none');\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\"><i class=\"bi bi-search\"></i></button></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
