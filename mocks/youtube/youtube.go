@@ -29,6 +29,9 @@ var _ youtube.Client = &ClientMock{}
 //			GetVideoMetadataFunc: func(ctx context.Context, videoID string) (*models.Video, error) {
 //				panic("mock out the GetVideoMetadata method")
 //			},
+//			ResolveChannelIDFunc: func(ctx context.Context, handle string) (string, error) {
+//				panic("mock out the ResolveChannelID method")
+//			},
 //		}
 //
 //		// use mockedClient in code that requires youtube.Client
@@ -44,6 +47,9 @@ type ClientMock struct {
 
 	// GetVideoMetadataFunc mocks the GetVideoMetadata method.
 	GetVideoMetadataFunc func(ctx context.Context, videoID string) (*models.Video, error)
+
+	// ResolveChannelIDFunc mocks the ResolveChannelID method.
+	ResolveChannelIDFunc func(ctx context.Context, handle string) (string, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -68,10 +74,18 @@ type ClientMock struct {
 			// VideoID is the videoID argument value.
 			VideoID string
 		}
+		// ResolveChannelID holds details about calls to the ResolveChannelID method.
+		ResolveChannelID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Handle is the handle argument value.
+			Handle string
+		}
 	}
 	lockGetChannelImageURL sync.RWMutex
 	lockGetVideoDurations  sync.RWMutex
 	lockGetVideoMetadata   sync.RWMutex
+	lockResolveChannelID   sync.RWMutex
 }
 
 // GetChannelImageURL calls GetChannelImageURLFunc.
@@ -179,5 +193,41 @@ func (mock *ClientMock) GetVideoMetadataCalls() []struct {
 	mock.lockGetVideoMetadata.RLock()
 	calls = mock.calls.GetVideoMetadata
 	mock.lockGetVideoMetadata.RUnlock()
+	return calls
+}
+
+// ResolveChannelID calls ResolveChannelIDFunc.
+func (mock *ClientMock) ResolveChannelID(ctx context.Context, handle string) (string, error) {
+	if mock.ResolveChannelIDFunc == nil {
+		panic("ClientMock.ResolveChannelIDFunc: method is nil but Client.ResolveChannelID was just called")
+	}
+	callInfo := struct {
+		Ctx    context.Context
+		Handle string
+	}{
+		Ctx:    ctx,
+		Handle: handle,
+	}
+	mock.lockResolveChannelID.Lock()
+	mock.calls.ResolveChannelID = append(mock.calls.ResolveChannelID, callInfo)
+	mock.lockResolveChannelID.Unlock()
+	return mock.ResolveChannelIDFunc(ctx, handle)
+}
+
+// ResolveChannelIDCalls gets all the calls that were made to ResolveChannelID.
+// Check the length with:
+//
+//	len(mockedClient.ResolveChannelIDCalls())
+func (mock *ClientMock) ResolveChannelIDCalls() []struct {
+	Ctx    context.Context
+	Handle string
+} {
+	var calls []struct {
+		Ctx    context.Context
+		Handle string
+	}
+	mock.lockResolveChannelID.RLock()
+	calls = mock.calls.ResolveChannelID
+	mock.lockResolveChannelID.RUnlock()
 	return calls
 }

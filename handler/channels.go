@@ -3,12 +3,31 @@ package handler
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/TheEdgeOfRage/ytrssil-api/db"
 	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
 
+// isChannelID reports whether s looks like a raw YouTube channel ID (UCxxxxxxxx…).
+func isChannelID(s string) bool {
+	return strings.HasPrefix(s, "UC") && len(s) == 24
+}
+
 func (h *handler) SubscribeToChannel(ctx context.Context, channelID string) (*models.Channel, error) {
+	if !isChannelID(channelID) {
+		// Treat input as a handle; normalise to @handle form for the API.
+		handle := channelID
+		if !strings.HasPrefix(handle, "@") {
+			handle = "@" + handle
+		}
+		resolved, err := h.youTubeClient.ResolveChannelID(ctx, handle)
+		if err != nil {
+			return nil, err
+		}
+		channelID = resolved
+	}
+
 	parsedChannel, err := h.parser.Parse(channelID)
 	if err != nil {
 		return nil, err

@@ -1,4 +1,3 @@
-- Don't use serena for templ files, it only supports normal go code.
 - Don't attempt to edit the generated templ code
 - Don't invoke ANY go commands other than `go vet` and `go mod tidy`
 
@@ -9,6 +8,7 @@
 **Tech Stack**: Go 1.25, Gin (HTTP), Templ (SSR), PostgreSQL (pgx), yt-dlp (downloads), HTMX (frontend interactivity), Bootstrap 5 (UI)
 
 **Layers**:
+
 - **HTTP**: Gin router with dual interfaces (HTML pages + JSON API), authentication middleware, HTMX-enabled templates
 - **Handler**: Business logic layer orchestrating channels, videos, downloads, and cleanup routines
 - **Database**: PostgreSQL with pgx connection pooling, 7 migrations tracking schema evolution

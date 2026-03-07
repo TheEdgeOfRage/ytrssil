@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -105,6 +106,9 @@ func (s *EndpointsTestSuite) SetupSuite() {
 		},
 		GetChannelImageURLFunc: func(ctx context.Context, channelID string) (string, error) {
 			return fmt.Sprintf("https://example.com/%s.jpg", channelID), nil
+		},
+		ResolveChannelIDFunc: func(ctx context.Context, handle string) (string, error) {
+			return strings.TrimPrefix(handle, "@"), nil
 		},
 	}
 
