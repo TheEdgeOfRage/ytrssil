@@ -43,3 +43,21 @@ func (srv *server) UnsubscribeFromChannelJSON(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"msg": "unsubscribed from channel successfully"})
 }
+
+func (srv *server) ToggleChannelShortsJSON(c *gin.Context) {
+	channelID := c.Param("channel_id")
+	enable := c.Query("enable") == "true"
+
+	err := srv.handler.ToggleChannelShorts(c.Request.Context(), channelID, enable)
+	if err != nil {
+		if errors.Is(err, db.ErrChannelNotFound) {
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"msg": "shorts setting updated", "enable_shorts": enable})
+}

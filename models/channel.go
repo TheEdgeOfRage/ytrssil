@@ -11,4 +11,6 @@ type Channel struct {
 	UnwatchedCount int `json:"unwatched_count"`
 	// ImageURL is the URL of the channel's profile image
 	ImageURL string `json:"image_url"`
+	// EnableShorts indicates if shorts should be shown for this channel
+	EnableShorts bool `json:"enable_shorts"`
 }

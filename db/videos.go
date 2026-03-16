@@ -25,6 +25,11 @@ func (db *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models
 		FROM videos
 		LEFT JOIN channels ON videos.channel_id=channels.id
 		WHERE watch_timestamp IS NULL
+			AND (
+				videos.is_short = false 
+				OR channels.enable_shorts = true
+			)
+			AND videos.is_discarded = false
 		ORDER BY published_timestamp
 	`
 	if sortDesc {
@@ -84,8 +89,9 @@ func (db *postgresDB) GetWatchedVideos(
 			, channels.name
 			, channels.id
 		FROM videos
-		LEFT JOIN channels ON videos.channel_id=channels.id
+		LEFT JOIN channels ON videos.channel_id=videos.channel_id
 		WHERE watch_timestamp IS NOT NULL
+			AND videos.is_discarded = false
 		ORDER BY watch_timestamp
 	`
 	if sortDesc {
@@ -176,6 +182,16 @@ func (db *postgresDB) AddVideo(ctx context.Context, video models.Video, channelI
 	return nil
 }
 
+func (db *postgresDB) DiscardVideo(ctx context.Context, videoID string) error {
+	query := `UPDATE videos SET is_discarded = true WHERE id = $1`
+	_, err := db.db.Exec(ctx, query, videoID)
+	if err != nil {
+		db.l.Error("Failed to discard video", "call", "sql.Exec", "error", err)
+		return err
+	}
+	return nil
+}
+
 func (db *postgresDB) SetVideoWatchTime(
 	ctx context.Context,
 	videoID string,
@@ -246,7 +262,7 @@ func (db *postgresDB) GetVideo(ctx context.Context, videoID string) (*models.Vid
 			, channels.name
 			, channels.id
 		FROM videos
-		LEFT JOIN channels ON videos.channel_id = channels.id
+		LEFT JOIN channels ON videos.channel_id=channels.id
 		WHERE videos.id = $1
 	`
 
@@ -327,6 +343,7 @@ func (db *postgresDB) GetVideosForCleanup(ctx context.Context, olderThan time.Du
 			AND download_status = 'completed'
 			AND watch_timestamp IS NOT NULL
 			AND watch_timestamp < $1
+			AND is_discarded = false
 	`
 	cutoffTime := time.Now().Add(-olderThan)
 

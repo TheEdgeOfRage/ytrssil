@@ -30,6 +30,12 @@ var _ db.DB = &DBMock{}
 //			DeleteVideoFileFunc: func(ctx context.Context, videoID string) error {
 //				panic("mock out the DeleteVideoFile method")
 //			},
+//			DiscardVideoFunc: func(ctx context.Context, videoID string) error {
+//				panic("mock out the DiscardVideo method")
+//			},
+//			GetChannelByIDFunc: func(ctx context.Context, channelID string) (*models.Channel, error) {
+//				panic("mock out the GetChannelByID method")
+//			},
 //			GetNewVideosFunc: func(ctx context.Context, sortDesc bool) ([]models.Video, error) {
 //				panic("mock out the GetNewVideos method")
 //			},
@@ -66,6 +72,9 @@ var _ db.DB = &DBMock{}
 //			SubscribeToChannelFunc: func(ctx context.Context, channel models.Channel) error {
 //				panic("mock out the SubscribeToChannel method")
 //			},
+//			ToggleChannelShortsFunc: func(ctx context.Context, channelID string, enableShorts bool) error {
+//				panic("mock out the ToggleChannelShorts method")
+//			},
 //			UnsubscribeFromChannelFunc: func(ctx context.Context, channelID string) error {
 //				panic("mock out the UnsubscribeFromChannel method")
 //			},
@@ -84,6 +93,12 @@ type DBMock struct {
 
 	// DeleteVideoFileFunc mocks the DeleteVideoFile method.
 	DeleteVideoFileFunc func(ctx context.Context, videoID string) error
+
+	// DiscardVideoFunc mocks the DiscardVideo method.
+	DiscardVideoFunc func(ctx context.Context, videoID string) error
+
+	// GetChannelByIDFunc mocks the GetChannelByID method.
+	GetChannelByIDFunc func(ctx context.Context, channelID string) (*models.Channel, error)
 
 	// GetNewVideosFunc mocks the GetNewVideos method.
 	GetNewVideosFunc func(ctx context.Context, sortDesc bool) ([]models.Video, error)
@@ -121,6 +136,9 @@ type DBMock struct {
 	// SubscribeToChannelFunc mocks the SubscribeToChannel method.
 	SubscribeToChannelFunc func(ctx context.Context, channel models.Channel) error
 
+	// ToggleChannelShortsFunc mocks the ToggleChannelShorts method.
+	ToggleChannelShortsFunc func(ctx context.Context, channelID string, enableShorts bool) error
+
 	// UnsubscribeFromChannelFunc mocks the UnsubscribeFromChannel method.
 	UnsubscribeFromChannelFunc func(ctx context.Context, channelID string) error
 
@@ -144,6 +162,20 @@ type DBMock struct {
 			Ctx context.Context
 			// VideoID is the videoID argument value.
 			VideoID string
+		}
+		// DiscardVideo holds details about calls to the DiscardVideo method.
+		DiscardVideo []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// VideoID is the videoID argument value.
+			VideoID string
+		}
+		// GetChannelByID holds details about calls to the GetChannelByID method.
+		GetChannelByID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ChannelID is the channelID argument value.
+			ChannelID string
 		}
 		// GetNewVideos holds details about calls to the GetNewVideos method.
 		GetNewVideos []struct {
@@ -241,6 +273,15 @@ type DBMock struct {
 			// Channel is the channel argument value.
 			Channel models.Channel
 		}
+		// ToggleChannelShorts holds details about calls to the ToggleChannelShorts method.
+		ToggleChannelShorts []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ChannelID is the channelID argument value.
+			ChannelID string
+			// EnableShorts is the enableShorts argument value.
+			EnableShorts bool
+		}
 		// UnsubscribeFromChannel holds details about calls to the UnsubscribeFromChannel method.
 		UnsubscribeFromChannel []struct {
 			// Ctx is the ctx argument value.
@@ -252,6 +293,8 @@ type DBMock struct {
 	lockAddVideo                  sync.RWMutex
 	lockClose                     sync.RWMutex
 	lockDeleteVideoFile           sync.RWMutex
+	lockDiscardVideo              sync.RWMutex
+	lockGetChannelByID            sync.RWMutex
 	lockGetNewVideos              sync.RWMutex
 	lockGetVideo                  sync.RWMutex
 	lockGetVideosForCleanup       sync.RWMutex
@@ -264,6 +307,7 @@ type DBMock struct {
 	lockSetVideoProgress          sync.RWMutex
 	lockSetVideoWatchTime         sync.RWMutex
 	lockSubscribeToChannel        sync.RWMutex
+	lockToggleChannelShorts       sync.RWMutex
 	lockUnsubscribeFromChannel    sync.RWMutex
 }
 
@@ -367,6 +411,78 @@ func (mock *DBMock) DeleteVideoFileCalls() []struct {
 	mock.lockDeleteVideoFile.RLock()
 	calls = mock.calls.DeleteVideoFile
 	mock.lockDeleteVideoFile.RUnlock()
+	return calls
+}
+
+// DiscardVideo calls DiscardVideoFunc.
+func (mock *DBMock) DiscardVideo(ctx context.Context, videoID string) error {
+	if mock.DiscardVideoFunc == nil {
+		panic("DBMock.DiscardVideoFunc: method is nil but DB.DiscardVideo was just called")
+	}
+	callInfo := struct {
+		Ctx     context.Context
+		VideoID string
+	}{
+		Ctx:     ctx,
+		VideoID: videoID,
+	}
+	mock.lockDiscardVideo.Lock()
+	mock.calls.DiscardVideo = append(mock.calls.DiscardVideo, callInfo)
+	mock.lockDiscardVideo.Unlock()
+	return mock.DiscardVideoFunc(ctx, videoID)
+}
+
+// DiscardVideoCalls gets all the calls that were made to DiscardVideo.
+// Check the length with:
+//
+//	len(mockedDB.DiscardVideoCalls())
+func (mock *DBMock) DiscardVideoCalls() []struct {
+	Ctx     context.Context
+	VideoID string
+} {
+	var calls []struct {
+		Ctx     context.Context
+		VideoID string
+	}
+	mock.lockDiscardVideo.RLock()
+	calls = mock.calls.DiscardVideo
+	mock.lockDiscardVideo.RUnlock()
+	return calls
+}
+
+// GetChannelByID calls GetChannelByIDFunc.
+func (mock *DBMock) GetChannelByID(ctx context.Context, channelID string) (*models.Channel, error) {
+	if mock.GetChannelByIDFunc == nil {
+		panic("DBMock.GetChannelByIDFunc: method is nil but DB.GetChannelByID was just called")
+	}
+	callInfo := struct {
+		Ctx       context.Context
+		ChannelID string
+	}{
+		Ctx:       ctx,
+		ChannelID: channelID,
+	}
+	mock.lockGetChannelByID.Lock()
+	mock.calls.GetChannelByID = append(mock.calls.GetChannelByID, callInfo)
+	mock.lockGetChannelByID.Unlock()
+	return mock.GetChannelByIDFunc(ctx, channelID)
+}
+
+// GetChannelByIDCalls gets all the calls that were made to GetChannelByID.
+// Check the length with:
+//
+//	len(mockedDB.GetChannelByIDCalls())
+func (mock *DBMock) GetChannelByIDCalls() []struct {
+	Ctx       context.Context
+	ChannelID string
+} {
+	var calls []struct {
+		Ctx       context.Context
+		ChannelID string
+	}
+	mock.lockGetChannelByID.RLock()
+	calls = mock.calls.GetChannelByID
+	mock.lockGetChannelByID.RUnlock()
 	return calls
 }
 
@@ -823,6 +939,46 @@ func (mock *DBMock) SubscribeToChannelCalls() []struct {
 	mock.lockSubscribeToChannel.RLock()
 	calls = mock.calls.SubscribeToChannel
 	mock.lockSubscribeToChannel.RUnlock()
+	return calls
+}
+
+// ToggleChannelShorts calls ToggleChannelShortsFunc.
+func (mock *DBMock) ToggleChannelShorts(ctx context.Context, channelID string, enableShorts bool) error {
+	if mock.ToggleChannelShortsFunc == nil {
+		panic("DBMock.ToggleChannelShortsFunc: method is nil but DB.ToggleChannelShorts was just called")
+	}
+	callInfo := struct {
+		Ctx          context.Context
+		ChannelID    string
+		EnableShorts bool
+	}{
+		Ctx:          ctx,
+		ChannelID:    channelID,
+		EnableShorts: enableShorts,
+	}
+	mock.lockToggleChannelShorts.Lock()
+	mock.calls.ToggleChannelShorts = append(mock.calls.ToggleChannelShorts, callInfo)
+	mock.lockToggleChannelShorts.Unlock()
+	return mock.ToggleChannelShortsFunc(ctx, channelID, enableShorts)
+}
+
+// ToggleChannelShortsCalls gets all the calls that were made to ToggleChannelShorts.
+// Check the length with:
+//
+//	len(mockedDB.ToggleChannelShortsCalls())
+func (mock *DBMock) ToggleChannelShortsCalls() []struct {
+	Ctx          context.Context
+	ChannelID    string
+	EnableShorts bool
+} {
+	var calls []struct {
+		Ctx          context.Context
+		ChannelID    string
+		EnableShorts bool
+	}
+	mock.lockToggleChannelShorts.RLock()
+	calls = mock.calls.ToggleChannelShorts
+	mock.lockToggleChannelShorts.RUnlock()
 	return calls
 }
 

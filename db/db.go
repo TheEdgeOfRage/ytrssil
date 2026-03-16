@@ -23,6 +23,10 @@ type DB interface {
 	SubscribeToChannel(ctx context.Context, channel models.Channel) error
 	// UnsubscribeToChannel will stop fetching videos from that channel
 	UnsubscribeFromChannel(ctx context.Context, channelID string) error
+	// ToggleChannelShorts enables or disables shorts for a channel
+	ToggleChannelShorts(ctx context.Context, channelID string, enableShorts bool) error
+	// GetChannelByID returns a channel by its ID
+	GetChannelByID(ctx context.Context, channelID string) (*models.Channel, error)
 
 	// GetNewVideos returns a list of unwatched videos from all subscribed channels
 	GetNewVideos(ctx context.Context, sortDesc bool) ([]models.Video, error)
@@ -32,6 +36,8 @@ type DB interface {
 	HasVideo(ctx context.Context, videoID string) (bool, error)
 	// AddVideo adds a newly published video to the database
 	AddVideo(ctx context.Context, video models.Video, channelID string) error
+	// DiscardVideo marks a video as discarded (e.g., shorts filtered out)
+	DiscardVideo(ctx context.Context, videoID string) error
 	// SetVideoWatchTime sets or unsets the watch timestamp of a video
 	SetVideoWatchTime(ctx context.Context, videoID string, watchTime *time.Time) error
 	// SetVideoProgress sets or unsets the watch progress of a video

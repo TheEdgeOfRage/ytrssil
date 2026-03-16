@@ -30,9 +30,10 @@ func (h *handler) GetWatchedVideos(ctx context.Context, sortDesc bool, page int)
 	return h.db.GetWatchedVideos(ctx, sortDesc, WatchedVideosPageSize, offset)
 }
 
-func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedparser.Channel) {
-	var err error
-	videos := make(map[string]*models.Video, len(parsedChannel.Videos))
+func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedparser.Channel, enableShorts bool) {
+	videosToAdd := make(map[string]*models.Video)
+	videosToDiscard := make(map[string]*models.Video)
+
 	for _, parsedVideo := range parsedChannel.Videos {
 		date, err := parsedVideo.Published.Parse()
 		if err != nil {
@@ -46,27 +47,62 @@ func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedpa
 			h.log.Error("Failed to check if video already exists", "call", "db.HasVideo", "err", err)
 			continue
 		}
-		if !exists {
-			videos[videoID] = &models.Video{
-				ID:            videoID,
-				Title:         parsedVideo.Title,
-				PublishedTime: date,
-				IsShort:       parsedVideo.IsShort,
-			}
+
+		if exists {
+			continue
+		}
+
+		video := &models.Video{
+			ID:            videoID,
+			Title:         parsedVideo.Title,
+			PublishedTime: date,
+			IsShort:       parsedVideo.IsShort,
+		}
+
+		// If it's a short and enableShorts is false, mark for discard
+		if parsedVideo.IsShort && !enableShorts {
+			videosToDiscard[videoID] = video
+		} else {
+			videosToAdd[videoID] = video
 		}
 	}
 
-	if len(videos) == 0 {
+	if len(videosToAdd) == 0 && len(videosToDiscard) == 0 {
 		return
 	}
 
-	err = h.youTubeClient.GetVideoDurations(ctx, videos)
+	// Get durations for all videos (both normal and shorts to be discarded)
+	allVideos := make(map[string]*models.Video)
+	for k, v := range videosToAdd {
+		allVideos[k] = v
+	}
+	for k, v := range videosToDiscard {
+		allVideos[k] = v
+	}
+
+	err := h.youTubeClient.GetVideoDurations(ctx, allVideos)
 	if err != nil {
 		h.log.Error("Failed to get video durations", "call", "handler.getVideoDurations", "err", err)
 		return
 	}
 
-	for _, video := range videos {
+	// Add videos marked for discard and mark them as discarded
+	for videoID, video := range videosToDiscard {
+		err = h.db.AddVideo(ctx, *video, parsedChannel.ID)
+		if err != nil {
+			if !errors.Is(err, db.ErrVideoExists) {
+				h.log.Error("Failed to save video to db", "call", "db.AddVideo", "err", err)
+			}
+			continue
+		}
+		err = h.db.DiscardVideo(ctx, videoID)
+		if err != nil {
+			h.log.Error("Failed to discard video", "call", "db.DiscardVideo", "err", err)
+		}
+	}
+
+	// Add normal videos
+	for _, video := range videosToAdd {
 		err = h.db.AddVideo(ctx, *video, parsedChannel.ID)
 		if err != nil {
 			if !errors.Is(err, db.ErrVideoExists) {
@@ -109,7 +145,15 @@ func (h *handler) FetchVideos(ctx context.Context) error {
 			h.log.Error("failed to parse channel feed", "error", result.err)
 			continue
 		}
-		h.addVideosForChannel(ctx, result.channel)
+
+		// Get channel's enable_shorts setting
+		channel, err := h.db.GetChannelByID(ctx, result.channel.ID)
+		if err != nil {
+			h.log.Error("failed to get channel settings", "error", err)
+			continue
+		}
+
+		h.addVideosForChannel(ctx, result.channel, channel.EnableShorts)
 	}
 
 	return nil
@@ -198,9 +242,10 @@ func (h *handler) AddCustomVideo(ctx context.Context, videoID string) error {
 	}
 
 	channel := models.Channel{
-		ID:         video.ChannelID,
-		Name:       video.ChannelName,
-		Subscribed: false,
+		ID:           video.ChannelID,
+		Name:         video.ChannelName,
+		Subscribed:   false,
+		EnableShorts: true,
 	}
 	err = h.db.SubscribeToChannel(ctx, channel)
 	if err != nil {
