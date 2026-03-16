@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/TheEdgeOfRage/ytrssil-api/config"
 	"github.com/TheEdgeOfRage/ytrssil-api/db"
 	"github.com/TheEdgeOfRage/ytrssil-api/feedparser"
 	"github.com/TheEdgeOfRage/ytrssil-api/lib/clients/youtube"
@@ -15,6 +16,8 @@ type Handler interface {
 	SubscribeToChannel(ctx context.Context, channelID string) (*models.Channel, error)
 	UnsubscribeFromChannel(ctx context.Context, channelID string) error
 	ListChannels(ctx context.Context) ([]models.Channel, error)
+	GetChannelByID(ctx context.Context, channelID string) (*models.Channel, error)
+	ToggleChannelShorts(ctx context.Context, channelID string, enableShorts bool) error
 	GetNewVideos(ctx context.Context, sortDesc bool) ([]models.Video, error)
 	GetWatchedVideos(ctx context.Context, sortDesc bool, page int) ([]models.Video, error)
 	FetchVideos(ctx context.Context) error
@@ -33,7 +36,7 @@ type handler struct {
 	parser        feedparser.Parser
 	youTubeClient youtube.Client
 	downloader    downloader.Downloader
-	downloadsDir  string
+	config        config.Config
 }
 
 func New(
@@ -42,7 +45,7 @@ func New(
 	parser feedparser.Parser,
 	youTubeClient youtube.Client,
 	downloader downloader.Downloader,
-	downloadsDir string,
+	cfg config.Config,
 ) *handler {
 	return &handler{
 		log:           log,
@@ -50,6 +53,6 @@ func New(
 		parser:        parser,
 		youTubeClient: youTubeClient,
 		downloader:    downloader,
-		downloadsDir:  downloadsDir,
+		config:        cfg,
 	}
 }

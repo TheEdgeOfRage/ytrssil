@@ -27,8 +27,8 @@ func init() {
 	time.Local = time.UTC
 }
 
-func fetcherRoutine(ctx context.Context, l *slog.Logger, h handler.Handler) {
-	ticker := time.NewTicker(5 * time.Minute)
+func fetcherRoutine(ctx context.Context, l *slog.Logger, h handler.Handler, fetchInterval time.Duration) {
+	ticker := time.NewTicker(fetchInterval)
 	for {
 		select {
 		case <-ctx.Done():
@@ -51,6 +51,7 @@ func main() {
 		logger.Error("Failed to parse config", "call", "config.Parse", "error", err)
 		return
 	}
+
 	db, err := db.NewPostgresDB(logger, cfg.DBURI)
 	if err != nil {
 		logger.Error(
@@ -68,7 +69,14 @@ func main() {
 		logger.Error("yt-dlp validation failed", "error", err)
 		return
 	}
-	handler := handler.New(logger, db, parser, youTubeClient, downloader, cfg.DownloadsDir)
+	handler := handler.New(
+		logger,
+		db,
+		parser,
+		youTubeClient,
+		downloader,
+		cfg,
+	)
 	if cfg.Dev {
 		gin.SetMode(gin.DebugMode)
 	} else {
@@ -97,7 +105,7 @@ func main() {
 	fetcherContext, cancelFetcher := context.WithCancel(context.Background())
 	if !cfg.Dev {
 		wg.Go(func() {
-			fetcherRoutine(fetcherContext, logger, handler)
+			fetcherRoutine(fetcherContext, logger, handler, cfg.FetchInterval)
 		})
 	}
 

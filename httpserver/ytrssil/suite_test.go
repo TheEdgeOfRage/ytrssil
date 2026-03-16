@@ -3,9 +3,9 @@ package ytrssil_test
 import (
 	"context"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -42,7 +42,7 @@ type EndpointsTestSuite struct {
 
 func (s *EndpointsTestSuite) SetupSuite() {
 	var err error
-	l := slog.New(slog.NewTextHandler(io.Discard, nil))
+	l := slog.New(slog.NewTextHandler(os.Stderr, nil))
 	s.cfg = config.TestConfig()
 
 	s.schema = fmt.Sprintf("ytrssil_test_%s", ulid.Make().String())
@@ -112,7 +112,7 @@ func (s *EndpointsTestSuite) SetupSuite() {
 		},
 	}
 
-	h := handler.New(l, s.db, s.parser, s.youtubeClient, nil, s.cfg.DownloadsDir)
+	h := handler.New(l, s.db, s.parser, s.youtubeClient, nil, s.cfg)
 
 	gin.SetMode(gin.TestMode)
 	router, err := ytrssil.SetupGinRouter(l, s.cfg, h)
@@ -135,8 +135,9 @@ func (s *EndpointsTestSuite) TearDownSuite() {
 }
 
 func (s *EndpointsTestSuite) SetupTest() {
-	_, err := s.dbConn.Exec(context.Background(), fmt.Sprintf("TRUNCATE TABLE %s.videos", s.schema))
+	query := fmt.Sprintf("TRUNCATE TABLE %s.videos, %s.channels CASCADE", s.schema, s.schema)
+	_, err := s.dbConn.Exec(context.Background(), query)
 	if err != nil {
-		panic(fmt.Sprintf("failed to drop test schema: %v", err))
+		panic(fmt.Sprintf("failed to truncate test tables: %v", err))
 	}
 }

@@ -30,9 +30,9 @@ func (h *handler) GetWatchedVideos(ctx context.Context, sortDesc bool, page int)
 	return h.db.GetWatchedVideos(ctx, sortDesc, WatchedVideosPageSize, offset)
 }
 
-func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedparser.Channel) {
-	var err error
+func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedparser.Channel, enableShorts bool) {
 	videos := make(map[string]*models.Video, len(parsedChannel.Videos))
+
 	for _, parsedVideo := range parsedChannel.Videos {
 		date, err := parsedVideo.Published.Parse()
 		if err != nil {
@@ -46,13 +46,16 @@ func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedpa
 			h.log.Error("Failed to check if video already exists", "call", "db.HasVideo", "err", err)
 			continue
 		}
-		if !exists {
-			videos[videoID] = &models.Video{
-				ID:            videoID,
-				Title:         parsedVideo.Title,
-				PublishedTime: date,
-				IsShort:       parsedVideo.IsShort,
-			}
+
+		if exists {
+			continue
+		}
+
+		videos[videoID] = &models.Video{
+			ID:            videoID,
+			Title:         parsedVideo.Title,
+			PublishedTime: date,
+			IsShort:       parsedVideo.IsShort,
 		}
 	}
 
@@ -60,14 +63,17 @@ func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedpa
 		return
 	}
 
-	err = h.youTubeClient.GetVideoDurations(ctx, videos)
+	// Get durations for all videos
+	err := h.youTubeClient.GetVideoDurations(ctx, videos)
 	if err != nil {
 		h.log.Error("Failed to get video durations", "call", "handler.getVideoDurations", "err", err)
 		return
 	}
 
+	// Add videos with appropriate discard flag
 	for _, video := range videos {
-		err = h.db.AddVideo(ctx, *video, parsedChannel.ID)
+		isDiscarded := video.IsShort && !enableShorts
+		err = h.db.AddVideo(ctx, *video, parsedChannel.ID, isDiscarded)
 		if err != nil {
 			if !errors.Is(err, db.ErrVideoExists) {
 				h.log.Error("Failed to save video to db", "call", "db.AddVideo", "err", err)
@@ -78,8 +84,9 @@ func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedpa
 }
 
 type parseResult struct {
-	channel *feedparser.Channel
-	err     error
+	channel      *feedparser.Channel
+	err          error
+	enableShorts bool
 }
 
 func (h *handler) FetchVideos(ctx context.Context) error {
@@ -95,7 +102,7 @@ func (h *handler) FetchVideos(ctx context.Context) error {
 	for _, channel := range channels {
 		wg.Go(func() {
 			parsedChannel, err := h.parser.Parse(channel.ID)
-			results <- parseResult{channel: parsedChannel, err: err}
+			results <- parseResult{channel: parsedChannel, err: err, enableShorts: channel.EnableShorts}
 		})
 	}
 
@@ -109,7 +116,8 @@ func (h *handler) FetchVideos(ctx context.Context) error {
 			h.log.Error("failed to parse channel feed", "error", result.err)
 			continue
 		}
-		h.addVideosForChannel(ctx, result.channel)
+
+		h.addVideosForChannel(ctx, result.channel, result.enableShorts)
 	}
 
 	return nil
@@ -198,9 +206,10 @@ func (h *handler) AddCustomVideo(ctx context.Context, videoID string) error {
 	}
 
 	channel := models.Channel{
-		ID:         video.ChannelID,
-		Name:       video.ChannelName,
-		Subscribed: false,
+		ID:           video.ChannelID,
+		Name:         video.ChannelName,
+		Subscribed:   false,
+		EnableShorts: true,
 	}
 	err = h.db.SubscribeToChannel(ctx, channel)
 	if err != nil {
@@ -208,7 +217,7 @@ func (h *handler) AddCustomVideo(ctx context.Context, videoID string) error {
 		return err
 	}
 
-	err = h.db.AddVideo(ctx, *video, video.ChannelID)
+	err = h.db.AddVideo(ctx, *video, video.ChannelID, false)
 	if err != nil {
 		if !errors.Is(err, db.ErrVideoExists) {
 			h.log.Error("Failed to save video to db", "call", "db.AddVideo", "err", err)

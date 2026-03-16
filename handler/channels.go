@@ -40,10 +40,11 @@ func (h *handler) SubscribeToChannel(ctx context.Context, channelID string) (*mo
 	}
 
 	channel := models.Channel{
-		ID:         channelID,
-		Name:       parsedChannel.Name,
-		Subscribed: true,
-		ImageURL:   imageURL,
+		ID:           channelID,
+		Name:         parsedChannel.Name,
+		Subscribed:   true,
+		ImageURL:     imageURL,
+		EnableShorts: true,
 	}
 
 	err = h.db.SubscribeToChannel(ctx, channel)
@@ -60,4 +61,12 @@ func (h *handler) UnsubscribeFromChannel(ctx context.Context, channelID string) 
 
 func (h *handler) ListChannels(ctx context.Context) ([]models.Channel, error) {
 	return h.db.ListChannels(ctx)
+}
+
+func (h *handler) GetChannelByID(ctx context.Context, channelID string) (*models.Channel, error) {
+	return h.db.GetChannelByID(ctx, channelID)
+}
+
+func (h *handler) ToggleChannelShorts(ctx context.Context, channelID string, enableShorts bool) error {
+	return h.db.ToggleChannelShorts(ctx, channelID, enableShorts)
 }

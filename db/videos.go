@@ -16,6 +16,7 @@ func (db *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models
 			, is_short
 			, duration
 			, progress
+			, is_discarded
 			, downloaded_at
 			, file_path
 			, download_status
@@ -25,6 +26,7 @@ func (db *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models
 		FROM videos
 		LEFT JOIN channels ON videos.channel_id=channels.id
 		WHERE watch_timestamp IS NULL
+			AND videos.is_discarded = false
 		ORDER BY published_timestamp
 	`
 	if sortDesc {
@@ -48,6 +50,7 @@ func (db *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models
 			&video.IsShort,
 			&video.DurationSeconds,
 			&video.ProgressSeconds,
+			&video.IsDiscarded,
 			&video.DownloadedAt,
 			&video.FilePath,
 			&video.DownloadStatus,
@@ -77,6 +80,7 @@ func (db *postgresDB) GetWatchedVideos(
 			, is_short
 			, duration
 			, progress
+			, is_discarded
 			, downloaded_at
 			, file_path
 			, download_status
@@ -84,8 +88,9 @@ func (db *postgresDB) GetWatchedVideos(
 			, channels.name
 			, channels.id
 		FROM videos
-		LEFT JOIN channels ON videos.channel_id=channels.id
+		LEFT JOIN channels ON videos.channel_id=videos.channel_id
 		WHERE watch_timestamp IS NOT NULL
+			AND videos.is_discarded = false
 		ORDER BY watch_timestamp
 	`
 	if sortDesc {
@@ -111,6 +116,7 @@ func (db *postgresDB) GetWatchedVideos(
 			&video.IsShort,
 			&video.DurationSeconds,
 			&video.ProgressSeconds,
+			&video.IsDiscarded,
 			&video.DownloadedAt,
 			&video.FilePath,
 			&video.DownloadStatus,
@@ -142,7 +148,7 @@ func (db *postgresDB) HasVideo(ctx context.Context, videoID string) (bool, error
 	return count == 1, nil
 }
 
-func (db *postgresDB) AddVideo(ctx context.Context, video models.Video, channelID string) error {
+func (db *postgresDB) AddVideo(ctx context.Context, video models.Video, channelID string, isDiscarded bool) error {
 	query := `
 		INSERT INTO videos (
 			id
@@ -151,7 +157,8 @@ func (db *postgresDB) AddVideo(ctx context.Context, video models.Video, channelI
 			, duration
 			, is_short
 			, channel_id
-		) VALUES ($1, $2, $3, $4, $5, $6)
+			, is_discarded
+		) VALUES ($1, $2, $3, $4, $5, $6, $7)
 		ON CONFLICT DO NOTHING
 	`
 
@@ -164,6 +171,7 @@ func (db *postgresDB) AddVideo(ctx context.Context, video models.Video, channelI
 		video.DurationSeconds,
 		video.IsShort,
 		channelID,
+		isDiscarded,
 	)
 	if err != nil {
 		db.l.Error("Failed to add video", "call", "sql.Exec", "error", err)
@@ -173,6 +181,16 @@ func (db *postgresDB) AddVideo(ctx context.Context, video models.Video, channelI
 		return ErrVideoExists
 	}
 
+	return nil
+}
+
+func (db *postgresDB) DiscardVideo(ctx context.Context, videoID string) error {
+	query := `UPDATE videos SET is_discarded = true WHERE id = $1`
+	_, err := db.db.Exec(ctx, query, videoID)
+	if err != nil {
+		db.l.Error("Failed to discard video", "call", "sql.Exec", "error", err)
+		return err
+	}
 	return nil
 }
 
@@ -239,6 +257,7 @@ func (db *postgresDB) GetVideo(ctx context.Context, videoID string) (*models.Vid
 			, duration
 			, progress
 			, watch_timestamp
+			, is_discarded
 			, downloaded_at
 			, file_path
 			, download_status
@@ -246,7 +265,7 @@ func (db *postgresDB) GetVideo(ctx context.Context, videoID string) (*models.Vid
 			, channels.name
 			, channels.id
 		FROM videos
-		LEFT JOIN channels ON videos.channel_id = channels.id
+		LEFT JOIN channels ON videos.channel_id=channels.id
 		WHERE videos.id = $1
 	`
 
@@ -260,6 +279,7 @@ func (db *postgresDB) GetVideo(ctx context.Context, videoID string) (*models.Vid
 		&video.DurationSeconds,
 		&video.ProgressSeconds,
 		&video.WatchTime,
+		&video.IsDiscarded,
 		&video.DownloadedAt,
 		&video.FilePath,
 		&video.DownloadStatus,
@@ -327,6 +347,7 @@ func (db *postgresDB) GetVideosForCleanup(ctx context.Context, olderThan time.Du
 			AND download_status = 'completed'
 			AND watch_timestamp IS NOT NULL
 			AND watch_timestamp < $1
+			AND is_discarded = false
 	`
 	cutoffTime := time.Now().Add(-olderThan)
 

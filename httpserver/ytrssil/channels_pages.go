@@ -62,3 +62,31 @@ func (srv *server) UnsubscribeFromChannelPage(c *gin.Context) {
 
 	returnMsg(c, http.StatusOK, "")
 }
+
+func (srv *server) ToggleChannelShortsPage(c *gin.Context) {
+	channelID := c.Param("channel_id")
+	enable := c.PostForm("enable") == "true"
+
+	err := srv.handler.ToggleChannelShorts(c.Request.Context(), channelID, enable)
+	if err != nil {
+		if errors.Is(err, db.ErrChannelNotFound) {
+			returnErr(c, http.StatusNotFound, err)
+			return
+		}
+
+		returnErr(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	channel, err := srv.handler.GetChannelByID(c.Request.Context(), channelID)
+	if err != nil {
+		returnErr(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	r := pages.TemplRenderer{
+		Ctx:       c.Request.Context(),
+		Component: pages.ChannelCard(*channel),
+	}
+	c.Render(http.StatusOK, r)
+}

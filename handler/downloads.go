@@ -59,7 +59,7 @@ func (h *handler) performDownload(videoID string) {
 
 	h.log.Info("Starting video download", "video_id", videoID, "title", video.Title)
 
-	filePath, err := h.downloader.Download(ctx, videoID, video.Title, h.downloadsDir)
+	filePath, err := h.downloader.Download(ctx, videoID, video.Title, h.config.DownloadsDir)
 	if err != nil {
 		h.log.Error("Video download failed", "video_id", videoID, "error", err)
 		if dbErr := h.db.SetVideoDownloadFailed(ctx, videoID, err.Error()); dbErr != nil {

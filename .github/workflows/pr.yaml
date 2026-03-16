@@ -1,0 +1,48 @@
+---
+name: "PR CI"
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci:
+    name: "Run CI checks"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 2s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.11.3
+
+      - name: Tests
+        env:
+          DB_URI: postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable
+        run: |-
+          make migrate
+          make test

@@ -35,6 +35,33 @@ templ unsubscribeModal(channelID string) {
 	</div>
 }
 
+templ shortsToggle(channel models.Channel) {
+	<a
+		href={ fmt.Sprintf("/channels/%s/toggle-shorts?enable=%t", channel.ID, !channel.EnableShorts) }
+		class={ fmt.Sprintf("btn btn-sm %s", ifShortsEnabled(channel.EnableShorts)) }
+		hx-post={ fmt.Sprintf("/channels/%s/toggle-shorts", channel.ID) }
+		hx-vals={ fmt.Sprintf(`{"enable": %t}`, !channel.EnableShorts) }
+		hx-target={ fmt.Sprintf("#channel-card-%s", channel.ID) }
+		hx-swap="outerHTML"
+	>
+		{ toggleLabel(channel.EnableShorts) }
+	</a>
+}
+
+func ifShortsEnabled(enabled bool) string {
+	if enabled {
+		return "btn-success"
+	}
+	return "btn-outline-secondary"
+}
+
+func toggleLabel(enabled bool) string {
+	if enabled {
+		return "Shorts: ON"
+	}
+	return "Shorts: OFF"
+}
+
 templ ChannelCard(channel models.Channel) {
 	<div id={ fmt.Sprintf("channel-card-%s", channel.ID) } class="channel-card col-md-3 p-2">
 		@unsubscribeModal(channel.ID)
@@ -62,13 +89,16 @@ templ ChannelCard(channel models.Channel) {
 						{ fmt.Sprintf("%d", channel.UnwatchedCount) } unwatched
 					</p>
 				</div>
-				<button
-					class="btn btn-danger ms-2"
-					data-bs-toggle="modal"
-					data-bs-target={ fmt.Sprintf("#unsubscribe-modal-%s", channel.ID) }
-				>
-					<i class="bi bi-bookmark-dash"></i>
-				</button>
+				<div class="d-flex gap-2 align-items-center">
+					@shortsToggle(channel)
+					<button
+						class="btn btn-danger ms-2"
+						data-bs-toggle="modal"
+						data-bs-target={ fmt.Sprintf("#unsubscribe-modal-%s", channel.ID) }
+					>
+						<i class="bi bi-bookmark-dash"></i>
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>
