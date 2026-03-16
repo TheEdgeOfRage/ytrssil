@@ -1,5 +1,7 @@
-- Don't attempt to edit the generated templ code
-- Don't invoke ANY go commands other than `go vet` and `go mod tidy`
+## IMPORTANT
+
+- Don't edit the generated templ code or mock files
+- Don't invoke ANY go commands, the development workflow is orchestrated with make targets
 
 ## Architecture
 
@@ -19,3 +21,17 @@
 **Background Jobs**: Video fetcher (5min intervals), cleanup routine (1hr intervals) - both disabled in dev mode
 
 **Directory Structure**: `cmd/` (main), `config/`, `db/`, `models/`, `handler/`, `httpserver/`, `pages/` (templ), `lib/clients/`, `lib/downloader/`, `feedparser/`, `migrations/`, `assets/`
+
+## Development Workflow
+
+All Go tooling is managed via `make` targets. Never run `go` commands directly.
+
+**Make Targets**:
+
+- `make lint` — runs `go mod tidy`, `go vet`, and golangci-lint (lint + fmt). Use to check code quality.
+- `make test` — runs `go test -timeout=30s -race ./...`
+- `make templ` — generates Go code from `.templ` files via `templ generate`. Required before build.
+- `make gen-mocks` — regenerates mock files in `mocks/` using moq. Run after changing interfaces in `db/`, `feedparser/`, or `lib/clients/youtube/`.
+- `make migrate` — applies PostgreSQL migrations from `migrations/` dir. Configurable via `DB_URI` env var (default: `postgres://ytrssil:ytrssil@localhost:5432/ytrssil?sslmode=disable`)
+
+**Tool binaries** are installed into `bin/` locally (golangci-lint, moq, migrate) and auto-installed by their respective targets.
