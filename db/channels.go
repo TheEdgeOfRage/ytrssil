@@ -12,7 +12,8 @@ func (db *postgresDB) SubscribeToChannel(ctx context.Context, channel models.Cha
 		INSERT INTO channels (id, name, subscribed, image_url, enable_shorts) VALUES ($1, $2, $3, $4, $5)
 		ON CONFLICT (id) DO UPDATE SET subscribed = $3, image_url = $4, enable_shorts = $5
 	`
-	resp, err := db.db.Exec(ctx, query, channel.ID, channel.Name, channel.Subscribed, channel.ImageURL, channel.EnableShorts)
+	resp, err := db.db.Exec(ctx, query, channel.ID, channel.Name, channel.Subscribed,
+		channel.ImageURL, channel.EnableShorts)
 	if err != nil {
 		db.l.Error("Failed to subscribe to channel", "call", "sql.ExecContext", "error", err)
 		return err
@@ -51,7 +52,8 @@ func (db *postgresDB) ListChannels(ctx context.Context) ([]models.Channel, error
 	channels := make([]models.Channel, 0)
 	for rows.Next() {
 		var channel models.Channel
-		err = rows.Scan(&channel.ID, &channel.Name, &channel.Subscribed, &channel.ImageURL, &channel.EnableShorts, &channel.UnwatchedCount)
+		err = rows.Scan(&channel.ID, &channel.Name, &channel.Subscribed, &channel.ImageURL,
+			&channel.EnableShorts, &channel.UnwatchedCount)
 		if err != nil {
 			db.l.Error("Failed to scan rows to list channels", "call", "sql.Scan", "error", err)
 			return nil, err
