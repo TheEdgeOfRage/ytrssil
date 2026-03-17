@@ -135,7 +135,8 @@ func (s *EndpointsTestSuite) TearDownSuite() {
 }
 
 func (s *EndpointsTestSuite) SetupTest() {
-	_, err := s.dbConn.Exec(context.Background(), fmt.Sprintf("TRUNCATE TABLE %s.videos, %s.channels CASCADE", s.schema, s.schema))
+	query := fmt.Sprintf("TRUNCATE TABLE %s.videos, %s.channels CASCADE", s.schema, s.schema)
+	_, err := s.dbConn.Exec(context.Background(), query)
 	if err != nil {
 		panic(fmt.Sprintf("failed to truncate test tables: %v", err))
 	}
