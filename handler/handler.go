@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"log/slog"
+	"time"
 
 	"github.com/TheEdgeOfRage/ytrssil-api/db"
 	"github.com/TheEdgeOfRage/ytrssil-api/feedparser"
@@ -29,12 +30,15 @@ type Handler interface {
 }
 
 type handler struct {
-	log           *slog.Logger
-	db            db.DB
-	parser        feedparser.Parser
-	youTubeClient youtube.Client
-	downloader    downloader.Downloader
-	downloadsDir  string
+	log             *slog.Logger
+	db              db.DB
+	parser          feedparser.Parser
+	youTubeClient   youtube.Client
+	downloader      downloader.Downloader
+	downloadsDir    string
+	fetchInterval   time.Duration
+	cleanupInterval time.Duration
+	cleanupAge      time.Duration
 }
 
 func New(
@@ -44,13 +48,19 @@ func New(
 	youTubeClient youtube.Client,
 	downloader downloader.Downloader,
 	downloadsDir string,
+	fetchInterval time.Duration,
+	cleanupInterval time.Duration,
+	cleanupAge time.Duration,
 ) *handler {
 	return &handler{
-		log:           log,
-		db:            db,
-		parser:        parser,
-		youTubeClient: youTubeClient,
-		downloader:    downloader,
-		downloadsDir:  downloadsDir,
+		log:             log,
+		db:              db,
+		parser:          parser,
+		youTubeClient:   youTubeClient,
+		downloader:      downloader,
+		downloadsDir:    downloadsDir,
+		fetchInterval:   fetchInterval,
+		cleanupInterval: cleanupInterval,
+		cleanupAge:      cleanupAge,
 	}
 }
