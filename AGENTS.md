@@ -20,7 +20,19 @@
 
 **Background Jobs**: Video fetcher (5min intervals), cleanup routine (1hr intervals) - both disabled in dev mode
 
-**Directory Structure**: `cmd/` (main), `config/`, `db/`, `models/`, `handler/`, `httpserver/`, `pages/` (templ), `lib/clients/`, `lib/downloader/`, `feedparser/`, `migrations/`, `assets/`
+## Project Structure
+
+```
+ytrssil/
+├── cmd/              # Application entry point
+├── handler/          # Business logic
+├── httpserver/       # HTTP routes (HTML + API)
+├── pages/            # UI templates
+├── lib/              # External clients (YouTube, RSS, downloader)
+├── db/               # Database operations
+├── migrations/       # Database schema changes
+└── assets/           # Static files
+```
 
 ## Development Workflow
 
