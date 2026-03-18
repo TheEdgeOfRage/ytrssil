@@ -42,6 +42,9 @@ func TestGetNewVideos(t *testing.T) {
 		&youtube_mock.ClientMock{},
 		nil,
 		testConfig.DownloadsDir,
+		testConfig.GetFetchInterval(),
+		testConfig.GetCleanupInterval(),
+		testConfig.GetCleanupAge(),
 	)
 	resp, err := handler.GetNewVideos(context.TODO(), false)
 

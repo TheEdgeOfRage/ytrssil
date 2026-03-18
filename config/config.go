@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	flags "github.com/jessevdk/go-flags"
 )
@@ -53,6 +54,24 @@ func Parse() (Config, error) {
 	}
 
 	return config, nil
+}
+
+// GetFetchInterval returns the fetch interval as a time.Duration
+func (c Config) GetFetchInterval() time.Duration {
+	d, _ := time.ParseDuration(c.FetchInterval)
+	return d
+}
+
+// GetCleanupInterval returns the cleanup interval as a time.Duration
+func (c Config) GetCleanupInterval() time.Duration {
+	d, _ := time.ParseDuration(c.CleanupInterval)
+	return d
+}
+
+// GetCleanupAge returns the cleanup age as a time.Duration
+func (c Config) GetCleanupAge() time.Duration {
+	d, _ := time.ParseDuration(c.CleanupAge)
+	return d
 }
 
 // TestConfig returns a mostly hardcoded configuration used for running tests
