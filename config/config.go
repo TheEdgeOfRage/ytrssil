@@ -17,6 +17,7 @@ type Config struct {
 	DownloadsDir   string `long:"downloads-dir" env:"DOWNLOADS_DIR" default:"/var/lib/ytrssil/downloads"`
 	FetchInterval  string `long:"fetch-interval" env:"FETCH_INTERVAL" default:"5m"`
 	CleanupInterval string `long:"cleanup-interval" env:"CLEANUP_INTERVAL" default:"1h"`
+	CleanupAge     string `long:"cleanup-age" env:"CLEANUP_AGE" default:"48h"`
 }
 
 func getenvOrDefault(key string, defaultValue string) string {
@@ -68,6 +69,7 @@ func TestConfig() Config {
 		DownloadsDir:  "/tmp/ytrssil-test-downloads",
 		FetchInterval: "5m",
 		CleanupInterval: "1h",
+		CleanupAge:    "48h",
 	}
 
 	return config

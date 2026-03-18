@@ -64,7 +64,11 @@ func main() {
 		return
 	}
 
-	cleanupAge := 48 * time.Hour
+	cleanupAge, err := time.ParseDuration(cfg.CleanupAge)
+	if err != nil {
+		logger.Error("Failed to parse cleanup age", "age", cfg.CleanupAge, "error", err)
+		return
+	}
 
 	db, err := db.NewPostgresDB(logger, cfg.DBURI)
 	if err != nil {
