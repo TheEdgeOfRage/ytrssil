@@ -40,7 +40,7 @@ func (s *VideosTestSuite) TestGetNewVideosJSON() {
 		PublishedTime:   time.Now().Add(-1 * time.Hour),
 		DurationSeconds: 300,
 		IsShort:         false,
-	}, channelID)
+	}, channelID, false)
 	s.Require().NoError(err)
 
 	w := httptest.NewRecorder()
@@ -75,7 +75,7 @@ func (s *VideosTestSuite) TestGetWatchedVideosJSON() {
 		PublishedTime:   time.Now().Add(-1 * time.Hour),
 		DurationSeconds: 300,
 		IsShort:         false,
-	}, channelID)
+	}, channelID, false)
 	s.Require().NoError(err)
 
 	watchTime := time.Now()
@@ -114,7 +114,7 @@ func (s *VideosTestSuite) TestMarkVideoAsWatchedJSON() {
 		PublishedTime:   time.Now().Add(-1 * time.Hour),
 		DurationSeconds: 300,
 		IsShort:         false,
-	}, channelID)
+	}, channelID, false)
 	s.Require().NoError(err)
 
 	w := httptest.NewRecorder()
@@ -148,7 +148,7 @@ func (s *VideosTestSuite) TestMarkVideoAsUnwatchedJSON() {
 		PublishedTime:   time.Now().Add(-1 * time.Hour),
 		DurationSeconds: 300,
 		IsShort:         false,
-	}, channelID)
+	}, channelID, false)
 	s.Require().NoError(err)
 
 	watchTime := time.Now()
@@ -186,7 +186,7 @@ func (s *VideosTestSuite) TestNewVideosPage() {
 		PublishedTime:   time.Now().Add(-1 * time.Hour),
 		DurationSeconds: 300,
 		IsShort:         false,
-	}, channelID)
+	}, channelID, false)
 	s.Require().NoError(err)
 
 	w := httptest.NewRecorder()
@@ -215,7 +215,7 @@ func (s *VideosTestSuite) TestWatchedVideosPage() {
 		PublishedTime:   time.Now().Add(-1 * time.Hour),
 		DurationSeconds: 300,
 		IsShort:         false,
-	}, channelID)
+	}, channelID, false)
 	s.Require().NoError(err)
 
 	watchTime := time.Now()
@@ -261,7 +261,7 @@ func (s *VideosTestSuite) TestMarkVideoAsWatchedPage() {
 		PublishedTime:   time.Now().Add(-1 * time.Hour),
 		DurationSeconds: 300,
 		IsShort:         false,
-	}, channelID)
+	}, channelID, false)
 	s.Require().NoError(err)
 
 	w := httptest.NewRecorder()
@@ -289,7 +289,7 @@ func (s *VideosTestSuite) TestMarkVideoAsUnwatchedPage() {
 		PublishedTime:   time.Now().Add(-1 * time.Hour),
 		DurationSeconds: 300,
 		IsShort:         false,
-	}, channelID)
+	}, channelID, false)
 	s.Require().NoError(err)
 
 	watchTime := time.Now()
@@ -321,7 +321,7 @@ func (s *VideosTestSuite) TestSetVideoProgressPage() {
 		PublishedTime:   time.Now().Add(-1 * time.Hour),
 		DurationSeconds: 300,
 		IsShort:         false,
-	}, channelID)
+	}, channelID, false)
 	s.Require().NoError(err)
 
 	form := url.Values{}

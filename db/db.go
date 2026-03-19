@@ -35,7 +35,7 @@ type DB interface {
 	// HasVideo returns true if the video with the given ID exists in the DB
 	HasVideo(ctx context.Context, videoID string) (bool, error)
 	// AddVideo adds a newly published video to the database
-	AddVideo(ctx context.Context, video models.Video, channelID string) error
+	AddVideo(ctx context.Context, video models.Video, channelID string, isDiscarded bool) error
 	// DiscardVideo marks a video as discarded (e.g., shorts filtered out)
 	DiscardVideo(ctx context.Context, videoID string) error
 	// SetVideoWatchTime sets or unsets the watch timestamp of a video

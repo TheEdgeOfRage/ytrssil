@@ -21,7 +21,7 @@ var _ db.DB = &DBMock{}
 //
 //		// make and configure a mocked db.DB
 //		mockedDB := &DBMock{
-//			AddVideoFunc: func(ctx context.Context, video models.Video, channelID string) error {
+//			AddVideoFunc: func(ctx context.Context, video models.Video, channelID string, isDiscarded bool) error {
 //				panic("mock out the AddVideo method")
 //			},
 //			CloseFunc: func()  {
@@ -86,7 +86,7 @@ var _ db.DB = &DBMock{}
 //	}
 type DBMock struct {
 	// AddVideoFunc mocks the AddVideo method.
-	AddVideoFunc func(ctx context.Context, video models.Video, channelID string) error
+	AddVideoFunc func(ctx context.Context, video models.Video, channelID string, isDiscarded bool) error
 
 	// CloseFunc mocks the Close method.
 	CloseFunc func()
@@ -152,6 +152,8 @@ type DBMock struct {
 			Video models.Video
 			// ChannelID is the channelID argument value.
 			ChannelID string
+			// IsDiscarded is the isDiscarded argument value.
+			IsDiscarded bool
 		}
 		// Close holds details about calls to the Close method.
 		Close []struct {
@@ -312,23 +314,25 @@ type DBMock struct {
 }
 
 // AddVideo calls AddVideoFunc.
-func (mock *DBMock) AddVideo(ctx context.Context, video models.Video, channelID string) error {
+func (mock *DBMock) AddVideo(ctx context.Context, video models.Video, channelID string, isDiscarded bool) error {
 	if mock.AddVideoFunc == nil {
 		panic("DBMock.AddVideoFunc: method is nil but DB.AddVideo was just called")
 	}
 	callInfo := struct {
-		Ctx       context.Context
-		Video     models.Video
-		ChannelID string
+		Ctx         context.Context
+		Video       models.Video
+		ChannelID   string
+		IsDiscarded bool
 	}{
-		Ctx:       ctx,
-		Video:     video,
-		ChannelID: channelID,
+		Ctx:         ctx,
+		Video:       video,
+		ChannelID:   channelID,
+		IsDiscarded: isDiscarded,
 	}
 	mock.lockAddVideo.Lock()
 	mock.calls.AddVideo = append(mock.calls.AddVideo, callInfo)
 	mock.lockAddVideo.Unlock()
-	return mock.AddVideoFunc(ctx, video, channelID)
+	return mock.AddVideoFunc(ctx, video, channelID, isDiscarded)
 }
 
 // AddVideoCalls gets all the calls that were made to AddVideo.
@@ -336,14 +340,16 @@ func (mock *DBMock) AddVideo(ctx context.Context, video models.Video, channelID 
 //
 //	len(mockedDB.AddVideoCalls())
 func (mock *DBMock) AddVideoCalls() []struct {
-	Ctx       context.Context
-	Video     models.Video
-	ChannelID string
+	Ctx         context.Context
+	Video       models.Video
+	ChannelID   string
+	IsDiscarded bool
 } {
 	var calls []struct {
-		Ctx       context.Context
-		Video     models.Video
-		ChannelID string
+		Ctx         context.Context
+		Video       models.Video
+		ChannelID   string
+		IsDiscarded bool
 	}
 	mock.lockAddVideo.RLock()
 	calls = mock.calls.AddVideo

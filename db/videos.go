@@ -25,10 +25,6 @@ func (db *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models
 		FROM videos
 		LEFT JOIN channels ON videos.channel_id=channels.id
 		WHERE watch_timestamp IS NULL
-			AND (
-				videos.is_short = false 
-				OR channels.enable_shorts = true
-			)
 			AND videos.is_discarded = false
 		ORDER BY published_timestamp
 	`
@@ -148,7 +144,7 @@ func (db *postgresDB) HasVideo(ctx context.Context, videoID string) (bool, error
 	return count == 1, nil
 }
 
-func (db *postgresDB) AddVideo(ctx context.Context, video models.Video, channelID string) error {
+func (db *postgresDB) AddVideo(ctx context.Context, video models.Video, channelID string, isDiscarded bool) error {
 	query := `
 		INSERT INTO videos (
 			id
@@ -157,7 +153,8 @@ func (db *postgresDB) AddVideo(ctx context.Context, video models.Video, channelI
 			, duration
 			, is_short
 			, channel_id
-		) VALUES ($1, $2, $3, $4, $5, $6)
+			, is_discarded
+		) VALUES ($1, $2, $3, $4, $5, $6, $7)
 		ON CONFLICT DO NOTHING
 	`
 
@@ -170,6 +167,7 @@ func (db *postgresDB) AddVideo(ctx context.Context, video models.Video, channelI
 		video.DurationSeconds,
 		video.IsShort,
 		channelID,
+		isDiscarded,
 	)
 	if err != nil {
 		db.l.Error("Failed to add video", "call", "sql.Exec", "error", err)
