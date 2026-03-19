@@ -87,7 +87,17 @@ func main() {
 		logger.Error("yt-dlp validation failed", "error", err)
 		return
 	}
-	handler := handler.New(logger, db, parser, youTubeClient, downloader, cfg.DownloadsDir, fetchInterval, cleanupInterval, cleanupAge)
+	handler := handler.New(
+		logger,
+		db,
+		parser,
+		youTubeClient,
+		downloader,
+		cfg.DownloadsDir,
+		fetchInterval,
+		cleanupInterval,
+		cleanupAge,
+	)
 	if cfg.Dev {
 		gin.SetMode(gin.DebugMode)
 	} else {
