@@ -44,9 +44,9 @@ func (s *APITestSuite) SetupSuite() {
 		nil,
 		nil,
 		s.cfg.DownloadsDir,
-		s.cfg.GetFetchInterval(),
-		s.cfg.GetCleanupInterval(),
-		s.cfg.GetCleanupAge(),
+		s.cfg.FetchInterval,
+		s.cfg.CleanupInterval,
+		s.cfg.CleanupAge,
 	)
 
 	gin.SetMode(gin.TestMode)

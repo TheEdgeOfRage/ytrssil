@@ -10,15 +10,15 @@ import (
 )
 
 type Config struct {
-	Dev             bool   `long:"dev" env:"DEV"`
-	Port            int    `long:"port" env:"PORT" default:"8080"`
-	DBURI           string `long:"db-uri" env:"DB_URI"`
-	AuthToken       string `long:"auth-token" env:"AUTH_TOKEN"`
-	YouTubeAPIKey   string `long:"youtube-api-key" env:"YOUTUBE_API_KEY"`
-	DownloadsDir    string `long:"downloads-dir" env:"DOWNLOADS_DIR" default:"/var/lib/ytrssil/downloads"`
-	FetchInterval   string `long:"fetch-interval" env:"FETCH_INTERVAL" default:"5m"`
-	CleanupInterval string `long:"cleanup-interval" env:"CLEANUP_INTERVAL" default:"1h"`
-	CleanupAge      string `long:"cleanup-age" env:"CLEANUP_AGE" default:"48h"`
+	Dev             bool          `long:"dev" env:"DEV"`
+	Port            int           `long:"port" env:"PORT" default:"8080"`
+	DBURI           string        `long:"db-uri" env:"DB_URI"`
+	AuthToken       string        `long:"auth-token" env:"AUTH_TOKEN"`
+	YouTubeAPIKey   string        `long:"youtube-api-key" env:"YOUTUBE_API_KEY"`
+	DownloadsDir    string        `long:"downloads-dir" env:"DOWNLOADS_DIR" default:"/var/lib/ytrssil/downloads"`
+	FetchInterval   time.Duration `long:"fetch-interval" env:"FETCH_INTERVAL" default:"5m"`
+	CleanupInterval time.Duration `long:"cleanup-interval" env:"CLEANUP_INTERVAL" default:"1h"`
+	CleanupAge      time.Duration `long:"cleanup-age" env:"CLEANUP_AGE" default:"48h"`
 }
 
 func getenvOrDefault(key string, defaultValue string) string {
@@ -56,24 +56,6 @@ func Parse() (Config, error) {
 	return config, nil
 }
 
-// GetFetchInterval returns the fetch interval as a time.Duration
-func (c Config) GetFetchInterval() time.Duration {
-	d, _ := time.ParseDuration(c.FetchInterval)
-	return d
-}
-
-// GetCleanupInterval returns the cleanup interval as a time.Duration
-func (c Config) GetCleanupInterval() time.Duration {
-	d, _ := time.ParseDuration(c.CleanupInterval)
-	return d
-}
-
-// GetCleanupAge returns the cleanup age as a time.Duration
-func (c Config) GetCleanupAge() time.Duration {
-	d, _ := time.ParseDuration(c.CleanupAge)
-	return d
-}
-
 // TestConfig returns a mostly hardcoded configuration used for running tests
 func TestConfig() Config {
 	dbURI := getenvOrDefault("DB_URI", "postgres://ytrssil:ytrssil@localhost:5432/ytrssil?sslmode=disable")
@@ -86,9 +68,9 @@ func TestConfig() Config {
 		DBURI:           dbURI,
 		AuthToken:       "foo",
 		DownloadsDir:    "/tmp/ytrssil-test-downloads",
-		FetchInterval:   "5m",
-		CleanupInterval: "1h",
-		CleanupAge:      "48h",
+		FetchInterval:   5 * time.Minute,
+		CleanupInterval: 1 * time.Hour,
+		CleanupAge:      48 * time.Hour,
 	}
 
 	return config

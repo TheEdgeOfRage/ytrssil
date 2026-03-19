@@ -52,24 +52,6 @@ func main() {
 		return
 	}
 
-	fetchInterval, err := time.ParseDuration(cfg.FetchInterval)
-	if err != nil {
-		logger.Error("Failed to parse fetch interval", "interval", cfg.FetchInterval, "error", err)
-		return
-	}
-
-	cleanupInterval, err := time.ParseDuration(cfg.CleanupInterval)
-	if err != nil {
-		logger.Error("Failed to parse cleanup interval", "interval", cfg.CleanupInterval, "error", err)
-		return
-	}
-
-	cleanupAge, err := time.ParseDuration(cfg.CleanupAge)
-	if err != nil {
-		logger.Error("Failed to parse cleanup age", "age", cfg.CleanupAge, "error", err)
-		return
-	}
-
 	db, err := db.NewPostgresDB(logger, cfg.DBURI)
 	if err != nil {
 		logger.Error(
@@ -94,9 +76,9 @@ func main() {
 		youTubeClient,
 		downloader,
 		cfg.DownloadsDir,
-		fetchInterval,
-		cleanupInterval,
-		cleanupAge,
+		cfg.FetchInterval,
+		cfg.CleanupInterval,
+		cfg.CleanupAge,
 	)
 	if cfg.Dev {
 		gin.SetMode(gin.DebugMode)
@@ -128,7 +110,7 @@ func main() {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			fetcherRoutine(fetcherContext, logger, handler, fetchInterval)
+			fetcherRoutine(fetcherContext, logger, handler, cfg.FetchInterval)
 		}()
 	}
 
