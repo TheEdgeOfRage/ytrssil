@@ -107,32 +107,26 @@ func main() {
 	// start periodic fetch videos routine
 	fetcherContext, cancelFetcher := context.WithCancel(context.Background())
 	if !cfg.Dev {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			fetcherRoutine(fetcherContext, logger, handler, cfg.FetchInterval)
-		}()
+		})
 	}
 
 	cleanupContext, cancelCleanup := context.WithCancel(context.Background())
 	if !cfg.Dev {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			handler.CleanupRoutine(cleanupContext)
-		}()
+		})
 	}
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		logger.Info("ytrssil API is starting up", "port", cfg.Port)
 		if err := server.ListenAndServe(); err != nil {
 			if err != http.ErrServerClosed {
 				logger.Error("Server crashed", "call", "server.ListenAndServe", "error", err)
 			}
 		}
-	}()
+	})
 
 	s := <-quit
 	logger.Info("Received signal, shutting down", "signal", s)
