@@ -7,10 +7,10 @@ import (
 )
 
 func (h *handler) CleanupRoutine(ctx context.Context) {
-	ticker := time.NewTicker(h.cleanupInterval)
+	ticker := time.NewTicker(h.config.CleanupInterval)
 	defer ticker.Stop()
 
-	h.log.Info("Starting cleanup goroutine", "interval", h.cleanupInterval, "age", h.cleanupAge)
+	h.log.Info("Starting cleanup goroutine", "interval", h.config.CleanupInterval, "age", h.config.CleanupAge)
 
 	for {
 		select {
@@ -24,7 +24,7 @@ func (h *handler) CleanupRoutine(ctx context.Context) {
 }
 
 func (h *handler) performCleanup(ctx context.Context) {
-	videos, err := h.db.GetVideosForCleanup(ctx, h.cleanupAge)
+	videos, err := h.db.GetVideosForCleanup(ctx, h.config.CleanupAge)
 	if err != nil {
 		h.log.Error("Failed to get videos for cleanup", "error", err)
 		return

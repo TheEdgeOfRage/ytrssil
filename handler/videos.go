@@ -31,7 +31,7 @@ func (h *handler) GetWatchedVideos(ctx context.Context, sortDesc bool, page int)
 }
 
 func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedparser.Channel, enableShorts bool) {
-	videos := make([]*models.Video, 0)
+	videoMap := make(map[string]*models.Video)
 
 	for _, parsedVideo := range parsedChannel.Videos {
 		date, err := parsedVideo.Published.Parse()
@@ -51,34 +51,27 @@ func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedpa
 			continue
 		}
 
-		video := &models.Video{
+		videoMap[videoID] = &models.Video{
 			ID:            videoID,
 			Title:         parsedVideo.Title,
 			PublishedTime: date,
 			IsShort:       parsedVideo.IsShort,
 		}
-		videos = append(videos, video)
 	}
 
-	if len(videos) == 0 {
+	if len(videoMap) == 0 {
 		return
 	}
 
-	// Convert slice to map for GetVideoDurations
-	videoMap := make(map[string]*models.Video)
-	for _, v := range videos {
-		videoMap[v.ID] = v
-	}
-
 	// Get durations for all videos
-	err := h.youTubeClient.GetVideoDurations(ctx, videoMap)
+	err := h.youTube.GetVideoDurations(ctx, videoMap)
 	if err != nil {
 		h.log.Error("Failed to get video durations", "call", "handler.getVideoDurations", "err", err)
 		return
 	}
 
 	// Add videos with appropriate discard flag
-	for _, video := range videos {
+	for _, video := range videoMap {
 		isDiscarded := video.IsShort && !enableShorts
 		err = h.db.AddVideo(ctx, *video, parsedChannel.ID, isDiscarded)
 		if err != nil {
@@ -91,8 +84,9 @@ func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedpa
 }
 
 type parseResult struct {
-	channel *feedparser.Channel
-	err     error
+	channel      *feedparser.Channel
+	err          error
+	enableShorts bool
 }
 
 func (h *handler) FetchVideos(ctx context.Context) error {
@@ -108,7 +102,7 @@ func (h *handler) FetchVideos(ctx context.Context) error {
 	for _, channel := range channels {
 		wg.Go(func() {
 			parsedChannel, err := h.parser.Parse(channel.ID)
-			results <- parseResult{channel: parsedChannel, err: err}
+			results <- parseResult{channel: parsedChannel, err: err, enableShorts: channel.EnableShorts}
 		})
 	}
 
@@ -123,14 +117,7 @@ func (h *handler) FetchVideos(ctx context.Context) error {
 			continue
 		}
 
-		// Get channel's enable_shorts setting
-		channel, err := h.db.GetChannelByID(ctx, result.channel.ID)
-		if err != nil {
-			h.log.Error("failed to get channel settings", "error", err)
-			continue
-		}
-
-		h.addVideosForChannel(ctx, result.channel, channel.EnableShorts)
+		h.addVideosForChannel(ctx, result.channel, result.enableShorts)
 	}
 
 	return nil
@@ -212,7 +199,7 @@ func (h *handler) AddCustomVideo(ctx context.Context, videoID string) error {
 		return nil
 	}
 
-	video, err := h.youTubeClient.GetVideoMetadata(ctx, videoID)
+	video, err := h.youTube.GetVideoMetadata(ctx, videoID)
 	if err != nil {
 		h.log.Error("Failed to get video metadata", "error", err)
 		return err

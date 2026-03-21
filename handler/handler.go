@@ -3,8 +3,8 @@ package handler
 import (
 	"context"
 	"log/slog"
-	"time"
 
+	"github.com/TheEdgeOfRage/ytrssil-api/config"
 	"github.com/TheEdgeOfRage/ytrssil-api/db"
 	"github.com/TheEdgeOfRage/ytrssil-api/feedparser"
 	"github.com/TheEdgeOfRage/ytrssil-api/lib/clients/youtube"
@@ -16,6 +16,7 @@ type Handler interface {
 	SubscribeToChannel(ctx context.Context, channelID string) (*models.Channel, error)
 	UnsubscribeFromChannel(ctx context.Context, channelID string) error
 	ListChannels(ctx context.Context) ([]models.Channel, error)
+	GetChannelByID(ctx context.Context, channelID string) (*models.Channel, error)
 	ToggleChannelShorts(ctx context.Context, channelID string, enableShorts bool) error
 	GetNewVideos(ctx context.Context, sortDesc bool) ([]models.Video, error)
 	GetWatchedVideos(ctx context.Context, sortDesc bool, page int) ([]models.Video, error)
@@ -30,15 +31,12 @@ type Handler interface {
 }
 
 type handler struct {
-	log             *slog.Logger
-	db              db.DB
-	parser          feedparser.Parser
-	youTubeClient   youtube.Client
-	downloader      downloader.Downloader
-	downloadsDir    string
-	fetchInterval   time.Duration
-	cleanupInterval time.Duration
-	cleanupAge      time.Duration
+	log        *slog.Logger
+	db         db.DB
+	parser     feedparser.Parser
+	youTube    youtube.Client
+	downloader downloader.Downloader
+	config     config.Config
 }
 
 func New(
@@ -47,20 +45,14 @@ func New(
 	parser feedparser.Parser,
 	youTubeClient youtube.Client,
 	downloader downloader.Downloader,
-	downloadsDir string,
-	fetchInterval time.Duration,
-	cleanupInterval time.Duration,
-	cleanupAge time.Duration,
+	cfg config.Config,
 ) *handler {
 	return &handler{
-		log:             log,
-		db:              db,
-		parser:          parser,
-		youTubeClient:   youTubeClient,
-		downloader:      downloader,
-		downloadsDir:    downloadsDir,
-		fetchInterval:   fetchInterval,
-		cleanupInterval: cleanupInterval,
-		cleanupAge:      cleanupAge,
+		log:        log,
+		db:         db,
+		parser:     parser,
+		youTube:    youTubeClient,
+		downloader: downloader,
+		config:     cfg,
 	}
 }

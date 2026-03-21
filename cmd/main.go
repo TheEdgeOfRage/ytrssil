@@ -75,10 +75,7 @@ func main() {
 		parser,
 		youTubeClient,
 		downloader,
-		cfg.DownloadsDir,
-		cfg.FetchInterval,
-		cfg.CleanupInterval,
-		cfg.CleanupAge,
+		cfg,
 	)
 	if cfg.Dev {
 		gin.SetMode(gin.DebugMode)

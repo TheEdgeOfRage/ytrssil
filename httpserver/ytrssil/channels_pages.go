@@ -78,23 +78,15 @@ func (srv *server) ToggleChannelShortsPage(c *gin.Context) {
 		return
 	}
 
-	// Return updated channel card
-	channels, err := srv.handler.ListChannels(c.Request.Context())
+	channel, err := srv.handler.GetChannelByID(c.Request.Context(), channelID)
 	if err != nil {
 		returnErr(c, http.StatusInternalServerError, err)
 		return
 	}
 
-	for _, ch := range channels {
-		if ch.ID == channelID {
-			r := pages.TemplRenderer{
-				Ctx:       c.Request.Context(),
-				Component: pages.ChannelCard(ch),
-			}
-			c.Render(http.StatusOK, r)
-			return
-		}
+	r := pages.TemplRenderer{
+		Ctx:       c.Request.Context(),
+		Component: pages.ChannelCard(*channel),
 	}
-
-	returnMsg(c, http.StatusOK, "")
+	c.Render(http.StatusOK, r)
 }

@@ -21,7 +21,7 @@ func (h *handler) SubscribeToChannel(ctx context.Context, channelID string) (*mo
 		if !strings.HasPrefix(handle, "@") {
 			handle = "@" + handle
 		}
-		resolved, err := h.youTubeClient.ResolveChannelID(ctx, handle)
+		resolved, err := h.youTube.ResolveChannelID(ctx, handle)
 		if err != nil {
 			return nil, err
 		}
@@ -33,7 +33,7 @@ func (h *handler) SubscribeToChannel(ctx context.Context, channelID string) (*mo
 		return nil, err
 	}
 
-	imageURL, err := h.youTubeClient.GetChannelImageURL(ctx, channelID)
+	imageURL, err := h.youTube.GetChannelImageURL(ctx, channelID)
 	if err != nil {
 		h.log.Warn("Failed to fetch channel image URL", "channelID", channelID, "error", err)
 		imageURL = ""
@@ -61,6 +61,10 @@ func (h *handler) UnsubscribeFromChannel(ctx context.Context, channelID string) 
 
 func (h *handler) ListChannels(ctx context.Context) ([]models.Channel, error) {
 	return h.db.ListChannels(ctx)
+}
+
+func (h *handler) GetChannelByID(ctx context.Context, channelID string) (*models.Channel, error) {
+	return h.db.GetChannelByID(ctx, channelID)
 }
 
 func (h *handler) ToggleChannelShorts(ctx context.Context, channelID string, enableShorts bool) error {
