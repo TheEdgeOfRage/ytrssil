@@ -21,7 +21,7 @@ func (h *handler) SubscribeToChannel(ctx context.Context, channelID string) (*mo
 		if !strings.HasPrefix(handle, "@") {
 			handle = "@" + handle
 		}
-		resolved, err := h.youTube.ResolveChannelID(ctx, handle)
+		resolved, err := h.youTubeClient.ResolveChannelID(ctx, handle)
 		if err != nil {
 			return nil, err
 		}
@@ -33,7 +33,7 @@ func (h *handler) SubscribeToChannel(ctx context.Context, channelID string) (*mo
 		return nil, err
 	}
 
-	imageURL, err := h.youTube.GetChannelImageURL(ctx, channelID)
+	imageURL, err := h.youTubeClient.GetChannelImageURL(ctx, channelID)
 	if err != nil {
 		h.log.Warn("Failed to fetch channel image URL", "channelID", channelID, "error", err)
 		imageURL = ""

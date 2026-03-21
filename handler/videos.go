@@ -31,7 +31,7 @@ func (h *handler) GetWatchedVideos(ctx context.Context, sortDesc bool, page int)
 }
 
 func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedparser.Channel, enableShorts bool) {
-	videoMap := make(map[string]*models.Video)
+	videos := make(map[string]*models.Video, len(parsedChannel.Videos))
 
 	for _, parsedVideo := range parsedChannel.Videos {
 		date, err := parsedVideo.Published.Parse()
@@ -51,7 +51,7 @@ func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedpa
 			continue
 		}
 
-		videoMap[videoID] = &models.Video{
+		videos[videoID] = &models.Video{
 			ID:            videoID,
 			Title:         parsedVideo.Title,
 			PublishedTime: date,
@@ -59,19 +59,19 @@ func (h *handler) addVideosForChannel(ctx context.Context, parsedChannel *feedpa
 		}
 	}
 
-	if len(videoMap) == 0 {
+	if len(videos) == 0 {
 		return
 	}
 
 	// Get durations for all videos
-	err := h.youTube.GetVideoDurations(ctx, videoMap)
+	err := h.youTubeClient.GetVideoDurations(ctx, videos)
 	if err != nil {
 		h.log.Error("Failed to get video durations", "call", "handler.getVideoDurations", "err", err)
 		return
 	}
 
 	// Add videos with appropriate discard flag
-	for _, video := range videoMap {
+	for _, video := range videos {
 		isDiscarded := video.IsShort && !enableShorts
 		err = h.db.AddVideo(ctx, *video, parsedChannel.ID, isDiscarded)
 		if err != nil {
@@ -199,7 +199,7 @@ func (h *handler) AddCustomVideo(ctx context.Context, videoID string) error {
 		return nil
 	}
 
-	video, err := h.youTube.GetVideoMetadata(ctx, videoID)
+	video, err := h.youTubeClient.GetVideoMetadata(ctx, videoID)
 	if err != nil {
 		h.log.Error("Failed to get video metadata", "error", err)
 		return err

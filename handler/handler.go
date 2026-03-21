@@ -31,12 +31,12 @@ type Handler interface {
 }
 
 type handler struct {
-	log        *slog.Logger
-	db         db.DB
-	parser     feedparser.Parser
-	youTube    youtube.Client
-	downloader downloader.Downloader
-	config     config.Config
+	log           *slog.Logger
+	db            db.DB
+	parser        feedparser.Parser
+	youTubeClient youtube.Client
+	downloader    downloader.Downloader
+	config        config.Config
 }
 
 func New(
@@ -48,11 +48,11 @@ func New(
 	cfg config.Config,
 ) *handler {
 	return &handler{
-		log:        log,
-		db:         db,
-		parser:     parser,
-		youTube:    youTubeClient,
-		downloader: downloader,
-		config:     cfg,
+		log:           log,
+		db:            db,
+		parser:        parser,
+		youTubeClient: youTubeClient,
+		downloader:    downloader,
+		config:        cfg,
 	}
 }
