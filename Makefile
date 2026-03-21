@@ -12,6 +12,8 @@ bin/migrate: bin
 	GOBIN=$(PWD)/bin go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.19.1
 bin/air: bin
 	GOBIN=$(PWD)/bin go install github.com/air-verse/air@v1.64.5
+bin/templ: bin
+	GOBIN=$(PWD)/bin go install github.com/a-h/templ/cmd/templ@v0.3.1001
 
 lint: bin/golangci-lint
 	go mod tidy
@@ -25,8 +27,8 @@ test:
 air: bin/air
 	@./bin/air -c .air.toml
 
-templ:
-	templ generate
+templ: bin/templ
+	bin/templ generate
 
 build: templ
 	go build -o dist/ytrssil ./cmd/main.go
