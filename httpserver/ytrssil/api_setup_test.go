@@ -2,10 +2,10 @@ package ytrssil_test
 
 import (
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	"time"
 
@@ -34,7 +34,7 @@ func TestAPITestSuite(t *testing.T) {
 }
 
 func (s *APITestSuite) SetupSuite() {
-	l := slog.New(slog.NewTextHandler(io.Discard, nil))
+	l := slog.New(slog.NewTextHandler(os.Stderr, nil))
 	s.cfg = config.TestConfig()
 
 	handler := handler.New(

@@ -3,9 +3,9 @@ package ytrssil_test
 import (
 	"context"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -42,7 +42,7 @@ type EndpointsTestSuite struct {
 
 func (s *EndpointsTestSuite) SetupSuite() {
 	var err error
-	l := slog.New(slog.NewTextHandler(io.Discard, nil))
+	l := slog.New(slog.NewTextHandler(os.Stderr, nil))
 	s.cfg = config.TestConfig()
 
 	s.schema = fmt.Sprintf("ytrssil_test_%s", ulid.Make().String())
