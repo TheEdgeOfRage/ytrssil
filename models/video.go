@@ -26,6 +26,9 @@ type Video struct {
 	ProgressSeconds int `json:"progress"`
 	// IsShort indicates if a video is a YouTube short
 	IsShort bool `json:"short"`
+	// IsDiscarded indicates if the video was discarded from the feed without watching
+	// This happens to shorts videos for channels that have shorts disabled
+	IsDiscarded bool `json:"is_discarded"`
 	// DownloadedAt is the timestamp when the video was downloaded to the server
 	DownloadedAt *time.Time `json:"downloaded_at"`
 	// FilePath is the path to the downloaded video file on the server

@@ -16,6 +16,7 @@ func (db *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models
 			, is_short
 			, duration
 			, progress
+			, is_discarded
 			, downloaded_at
 			, file_path
 			, download_status
@@ -78,6 +79,7 @@ func (db *postgresDB) GetWatchedVideos(
 			, is_short
 			, duration
 			, progress
+			, is_discarded
 			, downloaded_at
 			, file_path
 			, download_status
@@ -253,6 +255,7 @@ func (db *postgresDB) GetVideo(ctx context.Context, videoID string) (*models.Vid
 			, duration
 			, progress
 			, watch_timestamp
+			, is_discarded
 			, downloaded_at
 			, file_path
 			, download_status
