@@ -86,6 +86,7 @@ func SetupGinRouter(
 		pages.POST("/videos/:video_id/download", srv.DownloadVideoPage)
 		pages.GET("/videos/:video_id/card", srv.GetVideoCardPage)
 		pages.GET("/videos/:video_id/file", srv.ServeVideoFilePage)
+		pages.GET("/videos/:video_id/resolution-modal", srv.GetResolutionModal)
 	}
 
 	api := engine.Group("/api")

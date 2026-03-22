@@ -1,6 +1,12 @@
 package pages
 
-templ resolutionModal(videoID string, title string) {
+import (
+	"fmt"
+
+	"github.com/TheEdgeOfRage/ytrssil-api/lib/downloader"
+)
+
+templ ResolutionModal(videoID string, title string, formats []downloader.VideoFormat) {
 	<div class="modal fade" id="resolution-modal" tabindex="-1">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -10,11 +16,19 @@ templ resolutionModal(videoID string, title string) {
 				</div>
 				<div class="modal-body">
 					<p class="mb-3">{ title }</p>
-					<div id="format-options" class="d-flex flex-column gap-2">
-						<div class="spinner-border spinner-border-sm text-primary" role="status">
-							<span class="visually-hidden">Loading...</span>
+					<form hx-post={ fmt.Sprintf("/api/videos/%s/download", videoID) } hx-swap="none" hx-on::after-request="closeResolutionModal(event)">
+						<input type="hidden" name="format" id="selected-format"/>
+						<div id="format-options" class="d-flex flex-column gap-2">
+							for _, format := range formats {
+								<button type="button" class="btn btn-outline-primary w-100 text-start format-btn" data-format="{ format.FormatID }">
+									<div class="d-flex justify-content-between align-items-center">
+										<span>{ format.FormatID }</span>
+										<i class="bi bi-download"></i>
+									</div>
+								</button>
+							}
 						</div>
-					</div>
+					</form>
 				</div>
 			</div>
 		</div>

@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/TheEdgeOfRage/ytrssil-api/pages"
 )
 
 func (srv *server) GetNewVideosJSON(c *gin.Context) {
@@ -79,4 +81,20 @@ func (srv *server) DownloadVideoJSON(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"msg": "download started"})
+}
+
+func (srv *server) GetResolutionModal(c *gin.Context) {
+	videoID := c.Param("video_id")
+	title := c.Query("title")
+
+	formats, err := srv.handler.GetVideoFormats(c.Request.Context(), videoID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Render(http.StatusOK, pages.TemplRenderer{
+		Ctx:       c.Request.Context(),
+		Component: pages.ResolutionModal(videoID, title, formats),
+	})
 }
