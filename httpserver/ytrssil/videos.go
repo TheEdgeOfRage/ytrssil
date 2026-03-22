@@ -55,3 +55,28 @@ func (srv *server) MarkVideoAsUnwatchedJSON(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"msg": "cleared video from watch history"})
 }
+
+func (srv *server) GetVideoFormatsJSON(c *gin.Context) {
+	videoID := c.Param("video_id")
+
+	formats, err := srv.handler.GetVideoFormats(c.Request.Context(), videoID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"formats": formats})
+}
+
+func (srv *server) DownloadVideoJSON(c *gin.Context) {
+	videoID := c.Param("video_id")
+	format := c.PostForm("format")
+
+	err := srv.handler.DownloadVideoWithFormat(c.Request.Context(), videoID, format)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"msg": "download started"})
+}
