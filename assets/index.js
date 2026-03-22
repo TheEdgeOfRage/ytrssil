@@ -2,6 +2,14 @@ document.addEventListener("DOMContentLoaded", function() {
 	const searchInput = document.getElementById("video-search");
 	if (!searchInput) return;
 
+	document.querySelectorAll('button[data-url]').forEach(function(btn) {
+		btn.addEventListener('click', function() {
+			const url = this.dataset.url;
+			const filename = this.dataset.filename;
+			downloadVideo(url, filename);
+		});
+	});
+
 	function performSearch() {
 		const videoCards = Array.from(document.querySelectorAll(".video-card"));
 		const query = searchInput.value.trim();
@@ -72,4 +80,21 @@ if ("serviceWorker" in navigator) {
 	}).catch((error) => {
 		console.log("Service Worker registration failed:", error);
 	});
+}
+
+function downloadVideo(url, filename) {
+	const xhr = new XMLHttpRequest();
+	xhr.open("GET", url, true);
+	xhr.responseType = "blob";
+	xhr.onload = function () {
+		if (this.status === 200) {
+			const blob = this.response;
+			const link = document.createElement("a");
+			link.href = window.URL.createObjectURL(blob);
+			link.download = filename;
+			link.click();
+			window.URL.revokeObjectURL(link.href);
+		}
+	};
+	xhr.send();
 }
