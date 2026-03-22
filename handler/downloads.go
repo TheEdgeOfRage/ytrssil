@@ -26,10 +26,6 @@ func sanitizeFilename(title string) string {
 	return title
 }
 
-func (h *handler) DownloadVideo(ctx context.Context, videoID string) error {
-	return h.DownloadVideoWithFormat(ctx, videoID, "")
-}
-
 func (h *handler) DownloadVideoWithFormat(ctx context.Context, videoID string, format string) error {
 	exists, err := h.db.HasVideo(ctx, videoID)
 	if err != nil {

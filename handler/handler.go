@@ -25,7 +25,6 @@ type Handler interface {
 	MarkVideoAsUnwatched(ctx context.Context, videoID string) error
 	SetVideoProgress(ctx context.Context, videoID string, progressTime string) (*models.Video, error)
 	AddCustomVideo(ctx context.Context, videoID string) error
-	DownloadVideo(ctx context.Context, videoID string) error
 	DownloadVideoWithFormat(ctx context.Context, videoID string, format string) error
 	ServeVideoFile(ctx context.Context, videoID string) (filePath string, filename string, err error)
 	CleanupRoutine(ctx context.Context)

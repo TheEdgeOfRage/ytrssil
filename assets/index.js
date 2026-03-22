@@ -46,6 +46,20 @@ document.addEventListener("DOMContentLoaded", function() {
 	}
 });
 
+document.addEventListener("DOMContentLoaded", function() {
+	document.querySelectorAll('.format-btn').forEach(function(btn) {
+		btn.addEventListener('click', function() {
+			const form = this.closest('form');
+			const formatInput = document.createElement('input');
+			formatInput.type = 'hidden';
+			formatInput.name = 'format';
+			formatInput.value = this.dataset.format;
+			form.appendChild(formatInput);
+			form.submit();
+		});
+	});
+});
+
 function addVideoHandler(event) {
 	if (event.detail.successful) {
 		bootstrap.Modal.getInstance(
@@ -98,27 +112,3 @@ function downloadVideo(url, filename) {
 	};
 	xhr.send();
 }
-
-function closeResolutionModal(event) {
-	const xhr = event.detail.xhr;
-	if (xhr.status === 200 || xhr.status === 202) {
-		bootstrap.Modal.getInstance(document.getElementById("resolution-modal")).hide();
-		location.reload();
-	} else {
-		alert('Download failed: ' + (xhr.responseText || 'Unknown error'));
-	}
-}
-
-document.addEventListener("DOMContentLoaded", function() {
-	document.querySelectorAll('.format-btn').forEach(function(btn) {
-		btn.addEventListener('click', function() {
-			const form = this.closest('form');
-			const formatInput = document.createElement('input');
-			formatInput.type = 'hidden';
-			formatInput.name = 'format';
-			formatInput.value = this.dataset.format;
-			form.appendChild(formatInput);
-			form.submit();
-		});
-	});
-});
