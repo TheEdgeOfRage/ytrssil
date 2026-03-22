@@ -2,6 +2,7 @@ package pages
 
 import (
 	"fmt"
+	"html/template"
 
 	"github.com/TheEdgeOfRage/ytrssil-api/models"
 )
@@ -110,19 +111,21 @@ templ VideoCard(video models.Video) {
 							</button>
 						} else if video.DownloadFailed() {
 							<button
+								type="button"
 								class="btn btn-danger"
 								title={ fmt.Sprintf("Download failed: %s", *video.DownloadError) }
-								hx-post={ fmt.Sprintf("/videos/%s/download", video.ID) }
-								hx-target="closest .video-card"
-								hx-swap="outerHTML"
+								data-video-id={ video.ID }
+								data-video-title={ template.HTMLEscapeString(video.Title) }
+								onclick="openResolutionModal(this)"
 							>
 								<i class="bi bi-exclamation-triangle"></i>
 							</button>
 						} else {
 							<button
-								hx-post={ fmt.Sprintf("/videos/%s/download", video.ID) }
-								hx-target="closest .video-card"
-								hx-swap="outerHTML"
+								type="button"
+								data-video-id={ video.ID }
+								data-video-title={ template.HTMLEscapeString(video.Title) }
+								onclick="openResolutionModal(this)"
 								class="btn btn-outline-primary"
 							>
 								<i class="bi bi-download"></i>

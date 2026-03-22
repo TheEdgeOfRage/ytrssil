@@ -85,3 +85,10 @@ type PaginatedVideos struct {
 	Videos     []Video
 	NextOffset int
 }
+
+type VideoFormat struct {
+	Height    int    `json:"height"`
+	FormatID  string `json:"format_id"`
+	Note      string `json:"note"`
+	Extension string `json:"extension"`
+}

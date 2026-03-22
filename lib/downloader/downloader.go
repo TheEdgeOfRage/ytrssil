@@ -12,6 +12,7 @@ const ytDlpFormat = "bestvideo[height<=1080][vcodec^=vp9]+bestaudio/bestvideo[he
 
 type Downloader interface {
 	Download(ctx context.Context, videoID string, title string, outputDir string) (string, error)
+	DownloadWithFormat(ctx context.Context, videoID string, title string, outputDir string, format string) (string, error)
 	ValidateInstallation() error
 }
 
@@ -37,11 +38,21 @@ func (d *ytdlpDownloader) Download(
 	title string,
 	outputDir string,
 ) (string, error) {
+	return d.DownloadWithFormat(ctx, videoID, title, outputDir, ytDlpFormat)
+}
+
+func (d *ytdlpDownloader) DownloadWithFormat(
+	ctx context.Context,
+	videoID string,
+	title string,
+	outputDir string,
+	format string,
+) (string, error) {
 	outputTemplate := filepath.Join(outputDir, fmt.Sprintf("%s.%%(ext)s", videoID))
 
 	cmd := exec.CommandContext(ctx,
 		"yt-dlp",
-		"--format", ytDlpFormat,
+		"--format", format,
 		"--output", outputTemplate,
 		"--no-playlist",
 		"--no-warnings",
