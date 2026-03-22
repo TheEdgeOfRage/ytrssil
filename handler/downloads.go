@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -10,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/TheEdgeOfRage/ytrssil-api/models"
+	"github.com/TheEdgeOfRage/ytrssil-api/lib/downloader"
 )
 
 func sanitizeFilename(title string) string {
@@ -115,7 +114,7 @@ func (h *handler) ServeVideoFile(ctx context.Context, videoID string) (filePath 
 	return *video.FilePath, filename, nil
 }
 
-func (h *handler) GetVideoFormats(ctx context.Context, videoID string) ([]models.VideoFormat, error) {
+func (h *handler) GetVideoFormats(ctx context.Context, videoID string) ([]downloader.VideoFormat, error) {
 	cmd := exec.CommandContext(ctx,
 		"yt-dlp",
 		"--dump-json",
@@ -131,51 +130,7 @@ func (h *handler) GetVideoFormats(ctx context.Context, videoID string) ([]models
 		return nil, fmt.Errorf("failed to get video formats: %w", err)
 	}
 
-	var formats []models.VideoFormat
-
-	lines := strings.Split(string(output), "\n")
-	for _, line := range lines {
-		if strings.TrimSpace(line) == "" {
-			continue
-		}
-
-		var formatInfo map[string]interface{}
-		if err := json.Unmarshal([]byte(line), &formatInfo); err != nil {
-			continue
-		}
-
-		if formatArr, ok := formatInfo["formats"].([]interface{}); ok {
-			for _, f := range formatArr {
-				if fMap, ok := f.(map[string]interface{}); ok {
-					if height, ok := fMap["height"].(float64); ok {
-						if height > 0 {
-							formatID := ""
-							if id, ok := fMap["format_id"].(string); ok {
-								formatID = id
-							}
-
-							note := ""
-							if n, ok := fMap["note"].(string); ok {
-								note = n
-							}
-
-							ext := ""
-							if e, ok := fMap["ext"].(string); ok {
-								ext = e
-							}
-
-							formats = append(formats, models.VideoFormat{
-								Height:    int(height),
-								FormatID:  formatID,
-								Note:      note,
-								Extension: ext,
-							})
-						}
-					}
-				}
-			}
-		}
-	}
+	formats := downloader.ParseFormats(output)
 
 	return formats, nil
 }
