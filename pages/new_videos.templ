@@ -109,12 +109,12 @@ templ VideoCard(video models.Video) {
 							>
 								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 							</button>
-						} else if video.DownloadFailed() {
+} else if video.DownloadFailed() {
 							<button
 								type="button"
 								class="btn btn-danger"
 								title={ fmt.Sprintf("Download failed: %s", *video.DownloadError) }
-								hx-get={ fmt.Sprintf("/api/videos/%s/modal?title=%s", video.ID, template.HTMLEscapeString(video.Title)) }
+								hx-get={ fmt.Sprintf("/videos/%s/resolution-modal?title=%s", video.ID, template.HTMLEscapeString(video.Title)) }
 								hx-target="body"
 								hx-swap="beforeend"
 								data-bs-toggle="modal"
@@ -125,7 +125,7 @@ templ VideoCard(video models.Video) {
 						} else {
 							<button
 								type="button"
-								hx-get={ fmt.Sprintf("/api/videos/%s/modal?title=%s", video.ID, template.HTMLEscapeString(video.Title)) }
+								hx-get={ fmt.Sprintf("/videos/%s/resolution-modal?title=%s", video.ID, template.HTMLEscapeString(video.Title)) }
 								hx-target="body"
 								hx-swap="beforeend"
 								data-bs-toggle="modal"

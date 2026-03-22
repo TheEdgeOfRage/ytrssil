@@ -431,9 +431,9 @@ func VideoCard(video models.Video) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var25 string
-			templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/api/videos/%s/modal?title=%s", video.ID, template.HTMLEscapeString(video.Title)))
+			templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/videos/%s/resolution-modal?title=%s", video.ID, template.HTMLEscapeString(video.Title)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 117, Col: 111}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 117, Col: 118}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 			if templ_7745c5c3_Err != nil {
@@ -449,9 +449,9 @@ func VideoCard(video models.Video) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var26 string
-			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/api/videos/%s/modal?title=%s", video.ID, template.HTMLEscapeString(video.Title)))
+			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/videos/%s/resolution-modal?title=%s", video.ID, template.HTMLEscapeString(video.Title)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 128, Col: 111}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 128, Col: 118}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 			if templ_7745c5c3_Err != nil {

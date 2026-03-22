@@ -86,6 +86,7 @@ func SetupGinRouter(
 		pages.POST("/videos/:video_id/download", srv.DownloadVideoPage)
 		pages.GET("/videos/:video_id/card", srv.GetVideoCardPage)
 		pages.GET("/videos/:video_id/file", srv.ServeVideoFilePage)
+		pages.GET("/videos/:video_id/resolution-modal", srv.GetResolutionModal)
 	}
 
 	api := engine.Group("/api")
@@ -96,7 +97,6 @@ func SetupGinRouter(
 		api.GET("videos/new", srv.GetNewVideosJSON)
 		api.GET("videos/watched", srv.GetWatchedVideosJSON)
 		api.GET("videos/:video_id/formats", srv.GetVideoFormatsJSON)
-		api.GET("videos/:video_id/modal", srv.GetResolutionModal)
 		api.POST("videos/:video_id/watch", srv.MarkVideoAsWatchedJSON)
 		api.POST("videos/:video_id/unwatch", srv.MarkVideoAsUnwatchedJSON)
 		api.POST("videos/:video_id/download", srv.DownloadVideoJSON)
