@@ -1,0 +1,24 @@
+package pages
+
+templ resolutionModal() {
+	<div class="modal fade" id="resolution-modal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5">Select Resolution</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<p id="resolution-modal-title" class="mb-3"></p>
+					<div class="d-flex flex-column gap-2">
+						<button type="button" class="btn btn-outline-primary w-100 resolution-btn" data-height="2160">2160p</button>
+						<button type="button" class="btn btn-outline-primary w-100 resolution-btn" data-height="1440">1440p</button>
+						<button type="button" class="btn btn-outline-primary w-100 resolution-btn" data-height="1080">1080p</button>
+						<button type="button" class="btn btn-outline-primary w-100 resolution-btn" data-height="720">720p</button>
+						<button type="button" class="btn btn-outline-primary w-100 resolution-btn" data-height="480">480p</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}

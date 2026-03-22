@@ -109,22 +109,24 @@ templ VideoCard(video models.Video) {
 								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 							</button>
 						} else if video.DownloadFailed() {
-							<button
-								class="btn btn-danger"
-								title={ fmt.Sprintf("Download failed: %s", *video.DownloadError) }
-								hx-post={ fmt.Sprintf("/videos/%s/download", video.ID) }
-								hx-target="closest .video-card"
-								hx-swap="outerHTML"
-							>
+						<button
+							type="button"
+							class="btn btn-danger"
+							title={ fmt.Sprintf("Download failed: %s", *video.DownloadError) }
+							data-video-id={ video.ID }
+							data-video-title={ video.Title }
+							onclick="openResolutionModal(this)"
+						>
 								<i class="bi bi-exclamation-triangle"></i>
 							</button>
 						} else {
-							<button
-								hx-post={ fmt.Sprintf("/videos/%s/download", video.ID) }
-								hx-target="closest .video-card"
-								hx-swap="outerHTML"
-								class="btn btn-outline-primary"
-							>
+						<button
+							type="button"
+							class="btn btn-outline-primary"
+							data-video-id={ video.ID }
+							data-video-title={ video.Title }
+							onclick="openResolutionModal(this)"
+						>
 								<i class="bi bi-download"></i>
 							</button>
 						}

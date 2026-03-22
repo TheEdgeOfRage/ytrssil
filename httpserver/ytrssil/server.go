@@ -97,6 +97,7 @@ func SetupGinRouter(
 		api.GET("videos/watched", srv.GetWatchedVideosJSON)
 		api.POST("videos/:video_id/watch", srv.MarkVideoAsWatchedJSON)
 		api.POST("videos/:video_id/unwatch", srv.MarkVideoAsUnwatchedJSON)
+		api.POST("videos/:video_id/download", srv.DownloadVideoJSON)
 	}
 
 	return engine, nil

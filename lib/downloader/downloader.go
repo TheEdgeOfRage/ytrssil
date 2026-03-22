@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 )
 
-const ytDlpFormat = "bestvideo[height<=1080][vcodec^=vp9]+bestaudio/bestvideo[height<=1080][vcodec^=av01]+bestaudio/bestvideo[height<=1080]+bestaudio/best[height<=1080]/best" // nolint:lll
+const defaultResolution = "1080"
 
 type Downloader interface {
-	Download(ctx context.Context, videoID string, title string, outputDir string) (string, error)
+	Download(ctx context.Context, videoID string, title string, outputDir string, resolution string) (string, error)
 	ValidateInstallation() error
 }
 
@@ -31,17 +31,28 @@ func (d *ytdlpDownloader) ValidateInstallation() error {
 	return nil
 }
 
+func formatSelector(resolution string) string {
+	return fmt.Sprintf(
+		"bestvideo[height<=%s]+bestaudio/best[height<=%s]",
+		resolution, resolution,
+	)
+}
+
 func (d *ytdlpDownloader) Download(
 	ctx context.Context,
 	videoID string,
 	title string,
 	outputDir string,
+	resolution string,
 ) (string, error) {
+	if resolution == "" {
+		resolution = defaultResolution
+	}
 	outputTemplate := filepath.Join(outputDir, fmt.Sprintf("%s.%%(ext)s", videoID))
 
 	cmd := exec.CommandContext(ctx,
 		"yt-dlp",
-		"--format", ytDlpFormat,
+		"--format", formatSelector(resolution),
 		"--output", outputTemplate,
 		"--no-playlist",
 		"--no-warnings",

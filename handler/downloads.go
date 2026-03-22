@@ -22,7 +22,7 @@ func sanitizeFilename(title string) string {
 	return title
 }
 
-func (h *handler) DownloadVideo(ctx context.Context, videoID string) error {
+func (h *handler) DownloadVideo(ctx context.Context, videoID string, resolution string) error {
 	exists, err := h.db.HasVideo(ctx, videoID)
 	if err != nil {
 		return fmt.Errorf("failed to check video existence: %w", err)
@@ -35,12 +35,12 @@ func (h *handler) DownloadVideo(ctx context.Context, videoID string) error {
 		return fmt.Errorf("failed to set download status: %w", err)
 	}
 
-	go h.performDownload(videoID)
+	go h.performDownload(videoID, resolution)
 
 	return nil
 }
 
-func (h *handler) performDownload(videoID string) {
+func (h *handler) performDownload(videoID string, resolution string) {
 	ctx := context.Background()
 
 	video, err := h.db.GetVideo(ctx, videoID)
@@ -57,9 +57,9 @@ func (h *handler) performDownload(videoID string) {
 		return
 	}
 
-	h.log.Info("Starting video download", "video_id", videoID, "title", video.Title)
+	h.log.Info("Starting video download", "video_id", videoID, "title", video.Title, "resolution", resolution)
 
-	filePath, err := h.downloader.Download(ctx, videoID, video.Title, h.config.DownloadsDir)
+	filePath, err := h.downloader.Download(ctx, videoID, video.Title, h.config.DownloadsDir, resolution)
 	if err != nil {
 		h.log.Error("Video download failed", "video_id", videoID, "error", err)
 		if dbErr := h.db.SetVideoDownloadFailed(ctx, videoID, err.Error()); dbErr != nil {

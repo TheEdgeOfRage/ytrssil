@@ -2,14 +2,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	const searchInput = document.getElementById("video-search");
 	if (!searchInput) return;
 
-	document.querySelectorAll('button[data-url]').forEach(function(btn) {
-		btn.addEventListener('click', function() {
-			const url = this.dataset.url;
-			const filename = this.dataset.filename;
-			downloadVideo(url, filename);
-		});
-	});
-
 	function performSearch() {
 		const videoCards = Array.from(document.querySelectorAll(".video-card"));
 		const query = searchInput.value.trim();
@@ -44,6 +36,36 @@ document.addEventListener("DOMContentLoaded", function() {
 	if (searchInput.value.trim()) {
 		performSearch();
 	}
+});
+
+document.addEventListener('click', function(e) {
+	const btn = e.target.closest('button[data-url]');
+	if (!btn) return;
+	downloadVideo(btn.dataset.url, btn.dataset.filename);
+});
+
+var currentVideoID = '';
+
+function openResolutionModal(button) {
+	currentVideoID = button.dataset.videoId;
+	document.getElementById('resolution-modal-title').textContent = button.dataset.videoTitle;
+	new bootstrap.Modal(document.getElementById('resolution-modal')).show();
+}
+
+document.addEventListener('click', function(e) {
+	const btn = e.target.closest('.resolution-btn');
+	if (!btn || !currentVideoID) return;
+	const formData = new FormData();
+	formData.append('format', btn.dataset.height);
+	fetch('/videos/' + currentVideoID + '/download', {
+		method: 'POST',
+		body: formData,
+	}).then(function(resp) {
+		if (resp.ok) {
+			bootstrap.Modal.getInstance(document.getElementById('resolution-modal')).hide();
+			location.reload();
+		}
+	});
 });
 
 function addVideoHandler(event) {

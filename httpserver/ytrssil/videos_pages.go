@@ -101,8 +101,9 @@ func (srv server) AddVideoPage(c *gin.Context) {
 
 func (srv server) DownloadVideoPage(c *gin.Context) {
 	videoID := c.Param("video_id")
+	resolution := c.PostForm("format")
 
-	err := srv.handler.DownloadVideo(c.Request.Context(), videoID)
+	err := srv.handler.DownloadVideo(c.Request.Context(), videoID, resolution)
 	if err != nil {
 		returnErr(c, http.StatusInternalServerError, err)
 		return
