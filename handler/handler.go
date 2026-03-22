@@ -28,7 +28,7 @@ type Handler interface {
 	DownloadVideoWithFormat(ctx context.Context, videoID string, format string) error
 	ServeVideoFile(ctx context.Context, videoID string) (filePath string, filename string, err error)
 	CleanupRoutine(ctx context.Context)
-	GetVideoFormats(ctx context.Context, videoID string) ([]models.VideoFormat, error)
+	GetVideoFormats(ctx context.Context, videoID string) ([]downloader.VideoFormat, error)
 }
 
 type handler struct {

@@ -1,37 +1,36 @@
 package downloader
 
 import (
-	"context"
+	"compress/gzip"
 	"encoding/json"
-	"os/exec"
+	"io"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
+func loadFormats(t *testing.T) []byte {
+	file, err := os.Open("formats.json.gz")
+	require.NoError(t, err, "should open formats.json.gz")
+	defer file.Close()
+
+	reader, err := gzip.NewReader(file)
+	require.NoError(t, err, "should create gzip reader")
+	defer reader.Close()
+
+	output, err := io.ReadAll(reader)
+	require.NoError(t, err, "should decompress gzip")
+
+	return output
+}
+
 func TestGetVideoFormats(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
-
-	videoID := "4PKfzGPZ2_A"
-
-	cmd := exec.CommandContext(context.Background(),
-		"yt-dlp",
-		"--dump-json",
-		"--no-playlist",
-		"--no-warnings",
-		"--quiet",
-		"--format", "best",
-		"https://www.youtube.com/watch?v="+videoID,
-	)
-
-	output, err := cmd.Output()
-	require.NoError(t, err, "yt-dlp should succeed")
+	output := loadFormats(t)
 
 	var formatInfo map[string]interface{}
-	err = json.Unmarshal(output, &formatInfo)
+	err := json.Unmarshal(output, &formatInfo)
 	require.NoError(t, err, "should parse JSON output")
 
 	formats, ok := formatInfo["formats"].([]interface{})
@@ -52,22 +51,9 @@ func TestGetVideoFormats(t *testing.T) {
 }
 
 func TestParseVideoFormats(t *testing.T) {
-	videoID := "4PKfzGPZ2_A"
+	output := loadFormats(t)
 
-	cmd := exec.CommandContext(context.Background(),
-		"yt-dlp",
-		"--dump-json",
-		"--no-playlist",
-		"--no-warnings",
-		"--quiet",
-		"--format", "best",
-		"https://www.youtube.com/watch?v="+videoID,
-	)
-
-	output, err := cmd.Output()
-	require.NoError(t, err, "yt-dlp should succeed")
-
-	formats := parseFormats(output)
+	formats := ParseFormats(output)
 
 	assert.NotEmpty(t, formats, "should have formats")
 
