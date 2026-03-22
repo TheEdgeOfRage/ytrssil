@@ -17,7 +17,7 @@ templ ResolutionModal(videoID string, title string, formats []downloader.VideoFo
 				<div class="modal-body">
 					<p class="mb-3">{ title }</p>
 					<form hx-post={ fmt.Sprintf("/api/videos/%s/download", videoID) } hx-swap="none" hx-on::after-request="closeResolutionModal(event)">
-						<input type="hidden" name="format" id="selected-format" />
+						<input type="hidden" name="format" id="selected-format"/>
 						<div id="format-options" class="d-flex flex-column gap-2">
 							for _, format := range formats {
 								<button type="button" class="btn btn-outline-primary w-100 text-start format-btn" data-format="{ format.FormatID }">
