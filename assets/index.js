@@ -99,78 +99,26 @@ function downloadVideo(url, filename) {
 	xhr.send();
 }
 
-function openResolutionModal(button) {
-	const videoID = button.dataset.videoId;
-	const title = button.dataset.videoTitle;
+function closeResolutionModal(event) {
+	const xhr = event.detail.xhr;
+	if (xhr.status === 200 || xhr.status === 202) {
+		bootstrap.Modal.getInstance(document.getElementById("resolution-modal")).hide();
+		location.reload();
+	} else {
+		alert('Download failed: ' + (xhr.responseText || 'Unknown error'));
+	}
+}
 
-	const modalElement = document.getElementById("resolution-modal");
-	const modalTitle = modalElement.querySelector(".modal-title");
-	const formatOptions = document.getElementById("format-options");
-
-	modalTitle.textContent = `Download: ${title}`;
-	formatOptions.innerHTML = '<div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
-
-	const modal = new bootstrap.Modal(modalElement);
-	modal.show();
-
-	fetch(`/api/videos/${videoID}/formats`)
-		.then(response => response.json())
-		.then(data => {
-			if (data.formats && data.formats.length > 0) {
-				const uniqueResolutions = new Map();
-				data.formats.forEach(format => {
-					if (!uniqueResolutions.has(format.height)) {
-						uniqueResolutions.set(format.height, format);
-					}
-				});
-
-				const sortedResolutions = Array.from(uniqueResolutions.values())
-					.sort((a, b) => b.height - a.height);
-
-				formatOptions.innerHTML = sortedResolutions.map(format => {
-					const resolutionLabel = format.height > 0 ? `${format.height}p` : 'Unknown';
-					const note = format.note ? ` - ${format.note}` : '';
-					const formatId = format.format_id ? format.format_id : '';
-					return `<button type="button" class="btn btn-outline-primary w-100 text-start" data-format="${formatId}">
-						<div class="d-flex justify-content-between align-items-center">
-							<span>${resolutionLabel}${note}</span>
-							<i class="bi bi-download"></i>
-						</div>
-					</button>`;
-				}).join('');
-
-				formatOptions.querySelectorAll('button[data-format]').forEach(btn => {
-					btn.addEventListener('click', function() {
-						const format = this.dataset.format;
-						downloadWithFormat(videoID, format);
-						modal.hide();
-					});
-				});
-			} else {
-				formatOptions.innerHTML = '<div class="alert alert-warning">No formats available</div>';
-			}
-		})
-		.catch(error => {
-			formatOptions.innerHTML = '<div class="alert alert-danger">Failed to load formats</div>';
-			console.error('Error fetching formats:', error);
+document.addEventListener("DOMContentLoaded", function() {
+	document.querySelectorAll('.format-btn').forEach(function(btn) {
+		btn.addEventListener('click', function() {
+			const form = this.closest('form');
+			const formatInput = document.createElement('input');
+			formatInput.type = 'hidden';
+			formatInput.name = 'format';
+			formatInput.value = this.dataset.format;
+			form.appendChild(formatInput);
+			form.submit();
 		});
-}
-
-function downloadWithFormat(videoID, format) {
-	const formData = new FormData();
-	formData.append("format", format);
-
-	const xhr = new XMLHttpRequest();
-	xhr.open("POST", `/api/videos/${videoID}/download`, true);
-	xhr.onload = function() {
-		if (this.status === 200 || this.status === 202) {
-			location.reload();
-		} else {
-			alert('Download failed: ' + (this.responseText || 'Unknown error'));
-		}
-	};
-	xhr.onerror = function() {
-		alert('Network error occurred');
-	};
-	xhr.send(formData);
-}
+	});
+});

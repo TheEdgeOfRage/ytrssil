@@ -96,6 +96,7 @@ func SetupGinRouter(
 		api.GET("videos/new", srv.GetNewVideosJSON)
 		api.GET("videos/watched", srv.GetWatchedVideosJSON)
 		api.GET("videos/:video_id/formats", srv.GetVideoFormatsJSON)
+		api.GET("videos/:video_id/modal", srv.GetResolutionModal)
 		api.POST("videos/:video_id/watch", srv.MarkVideoAsWatchedJSON)
 		api.POST("videos/:video_id/unwatch", srv.MarkVideoAsUnwatchedJSON)
 		api.POST("videos/:video_id/download", srv.DownloadVideoJSON)

@@ -114,18 +114,22 @@ templ VideoCard(video models.Video) {
 								type="button"
 								class="btn btn-danger"
 								title={ fmt.Sprintf("Download failed: %s", *video.DownloadError) }
-								data-video-id={ video.ID }
-								data-video-title={ template.HTMLEscapeString(video.Title) }
-								onclick="openResolutionModal(this)"
+								hx-get={ fmt.Sprintf("/api/videos/%s/modal?title=%s", video.ID, template.HTMLEscapeString(video.Title)) }
+								hx-target="body"
+								hx-swap="beforeend"
+								data-bs-toggle="modal"
+								data-bs-target="#resolution-modal"
 							>
 								<i class="bi bi-exclamation-triangle"></i>
 							</button>
 						} else {
 							<button
 								type="button"
-								data-video-id={ video.ID }
-								data-video-title={ template.HTMLEscapeString(video.Title) }
-								onclick="openResolutionModal(this)"
+								hx-get={ fmt.Sprintf("/api/videos/%s/modal?title=%s", video.ID, template.HTMLEscapeString(video.Title)) }
+								hx-target="body"
+								hx-swap="beforeend"
+								data-bs-toggle="modal"
+								data-bs-target="#resolution-modal"
 								class="btn btn-outline-primary"
 							>
 								<i class="bi bi-download"></i>
