@@ -2,6 +2,15 @@ document.addEventListener("DOMContentLoaded", function() {
 	const searchInput = document.getElementById("video-search");
 	if (!searchInput) return;
 
+	const addVideoInput = document.querySelector("#add-video-modal input[name='video_id']");
+	if (addVideoInput) {
+		document.addEventListener("show.bs.modal", function (e) {
+			if (e.target.id === "add-video-modal") {
+				addVideoInput.focus();
+			}
+		});
+	}
+
 	function performSearch() {
 		const videoCards = Array.from(document.querySelectorAll(".video-card"));
 		const query = searchInput.value.trim();
