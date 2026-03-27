@@ -5,9 +5,9 @@ DB_URI ?= postgres://ytrssil:ytrssil@localhost:5432/ytrssil?sslmode=disable
 bin:
 	mkdir bin
 bin/moq: bin
-	GOBIN=$(PWD)/bin go install github.com/matryer/moq@v0.6.0
+	GOBIN=$(PWD)/bin go install github.com/matryer/moq@v0.7.1
 bin/golangci-lint: bin
-	GOBIN=$(PWD)/bin go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.3
+	GOBIN=$(PWD)/bin go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.4
 bin/migrate: bin
 	GOBIN=$(PWD)/bin go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.19.1
 bin/air: bin

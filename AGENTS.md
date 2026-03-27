@@ -1,6 +1,6 @@
 ## IMPORTANT
 
-- Don't edit the generated templ code or mock files
+- Don't edit generated go code like the templ.go or mock files manually. Always generate them using the make targets
 - Don't invoke ANY go commands, the development workflow is orchestrated with make targets
 
 ## Architecture
