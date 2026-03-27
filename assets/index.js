@@ -1,4 +1,12 @@
 document.addEventListener("DOMContentLoaded", function() {
+	const addVideoModal = document.getElementById("add-video-modal");
+	if (addVideoModal) {
+		addVideoModal.addEventListener("shown.bs.modal", function () {
+			const input = addVideoModal.querySelector("input[name='video_id']");
+			if (input) input.focus();
+		});
+	}
+
 	const searchInput = document.getElementById("video-search");
 	if (!searchInput) return;
 
