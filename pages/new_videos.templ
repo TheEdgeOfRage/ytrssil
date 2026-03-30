@@ -89,14 +89,12 @@ templ VideoCard(video models.Video) {
 					</form>
 					<div class="d-flex gap-2">
 						if video.IsDownloaded() {
-							<button
-								type="button"
+							<a
+								href={ templ.SafeURL(fmt.Sprintf("/videos/%s/file", video.ID)) }
 								class="btn btn-success"
-								data-url={ templ.SafeURL(fmt.Sprintf("/videos/%s/file", video.ID)) }
-								data-filename={ templ.SafeURL(video.Title + ".mp4") }
 							>
 								<i class="bi bi-download"></i>
-							</button>
+							</a>
 						} else if video.IsDownloading() {
 							<button
 								class="btn btn-primary"

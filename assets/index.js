@@ -46,12 +46,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	}
 });
 
-document.addEventListener('click', function(e) {
-	const btn = e.target.closest('button[data-url]');
-	if (!btn) return;
-	downloadVideo(btn.dataset.url, btn.dataset.filename);
-});
-
 var currentVideoID = '';
 
 function openResolutionModal(button) {
@@ -112,19 +106,4 @@ if ("serviceWorker" in navigator) {
 	});
 }
 
-function downloadVideo(url, filename) {
-	const xhr = new XMLHttpRequest();
-	xhr.open("GET", url, true);
-	xhr.responseType = "blob";
-	xhr.onload = function () {
-		if (this.status === 200) {
-			const blob = this.response;
-			const link = document.createElement("a");
-			link.href = window.URL.createObjectURL(blob);
-			link.download = filename;
-			link.click();
-			window.URL.revokeObjectURL(link.href);
-		}
-	};
-	xhr.send();
-}
+
