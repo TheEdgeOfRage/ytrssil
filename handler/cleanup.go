@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"os"
 	"time"
 )
@@ -37,9 +38,13 @@ func (h *handler) performCleanup(ctx context.Context) {
 
 		h.log.Info("Cleaning up video file", "video_id", video.ID, "path", *video.FilePath)
 
-		if err := os.Remove(*video.FilePath); err != nil {
-			h.log.Error("Failed to delete file", "path", *video.FilePath, "error", err)
-			continue
+		err := os.Remove(*video.FilePath)
+		if err != nil {
+			if !errors.Is(err, os.ErrNotExist) {
+				h.log.Error("Failed to delete file", "path", *video.FilePath, "error", err)
+				continue
+			}
+			h.log.Warn("File already deleted, cleaning DB entry", "path", *video.FilePath)
 		}
 
 		if err := h.db.DeleteVideoFile(ctx, video.ID); err != nil {
