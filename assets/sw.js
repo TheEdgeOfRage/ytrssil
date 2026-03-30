@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ytrssil-v1';
+const CACHE_NAME = 'ytrssil-v2';
 const ASSETS_TO_CACHE = [
 	'/',
 	'/assets/vendor/bootstrap.min.css',
@@ -36,6 +36,11 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+	const url = new URL(event.request.url);
+	if (url.pathname.match(/^\/videos\/[^/]+\/file$/)) {
+		return;
+	}
+
 	event.respondWith(
 		caches.match(event.request).then((response) => {
 			return response || fetch(event.request);
