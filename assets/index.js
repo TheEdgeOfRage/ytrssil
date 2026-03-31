@@ -73,6 +73,30 @@ document.addEventListener("click", function (e) {
 	});
 });
 
+function animateRemove(selector) {
+	const el = document.querySelector(selector);
+	if (!el) return;
+	const siblings = [...el.parentElement.children].filter(c => c !== el);
+	const oldRects = siblings.map(s => s.getBoundingClientRect());
+
+	el.style.transition = "opacity 0.15s ease-out";
+	el.style.opacity = "0";
+	setTimeout(() => {
+		el.remove();
+		siblings.forEach((s, i) => {
+			const newRect = s.getBoundingClientRect();
+			const dx = oldRects[i].left - newRect.left;
+			const dy = oldRects[i].top - newRect.top;
+			if (!dx && !dy) return;
+			s.style.transition = "none";
+			s.style.transform = `translate(${dx}px, ${dy}px)`;
+			s.offsetHeight; // force reflow
+			s.style.transition = "transform 0.2s ease-out";
+			s.style.transform = "";
+		});
+	}, 150);
+}
+
 function showFormError(modalId, errorText) {
 	const modal = document.getElementById(modalId);
 	if (!modal) return;

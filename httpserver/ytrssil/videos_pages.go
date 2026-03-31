@@ -65,7 +65,7 @@ func (srv server) MarkVideoAsWatchedPage(c *gin.Context) {
 	}
 
 	sse := newSSE(c)
-	sse.RemoveElement(fmt.Sprintf("#video-card-%s", videoID))
+	sse.ExecuteScript(fmt.Sprintf(`animateRemove("#video-card-%s")`, videoID))
 }
 
 func (srv server) MarkVideoAsUnwatchedPage(c *gin.Context) {
@@ -77,7 +77,7 @@ func (srv server) MarkVideoAsUnwatchedPage(c *gin.Context) {
 	}
 
 	sse := newSSE(c)
-	sse.RemoveElement(fmt.Sprintf("#video-card-%s", videoID))
+	sse.ExecuteScript(fmt.Sprintf(`animateRemove("#video-card-%s")`, videoID))
 }
 
 func (srv server) SetVideoProgressPage(c *gin.Context) {

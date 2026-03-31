@@ -64,7 +64,7 @@ func (srv *server) UnsubscribeFromChannelPage(c *gin.Context) {
 	}
 
 	sse := newSSE(c)
-	sse.RemoveElement(fmt.Sprintf("#channel-card-%s", channelID))
+	sse.ExecuteScript(fmt.Sprintf(`animateRemove("#channel-card-%s")`, channelID))
 }
 
 func (srv *server) ToggleChannelShortsPage(c *gin.Context) {
