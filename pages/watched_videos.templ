@@ -23,9 +23,7 @@ templ watchedVideoCard(video models.Video) {
 			</p>
 			<div class="d-flex justify-content-end">
 				<button
-					hx-patch={ fmt.Sprintf("/videos/%s/unwatch", video.ID) }
-					hx-target="closest .video-card"
-					hx-swap="outerHTML"
+					data-on-click={ fmt.Sprintf("@patch('/videos/%s/unwatch')", video.ID) }
 					class="btn btn-secondary"
 				>
 					<i class="bi bi-arrow-counterclockwise"></i>
@@ -39,7 +37,7 @@ templ WatchedVideosPage(videos []models.Video, currentPage int) {
 	@BaseLayout("ytrssil - Watched Videos", "watched") {
 		<div class="row">
 			for _, video := range videos {
-				<div class="video-card col-md-3 p-2" data-title={ video.Title } data-channel-name={ video.ChannelName }>
+				<div id={ fmt.Sprintf("video-card-%s", video.ID) } class="video-card col-md-3 p-2" data-title={ video.Title } data-channel-name={ video.ChannelName }>
 					@watchedVideoCard(video)
 				</div>
 			}

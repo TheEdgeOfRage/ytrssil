@@ -12,13 +12,10 @@ templ subscriptionModal() {
 					<form
 						id="subscription-form"
 						class="d-flex"
-						hx-post="/subscribe"
-						hx-swap="none"
-						hx-on::after-request="subscribeHandler(event)"
+						data-on-submit__prevent="$channelID = el.querySelector('input').value; @post('/subscribe')"
 					>
 						<input
 							type="text"
-							name="channel_id"
 							placeholder="Channel ID or username"
 							class="form-control"
 							autocomplete="off"

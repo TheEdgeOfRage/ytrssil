@@ -55,9 +55,7 @@ templ navbar(route string) {
 							type="button"
 							class="btn btn-outline-secondary"
 							style="--bs-btn-color: var(--bs-body-color);"
-							hx-post="/fetch"
-							hx-swap="none"
-							hx-on::after-settle="window.location.reload()"
+							data-on-click="@post('/fetch')"
 						>
 							<span class="d-none d-lg-inline">Fetch </span><i class="bi bi-cloud-download"></i>
 						</button>

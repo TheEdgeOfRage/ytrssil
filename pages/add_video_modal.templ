@@ -13,16 +13,13 @@ templ addVideoModal() {
 					<form
 						id="add-video-form"
 						class="d-flex"
-						hx-post="/videos"
-						hx-swap="none"
-						hx-on::after-request="addVideoHandler(event)"
+						data-on-submit__prevent="$videoID = el.querySelector('input').value; @post('/videos')"
 					>
 						<input
 							type="text"
-							name="video_id"
 							placeholder="Video ID"
 							class="form-control"
-						autocomplete="off"
+							autocomplete="off"
 						/>
 						<button type="submit" class="btn btn-primary ms-3"><i class="bi bi-camera-video"></i></button>
 					</form>
