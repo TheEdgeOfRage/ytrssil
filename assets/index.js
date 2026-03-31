@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
 	const addVideoModal = document.getElementById("add-video-modal");
 	if (addVideoModal) {
 		addVideoModal.addEventListener("shown.bs.modal", function () {
@@ -46,25 +46,28 @@ document.addEventListener("DOMContentLoaded", function() {
 	}
 });
 
-var currentVideoID = '';
+var currentVideoID = "";
 
 function openResolutionModal(button) {
 	currentVideoID = button.dataset.videoId;
-	document.getElementById('resolution-modal-title').textContent = button.dataset.videoTitle;
-	new bootstrap.Modal(document.getElementById('resolution-modal')).show();
+	document.getElementById("resolution-modal-title").textContent =
+		button.dataset.videoTitle;
+	new bootstrap.Modal(document.getElementById("resolution-modal")).show();
 }
 
-document.addEventListener('click', function(e) {
-	const btn = e.target.closest('.resolution-btn');
+document.addEventListener("click", function (e) {
+	const btn = e.target.closest(".resolution-btn");
 	if (!btn || !currentVideoID) return;
 	const formData = new FormData();
-	formData.append('format', btn.dataset.height);
-	fetch('/videos/' + currentVideoID + '/download', {
-		method: 'POST',
+	formData.append("format", btn.dataset.height);
+	fetch("/videos/" + currentVideoID + "/download", {
+		method: "POST",
 		body: formData,
-	}).then(function(resp) {
+	}).then(function (resp) {
 		if (resp.ok) {
-			bootstrap.Modal.getInstance(document.getElementById('resolution-modal')).hide();
+			bootstrap.Modal.getInstance(
+				document.getElementById("resolution-modal"),
+			).hide();
 			location.reload();
 		}
 	});
@@ -82,11 +85,15 @@ function showFormError(modalId, errorText) {
 }
 
 if ("serviceWorker" in navigator) {
-	navigator.serviceWorker.register("/assets/sw.js").then((registration) => {
-		console.log("Service Worker registered with scope:", registration.scope);
-	}).catch((error) => {
-		console.log("Service Worker registration failed:", error);
-	});
+	navigator.serviceWorker
+		.register("/assets/sw.js")
+		.then((registration) => {
+			console.log(
+				"Service Worker registered with scope:",
+				registration.scope,
+			);
+		})
+		.catch((error) => {
+			console.log("Service Worker registration failed:", error);
+		});
 }
-
-
