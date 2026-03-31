@@ -345,14 +345,14 @@ func VideoCard(video models.Video) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</span></p><div class=\"d-flex justify-content-between\"><form data-on-submit__prevent=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</span></p><div class=\"d-flex justify-content-between\"><form data-signals=\"{progress: ''}\" data-on-submit__prevent=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var20 string
-		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("$progress = el.querySelector('input').value; @patch('/videos/%s/progress')", video.ID))
+		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("$progress = evt.target.querySelector('input').value; @patch('/videos/%s/progress')", video.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 82, Col: 131}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 83, Col: 139}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -370,7 +370,7 @@ func VideoCard(video models.Video) templ.Component {
 			var templ_7745c5c3_Var21 templ.SafeURL
 			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL(fmt.Sprintf("/videos/%s/file", video.ID)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 91, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 92, Col: 70}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 			if templ_7745c5c3_Err != nil {
@@ -388,7 +388,7 @@ func VideoCard(video models.Video) templ.Component {
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("@get('/videos/%s/card')", video.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 100, Col: 88}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 101, Col: 88}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {
@@ -406,7 +406,7 @@ func VideoCard(video models.Video) templ.Component {
 			var templ_7745c5c3_Var23 string
 			templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("Download failed: %s", *video.DownloadError))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 108, Col: 71}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 109, Col: 71}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 			if templ_7745c5c3_Err != nil {
@@ -419,7 +419,7 @@ func VideoCard(video models.Video) templ.Component {
 			var templ_7745c5c3_Var24 string
 			templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(video.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 109, Col: 31}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 110, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 			if templ_7745c5c3_Err != nil {
@@ -432,7 +432,7 @@ func VideoCard(video models.Video) templ.Component {
 			var templ_7745c5c3_Var25 string
 			templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(video.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 110, Col: 37}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 111, Col: 37}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 			if templ_7745c5c3_Err != nil {
@@ -450,7 +450,7 @@ func VideoCard(video models.Video) templ.Component {
 			var templ_7745c5c3_Var26 string
 			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(video.ID)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 119, Col: 31}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 120, Col: 31}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 			if templ_7745c5c3_Err != nil {
@@ -463,7 +463,7 @@ func VideoCard(video models.Video) templ.Component {
 			var templ_7745c5c3_Var27 string
 			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(video.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 120, Col: 37}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 121, Col: 37}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 			if templ_7745c5c3_Err != nil {
@@ -481,7 +481,7 @@ func VideoCard(video models.Video) templ.Component {
 		var templ_7745c5c3_Var28 string
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("@patch('/videos/%s/watch')", video.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 127, Col: 74}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/new_videos.templ`, Line: 128, Col: 74}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 		if templ_7745c5c3_Err != nil {

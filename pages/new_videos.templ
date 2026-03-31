@@ -79,7 +79,8 @@ templ VideoCard(video models.Video) {
 				</p>
 				<div class="d-flex justify-content-between">
 					<form
-						data-on-submit__prevent={ fmt.Sprintf("$progress = el.querySelector('input').value; @patch('/videos/%s/progress')", video.ID) }
+						data-signals="{progress: ''}"
+						data-on-submit__prevent={ fmt.Sprintf("$progress = evt.target.querySelector('input').value; @patch('/videos/%s/progress')", video.ID) }
 						class="d-flex"
 					>
 						<input type="text" placeholder="mm:ss/11m22s" class="form-control" style="width: 50%"/>
