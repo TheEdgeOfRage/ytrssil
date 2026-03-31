@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"strings"
 	"testing"
 
@@ -86,17 +85,14 @@ func (s *ChannelsTestSuite) TestChannelsPage() {
 }
 
 func (s *ChannelsTestSuite) TestSubscribeToChannelPage() {
-	form := url.Values{}
-	form.Add("channel_id", "channel-707")
-
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/subscribe", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req, _ := http.NewRequest("POST", "/subscribe", strings.NewReader(`{"channelID":"channel-707"}`))
+	req.Header.Set("Content-Type", "application/json")
 	req.AddCookie(&http.Cookie{Name: "token", Value: s.cfg.AuthToken})
 	s.server.Handler.ServeHTTP(w, req)
 
 	s.Equal(http.StatusOK, w.Code)
-	s.Contains(w.Body.String(), "channel-707")
+	s.Contains(w.Header().Get("Content-Type"), "text/event-stream")
 }
 
 func (s *ChannelsTestSuite) TestUnsubscribeFromChannelPage() {

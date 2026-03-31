@@ -1,8 +1,8 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
 	const addVideoModal = document.getElementById("add-video-modal");
 	if (addVideoModal) {
 		addVideoModal.addEventListener("shown.bs.modal", function () {
-			const input = addVideoModal.querySelector("input[name='video_id']");
+			const input = addVideoModal.querySelector("input");
 			if (input) input.focus();
 		});
 	}
@@ -46,64 +46,78 @@ document.addEventListener("DOMContentLoaded", function() {
 	}
 });
 
-var currentVideoID = '';
+var currentVideoID = "";
 
 function openResolutionModal(button) {
 	currentVideoID = button.dataset.videoId;
-	document.getElementById('resolution-modal-title').textContent = button.dataset.videoTitle;
-	new bootstrap.Modal(document.getElementById('resolution-modal')).show();
+	document.getElementById("resolution-modal-title").textContent =
+		button.dataset.videoTitle;
+	new bootstrap.Modal(document.getElementById("resolution-modal")).show();
 }
 
-document.addEventListener('click', function(e) {
-	const btn = e.target.closest('.resolution-btn');
+document.addEventListener("click", function (e) {
+	const btn = e.target.closest(".resolution-btn");
 	if (!btn || !currentVideoID) return;
 	const formData = new FormData();
-	formData.append('format', btn.dataset.height);
-	fetch('/videos/' + currentVideoID + '/download', {
-		method: 'POST',
+	formData.append("format", btn.dataset.height);
+	fetch("/videos/" + currentVideoID + "/download", {
+		method: "POST",
 		body: formData,
-	}).then(function(resp) {
+	}).then(function (resp) {
 		if (resp.ok) {
-			bootstrap.Modal.getInstance(document.getElementById('resolution-modal')).hide();
+			bootstrap.Modal.getInstance(
+				document.getElementById("resolution-modal"),
+			).hide();
 			location.reload();
 		}
 	});
 });
 
-function addVideoHandler(event) {
-	if (event.detail.successful) {
-		bootstrap.Modal.getInstance(
-			document.getElementById("add-video-modal"),
-		).hide();
-	} else {
-		const field = event.detail.elt.querySelector(`[name="video_id"]`);
-		field.setCustomValidity(event.detail.xhr.responseText);
-		field.onfocus = () => field.reportValidity();
-		field.onchange = () => field.setCustomValidity("");
-		field.reportValidity();
-	}
+function animateRemove(selector) {
+	const el = document.querySelector(selector);
+	if (!el) return;
+	const siblings = [...el.parentElement.children].filter(c => c !== el);
+	const oldRects = siblings.map(s => s.getBoundingClientRect());
+
+	el.style.transition = "opacity 0.15s ease-out";
+	el.style.opacity = "0";
+	setTimeout(() => {
+		el.remove();
+		siblings.forEach((s, i) => {
+			const newRect = s.getBoundingClientRect();
+			const dx = oldRects[i].left - newRect.left;
+			const dy = oldRects[i].top - newRect.top;
+			if (!dx && !dy) return;
+			s.style.transition = "none";
+			s.style.transform = `translate(${dx}px, ${dy}px)`;
+			s.offsetHeight; // force reflow
+			s.style.transition = "transform 0.2s ease-out";
+			s.style.transform = "";
+		});
+	}, 150);
 }
 
-function subscribeHandler(event) {
-	if (event.detail.successful) {
-		bootstrap.Modal.getInstance(
-			document.getElementById("subscription-modal"),
-		).hide();
-	} else {
-		const field = event.detail.elt.querySelector(`[name="channel_id"]`);
-		field.setCustomValidity(event.detail.xhr.responseText);
-		field.onfocus = field.reportValidity;
-		field.onchange = () => field.setCustomValidity("");
-		field.reportValidity();
-	}
+function showFormError(modalId, errorText) {
+	const modal = document.getElementById(modalId);
+	if (!modal) return;
+	const field = modal.querySelector("input");
+	if (!field) return;
+	field.setCustomValidity(errorText);
+	field.onfocus = () => field.reportValidity();
+	field.onchange = () => field.setCustomValidity("");
+	field.reportValidity();
 }
 
 if ("serviceWorker" in navigator) {
-	navigator.serviceWorker.register("/assets/sw.js").then((registration) => {
-		console.log("Service Worker registered with scope:", registration.scope);
-	}).catch((error) => {
-		console.log("Service Worker registration failed:", error);
-	});
+	navigator.serviceWorker
+		.register("/assets/sw.js")
+		.then((registration) => {
+			console.log(
+				"Service Worker registered with scope:",
+				registration.scope,
+			);
+		})
+		.catch((error) => {
+			console.log("Service Worker registration failed:", error);
+		});
 }
-
-

@@ -62,7 +62,7 @@ templ thumbnail(video models.Video) {
 }
 
 templ VideoCard(video models.Video) {
-	<div class="video-card col-md-3 p-2" data-title={ video.Title } data-channel-name={ video.ChannelName }>
+	<div id={ fmt.Sprintf("video-card-%s", video.ID) } class="video-card col-md-3 p-2" data-title={ video.Title } data-channel-name={ video.ChannelName }>
 		<div class="card">
 			@thumbnail(video)
 			<div class="card-body">
@@ -79,12 +79,11 @@ templ VideoCard(video models.Video) {
 				</p>
 				<div class="d-flex justify-content-between">
 					<form
-						hx-patch={ fmt.Sprintf("/videos/%s/progress", video.ID) }
-						hx-target={ fmt.Sprintf("#progress-%s", video.ID) }
-						hx-swap="outerHTML"
+						data-signals="{progress: ''}"
+						data-on:submit__prevent={ fmt.Sprintf("$progress = evt.target.querySelector('input').value; @patch('/videos/%s/progress')", video.ID) }
 						class="d-flex"
 					>
-						<input type="text" name="progress" placeholder="mm:ss/11m22s" class="form-control" style="width: 50%"/>
+						<input type="text" placeholder="mm:ss/11m22s" class="form-control" style="width: 50%"/>
 						<button type="submit" class="btn btn-primary ms-3"><i class="bi bi-clock"></i></button>
 					</form>
 					<div class="d-flex gap-2">
@@ -99,10 +98,7 @@ templ VideoCard(video models.Video) {
 							<button
 								class="btn btn-primary"
 								disabled
-								hx-get={ fmt.Sprintf("/videos/%s/card", video.ID) }
-								hx-trigger="every 2s"
-								hx-target="closest .video-card"
-								hx-swap="outerHTML"
+								data-on-interval__duration.2s={ fmt.Sprintf("@get('/videos/%s/card')", video.ID) }
 							>
 								<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
 							</button>
@@ -129,9 +125,7 @@ templ VideoCard(video models.Video) {
 							</button>
 						}
 						<button
-							hx-patch={ fmt.Sprintf("/videos/%s/watch", video.ID) }
-							hx-target="closest .video-card"
-							hx-swap="outerHTML"
+							data-on:click={ fmt.Sprintf("@patch('/videos/%s/watch')", video.ID) }
 							class="btn btn-danger"
 						>
 							<i class="bi bi-check-circle"></i>

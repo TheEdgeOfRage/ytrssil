@@ -64,7 +64,6 @@ func SetupGinRouter(
 		return nil, err
 	}
 	engine.GET("/healthz", srv.Healthz)
-	engine.POST("/fetch", srv.FetchVideosJSON)
 	engine.Static("/assets", "./assets")
 
 	engine.GET("/auth", srv.AuthPage)
@@ -73,6 +72,7 @@ func SetupGinRouter(
 	pages := engine.Group("")
 	pages.Use(auth.PageAuthMiddleware(cfg.AuthToken))
 	{
+		pages.POST("/fetch", srv.FetchVideosPage)
 		pages.GET("/", srv.NewVideosPage)
 		pages.GET("/watched", srv.WatchedVideosPage)
 		pages.GET("/channels", srv.ChannelsPage)
@@ -91,6 +91,7 @@ func SetupGinRouter(
 	api := engine.Group("/api")
 	api.Use(auth.APIAuthMiddleware(cfg.AuthToken))
 	{
+		api.POST("/fetch", srv.FetchVideosJSON)
 		api.POST("channels/:channel_id/subscribe", srv.SubscribeToChannelJSON)
 		api.POST("channels/:channel_id/unsubscribe", srv.UnsubscribeFromChannelJSON)
 		api.GET("videos/new", srv.GetNewVideosJSON)

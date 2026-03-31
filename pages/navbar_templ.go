@@ -58,7 +58,7 @@ func navbar(route string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if route != "auth" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<ul id=\"nav-buttons\" class=\"navbar-nav me-auto mb-0 flex-row\"><li class=\"nav-item me-1 me-lg-2\"><button type=\"button\" class=\"btn btn-primary\" onClick=\"window.location.reload();\"><i class=\"bi bi-arrow-clockwise\"></i></button></li><li class=\"nav-item me-1 me-lg-2\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" data-bs-toggle=\"modal\" data-bs-target=\"#add-video-modal\"><span class=\"d-none d-lg-inline\">Add Video </span><i class=\"bi bi-camera-video\"></i></button></li><li class=\"nav-item me-1 me-lg-2\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" hx-post=\"/fetch\" hx-swap=\"none\" hx-on::after-settle=\"window.location.reload()\"><span class=\"d-none d-lg-inline\">Fetch </span><i class=\"bi bi-cloud-download\"></i></button></li><li class=\"nav-item me-1 me-lg-2\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" data-bs-toggle=\"modal\" data-bs-target=\"#subscription-modal\"><span class=\"d-none d-lg-inline\">Subscribe </span><i class=\"bi bi-bookmark-plus\"></i></button></li>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<ul id=\"nav-buttons\" class=\"navbar-nav me-auto mb-0 flex-row\"><li class=\"nav-item me-1 me-lg-2\"><button type=\"button\" class=\"btn btn-primary\" onClick=\"window.location.reload();\"><i class=\"bi bi-arrow-clockwise\"></i></button></li><li class=\"nav-item me-1 me-lg-2\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" data-bs-toggle=\"modal\" data-bs-target=\"#add-video-modal\"><span class=\"d-none d-lg-inline\">Add Video </span><i class=\"bi bi-camera-video\"></i></button></li><li class=\"nav-item me-1 me-lg-2\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" data-on:click=\"@post('/fetch')\"><span class=\"d-none d-lg-inline\">Fetch </span><i class=\"bi bi-cloud-download\"></i></button></li><li class=\"nav-item me-1 me-lg-2\"><button type=\"button\" class=\"btn btn-outline-secondary\" style=\"--bs-btn-color: var(--bs-body-color);\" data-bs-toggle=\"modal\" data-bs-target=\"#subscription-modal\"><span class=\"d-none d-lg-inline\">Subscribe </span><i class=\"bi bi-bookmark-plus\"></i></button></li>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -70,7 +70,7 @@ func navbar(route string) templ.Component {
 				var templ_7745c5c3_Var2 templ.SafeURL
 				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinURLErrs(button.link)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/navbar.templ`, Line: 78, Col: 28}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/navbar.templ`, Line: 76, Col: 28}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 				if templ_7745c5c3_Err != nil {
@@ -83,7 +83,7 @@ func navbar(route string) templ.Component {
 				var templ_7745c5c3_Var3 string
 				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(button.text)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/navbar.templ`, Line: 79, Col: 54}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pages/navbar.templ`, Line: 77, Col: 54}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {

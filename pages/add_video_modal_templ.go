@@ -30,7 +30,7 @@ func addVideoModal() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"modal fade\" id=\"add-video-modal\" tabindex=\"-1\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><h1 class=\"modal-title fs-5\">Add video to list</h1><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\"></button></div><div class=\"modal-body\"><form id=\"add-video-form\" class=\"d-flex\" hx-post=\"/videos\" hx-swap=\"none\" hx-on::after-request=\"addVideoHandler(event)\"><input type=\"text\" name=\"video_id\" placeholder=\"Video ID\" class=\"form-control\" autocomplete=\"off\"> <button type=\"submit\" class=\"btn btn-primary ms-3\"><i class=\"bi bi-camera-video\"></i></button></form></div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"modal fade\" id=\"add-video-modal\" tabindex=\"-1\"><div class=\"modal-dialog\"><div class=\"modal-content\"><div class=\"modal-header\"><h1 class=\"modal-title fs-5\">Add video to list</h1><button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\"></button></div><div class=\"modal-body\"><form id=\"add-video-form\" class=\"d-flex\" data-on:submit__prevent=\"$videoID = el.querySelector('input').value; @post('/videos')\"><input type=\"text\" placeholder=\"Video ID\" class=\"form-control\" autocomplete=\"off\"> <button type=\"submit\" class=\"btn btn-primary ms-3\"><i class=\"bi bi-camera-video\"></i></button></form></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
