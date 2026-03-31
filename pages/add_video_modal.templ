@@ -13,7 +13,7 @@ templ addVideoModal() {
 					<form
 						id="add-video-form"
 						class="d-flex"
-						data-on-submit__prevent="$videoID = el.querySelector('input').value; @post('/videos')"
+						data-on:submit__prevent="$videoID = el.querySelector('input').value; @post('/videos')"
 					>
 						<input
 							type="text"

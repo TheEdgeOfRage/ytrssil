@@ -23,7 +23,7 @@ templ watchedVideoCard(video models.Video) {
 			</p>
 			<div class="d-flex justify-content-end">
 				<button
-					data-on-click={ fmt.Sprintf("@patch('/videos/%s/unwatch')", video.ID) }
+					data-on:click={ fmt.Sprintf("@patch('/videos/%s/unwatch')", video.ID) }
 					class="btn btn-secondary"
 				>
 					<i class="bi bi-arrow-counterclockwise"></i>

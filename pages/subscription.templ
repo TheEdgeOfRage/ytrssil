@@ -12,7 +12,7 @@ templ subscriptionModal() {
 					<form
 						id="subscription-form"
 						class="d-flex"
-						data-on-submit__prevent="$channelID = el.querySelector('input').value; @post('/subscribe')"
+						data-on:submit__prevent="$channelID = el.querySelector('input').value; @post('/subscribe')"
 					>
 						<input
 							type="text"
