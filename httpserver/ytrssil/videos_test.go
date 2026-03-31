@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -232,16 +231,14 @@ func (s *VideosTestSuite) TestWatchedVideosPage() {
 }
 
 func (s *VideosTestSuite) TestAddVideoPage() {
-	form := url.Values{}
-	form.Add("video_id", "custom-video-123")
-
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/videos", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req, _ := http.NewRequest("POST", "/videos", strings.NewReader(`{"videoID":"custom-video-123"}`))
+	req.Header.Set("Content-Type", "application/json")
 	req.AddCookie(&http.Cookie{Name: "token", Value: s.cfg.AuthToken})
 	s.server.Handler.ServeHTTP(w, req)
 
-	s.Equal(http.StatusAccepted, w.Code)
+	s.Equal(http.StatusOK, w.Code)
+	s.Contains(w.Header().Get("Content-Type"), "text/event-stream")
 }
 
 func (s *VideosTestSuite) TestMarkVideoAsWatchedPage() {
@@ -324,16 +321,14 @@ func (s *VideosTestSuite) TestSetVideoProgressPage() {
 	}, channelID, false)
 	s.Require().NoError(err)
 
-	form := url.Values{}
-	form.Add("progress", "2:30")
-
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("PATCH", "/videos/video606/progress", strings.NewReader(form.Encode()))
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req, _ := http.NewRequest("PATCH", "/videos/video606/progress", strings.NewReader(`{"progress":"2:30"}`))
+	req.Header.Set("Content-Type", "application/json")
 	req.AddCookie(&http.Cookie{Name: "token", Value: s.cfg.AuthToken})
 	s.server.Handler.ServeHTTP(w, req)
 
 	s.Equal(http.StatusOK, w.Code)
+	s.Contains(w.Header().Get("Content-Type"), "text/event-stream")
 }
 
 func (s *VideosTestSuite) TestFetchVideosJSON() {
@@ -347,7 +342,7 @@ func (s *VideosTestSuite) TestFetchVideosJSON() {
 	s.Require().NoError(err)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/fetch", nil)
+	req, _ := http.NewRequest("POST", "/api/fetch", nil)
 	req.Header.Set("Authorization", s.cfg.AuthToken)
 	s.server.Handler.ServeHTTP(w, req)
 
@@ -360,12 +355,14 @@ func (s *VideosTestSuite) TestFetchVideosJSON() {
 	s.Equal("videos fetched successfully", response["msg"])
 }
 
-func (s *VideosTestSuite) TestFetchEndpointNoAuthRequired() {
+func (s *VideosTestSuite) TestFetchVideosPage() {
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/fetch", nil)
+	req.AddCookie(&http.Cookie{Name: "token", Value: s.cfg.AuthToken})
 	s.server.Handler.ServeHTTP(w, req)
 
 	s.Equal(http.StatusOK, w.Code)
+	s.Contains(w.Header().Get("Content-Type"), "text/event-stream")
 }
 
 func (s *VideosTestSuite) TestVideosRequireAuth() {

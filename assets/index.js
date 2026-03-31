@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	const addVideoModal = document.getElementById("add-video-modal");
 	if (addVideoModal) {
 		addVideoModal.addEventListener("shown.bs.modal", function () {
-			const input = addVideoModal.querySelector("input[name='video_id']");
+			const input = addVideoModal.querySelector("input");
 			if (input) input.focus();
 		});
 	}
@@ -70,32 +70,15 @@ document.addEventListener('click', function(e) {
 	});
 });
 
-function addVideoHandler(event) {
-	if (event.detail.successful) {
-		bootstrap.Modal.getInstance(
-			document.getElementById("add-video-modal"),
-		).hide();
-	} else {
-		const field = event.detail.elt.querySelector(`[name="video_id"]`);
-		field.setCustomValidity(event.detail.xhr.responseText);
-		field.onfocus = () => field.reportValidity();
-		field.onchange = () => field.setCustomValidity("");
-		field.reportValidity();
-	}
-}
-
-function subscribeHandler(event) {
-	if (event.detail.successful) {
-		bootstrap.Modal.getInstance(
-			document.getElementById("subscription-modal"),
-		).hide();
-	} else {
-		const field = event.detail.elt.querySelector(`[name="channel_id"]`);
-		field.setCustomValidity(event.detail.xhr.responseText);
-		field.onfocus = field.reportValidity;
-		field.onchange = () => field.setCustomValidity("");
-		field.reportValidity();
-	}
+function showFormError(modalId, errorText) {
+	const modal = document.getElementById(modalId);
+	if (!modal) return;
+	const field = modal.querySelector("input");
+	if (!field) return;
+	field.setCustomValidity(errorText);
+	field.onfocus = () => field.reportValidity();
+	field.onchange = () => field.setCustomValidity("");
+	field.reportValidity();
 }
 
 if ("serviceWorker" in navigator) {
