@@ -1,10 +1,10 @@
-const CACHE_NAME = 'ytrssil-v2';
+const CACHE_NAME = 'ytrssil-v3';
 const ASSETS_TO_CACHE = [
 	'/',
 	'/assets/vendor/bootstrap.min.css',
 	'/assets/vendor/bootstrap-icons.min.css',
 	'/assets/vendor/bootstrap.bundle.min.js',
-	'/assets/vendor/htmx.min.js',
+	'/assets/vendor/datastar.js',
 	'/assets/vendor/fuse.js',
 	'/assets/index.js',
 	'/assets/ytrssil.png',
