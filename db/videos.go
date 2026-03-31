@@ -88,7 +88,7 @@ func (db *postgresDB) GetWatchedVideos(
 			, channels.name
 			, channels.id
 		FROM videos
-		LEFT JOIN channels ON videos.channel_id=videos.channel_id
+		LEFT JOIN channels ON channels.id=videos.channel_id
 		WHERE watch_timestamp IS NOT NULL
 			AND videos.is_discarded = false
 		ORDER BY watch_timestamp
