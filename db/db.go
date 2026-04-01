@@ -52,6 +52,10 @@ type DB interface {
 	SetVideoDownloadFailed(ctx context.Context, videoID string, errorMsg string) error
 	// GetVideosForCleanup returns videos that were downloaded and watched older than the given duration
 	GetVideosForCleanup(ctx context.Context, olderThan time.Duration) ([]models.Video, error)
+	// GetLiveVideos returns unwatched videos that are currently live
+	GetLiveVideos(ctx context.Context) ([]models.Video, error)
+	// UpdateVideoLiveStatus updates the live status and duration of a video
+	UpdateVideoLiveStatus(ctx context.Context, videoID string, isLive bool, duration int) error
 	// DeleteVideoFile clears the download fields for a video
 	DeleteVideoFile(ctx context.Context, videoID string) error
 

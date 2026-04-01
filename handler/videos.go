@@ -120,7 +120,41 @@ func (h *handler) FetchVideos(ctx context.Context) error {
 		h.addVideosForChannel(ctx, result.channel, result.enableShorts)
 	}
 
+	h.recheckLiveVideos(ctx)
+
 	return nil
+}
+
+func (h *handler) recheckLiveVideos(ctx context.Context) {
+	liveVideos, err := h.db.GetLiveVideos(ctx)
+	if err != nil {
+		h.log.Error("Failed to get live videos", "error", err)
+		return
+	}
+	if len(liveVideos) == 0 {
+		return
+	}
+
+	videos := make(map[string]*models.Video, len(liveVideos))
+	for i := range liveVideos {
+		videos[liveVideos[i].ID] = &liveVideos[i]
+	}
+
+	err = h.youTubeClient.GetVideoDurations(ctx, videos)
+	if err != nil {
+		h.log.Error("Failed to recheck live video durations", "error", err)
+		return
+	}
+
+	for _, video := range videos {
+		if video.IsLive {
+			continue
+		}
+		err = h.db.UpdateVideoLiveStatus(ctx, video.ID, false, video.DurationSeconds)
+		if err != nil {
+			h.log.Error("Failed to update video live status", "videoID", video.ID, "error", err)
+		}
+	}
 }
 
 func (h *handler) MarkVideoAsWatched(ctx context.Context, videoID string) error {

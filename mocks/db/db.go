@@ -36,6 +36,9 @@ var _ db.DB = &DBMock{}
 //			GetChannelByIDFunc: func(ctx context.Context, channelID string) (*models.Channel, error) {
 //				panic("mock out the GetChannelByID method")
 //			},
+//			GetLiveVideosFunc: func(ctx context.Context) ([]models.Video, error) {
+//				panic("mock out the GetLiveVideos method")
+//			},
 //			GetNewVideosFunc: func(ctx context.Context, sortDesc bool) ([]models.Video, error) {
 //				panic("mock out the GetNewVideos method")
 //			},
@@ -78,6 +81,9 @@ var _ db.DB = &DBMock{}
 //			UnsubscribeFromChannelFunc: func(ctx context.Context, channelID string) error {
 //				panic("mock out the UnsubscribeFromChannel method")
 //			},
+//			UpdateVideoLiveStatusFunc: func(ctx context.Context, videoID string, isLive bool, duration int) error {
+//				panic("mock out the UpdateVideoLiveStatus method")
+//			},
 //		}
 //
 //		// use mockedDB in code that requires db.DB
@@ -99,6 +105,9 @@ type DBMock struct {
 
 	// GetChannelByIDFunc mocks the GetChannelByID method.
 	GetChannelByIDFunc func(ctx context.Context, channelID string) (*models.Channel, error)
+
+	// GetLiveVideosFunc mocks the GetLiveVideos method.
+	GetLiveVideosFunc func(ctx context.Context) ([]models.Video, error)
 
 	// GetNewVideosFunc mocks the GetNewVideos method.
 	GetNewVideosFunc func(ctx context.Context, sortDesc bool) ([]models.Video, error)
@@ -142,6 +151,9 @@ type DBMock struct {
 	// UnsubscribeFromChannelFunc mocks the UnsubscribeFromChannel method.
 	UnsubscribeFromChannelFunc func(ctx context.Context, channelID string) error
 
+	// UpdateVideoLiveStatusFunc mocks the UpdateVideoLiveStatus method.
+	UpdateVideoLiveStatusFunc func(ctx context.Context, videoID string, isLive bool, duration int) error
+
 	// calls tracks calls to the methods.
 	calls struct {
 		// AddVideo holds details about calls to the AddVideo method.
@@ -178,6 +190,11 @@ type DBMock struct {
 			Ctx context.Context
 			// ChannelID is the channelID argument value.
 			ChannelID string
+		}
+		// GetLiveVideos holds details about calls to the GetLiveVideos method.
+		GetLiveVideos []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
 		}
 		// GetNewVideos holds details about calls to the GetNewVideos method.
 		GetNewVideos []struct {
@@ -291,12 +308,24 @@ type DBMock struct {
 			// ChannelID is the channelID argument value.
 			ChannelID string
 		}
+		// UpdateVideoLiveStatus holds details about calls to the UpdateVideoLiveStatus method.
+		UpdateVideoLiveStatus []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// VideoID is the videoID argument value.
+			VideoID string
+			// IsLive is the isLive argument value.
+			IsLive bool
+			// Duration is the duration argument value.
+			Duration int
+		}
 	}
 	lockAddVideo                  sync.RWMutex
 	lockClose                     sync.RWMutex
 	lockDeleteVideoFile           sync.RWMutex
 	lockDiscardVideo              sync.RWMutex
 	lockGetChannelByID            sync.RWMutex
+	lockGetLiveVideos             sync.RWMutex
 	lockGetNewVideos              sync.RWMutex
 	lockGetVideo                  sync.RWMutex
 	lockGetVideosForCleanup       sync.RWMutex
@@ -311,6 +340,7 @@ type DBMock struct {
 	lockSubscribeToChannel        sync.RWMutex
 	lockToggleChannelShorts       sync.RWMutex
 	lockUnsubscribeFromChannel    sync.RWMutex
+	lockUpdateVideoLiveStatus     sync.RWMutex
 }
 
 // AddVideo calls AddVideoFunc.
@@ -489,6 +519,38 @@ func (mock *DBMock) GetChannelByIDCalls() []struct {
 	mock.lockGetChannelByID.RLock()
 	calls = mock.calls.GetChannelByID
 	mock.lockGetChannelByID.RUnlock()
+	return calls
+}
+
+// GetLiveVideos calls GetLiveVideosFunc.
+func (mock *DBMock) GetLiveVideos(ctx context.Context) ([]models.Video, error) {
+	if mock.GetLiveVideosFunc == nil {
+		panic("DBMock.GetLiveVideosFunc: method is nil but DB.GetLiveVideos was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+	}{
+		Ctx: ctx,
+	}
+	mock.lockGetLiveVideos.Lock()
+	mock.calls.GetLiveVideos = append(mock.calls.GetLiveVideos, callInfo)
+	mock.lockGetLiveVideos.Unlock()
+	return mock.GetLiveVideosFunc(ctx)
+}
+
+// GetLiveVideosCalls gets all the calls that were made to GetLiveVideos.
+// Check the length with:
+//
+//	len(mockedDB.GetLiveVideosCalls())
+func (mock *DBMock) GetLiveVideosCalls() []struct {
+	Ctx context.Context
+} {
+	var calls []struct {
+		Ctx context.Context
+	}
+	mock.lockGetLiveVideos.RLock()
+	calls = mock.calls.GetLiveVideos
+	mock.lockGetLiveVideos.RUnlock()
 	return calls
 }
 
@@ -1021,5 +1083,49 @@ func (mock *DBMock) UnsubscribeFromChannelCalls() []struct {
 	mock.lockUnsubscribeFromChannel.RLock()
 	calls = mock.calls.UnsubscribeFromChannel
 	mock.lockUnsubscribeFromChannel.RUnlock()
+	return calls
+}
+
+// UpdateVideoLiveStatus calls UpdateVideoLiveStatusFunc.
+func (mock *DBMock) UpdateVideoLiveStatus(ctx context.Context, videoID string, isLive bool, duration int) error {
+	if mock.UpdateVideoLiveStatusFunc == nil {
+		panic("DBMock.UpdateVideoLiveStatusFunc: method is nil but DB.UpdateVideoLiveStatus was just called")
+	}
+	callInfo := struct {
+		Ctx      context.Context
+		VideoID  string
+		IsLive   bool
+		Duration int
+	}{
+		Ctx:      ctx,
+		VideoID:  videoID,
+		IsLive:   isLive,
+		Duration: duration,
+	}
+	mock.lockUpdateVideoLiveStatus.Lock()
+	mock.calls.UpdateVideoLiveStatus = append(mock.calls.UpdateVideoLiveStatus, callInfo)
+	mock.lockUpdateVideoLiveStatus.Unlock()
+	return mock.UpdateVideoLiveStatusFunc(ctx, videoID, isLive, duration)
+}
+
+// UpdateVideoLiveStatusCalls gets all the calls that were made to UpdateVideoLiveStatus.
+// Check the length with:
+//
+//	len(mockedDB.UpdateVideoLiveStatusCalls())
+func (mock *DBMock) UpdateVideoLiveStatusCalls() []struct {
+	Ctx      context.Context
+	VideoID  string
+	IsLive   bool
+	Duration int
+} {
+	var calls []struct {
+		Ctx      context.Context
+		VideoID  string
+		IsLive   bool
+		Duration int
+	}
+	mock.lockUpdateVideoLiveStatus.RLock()
+	calls = mock.calls.UpdateVideoLiveStatus
+	mock.lockUpdateVideoLiveStatus.RUnlock()
 	return calls
 }

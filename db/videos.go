@@ -382,6 +382,40 @@ func (db *postgresDB) GetVideosForCleanup(ctx context.Context, olderThan time.Du
 	return videos, nil
 }
 
+func (db *postgresDB) GetLiveVideos(ctx context.Context) ([]models.Video, error) {
+	query := `SELECT id FROM videos WHERE is_live = true AND watch_timestamp IS NULL`
+
+	rows, err := db.db.Query(ctx, query)
+	if err != nil {
+		db.l.Error("Failed to query live videos", "error", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	videos := make([]models.Video, 0)
+	for rows.Next() {
+		var video models.Video
+		err = rows.Scan(&video.ID)
+		if err != nil {
+			db.l.Error("Failed to scan live video", "error", err)
+			return nil, err
+		}
+		videos = append(videos, video)
+	}
+
+	return videos, nil
+}
+
+func (db *postgresDB) UpdateVideoLiveStatus(ctx context.Context, videoID string, isLive bool, duration int) error {
+	query := `UPDATE videos SET is_live = $1, duration = $2 WHERE id = $3`
+	_, err := db.db.Exec(ctx, query, isLive, duration, videoID)
+	if err != nil {
+		db.l.Error("Failed to update video live status", "error", err)
+		return err
+	}
+	return nil
+}
+
 func (db *postgresDB) DeleteVideoFile(ctx context.Context, videoID string) error {
 	query := `
 		UPDATE videos
