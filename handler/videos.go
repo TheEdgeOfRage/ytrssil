@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"strconv"
 	"strings"
 	"sync"
@@ -221,8 +222,53 @@ func (h *handler) SetVideoProgress(ctx context.Context, videoID string, progress
 	return video, nil
 }
 
-func (h *handler) AddCustomVideo(ctx context.Context, videoID string) error {
-	exists, err := h.db.HasVideo(ctx, videoID)
+type videoInput struct {
+	id              string
+	progressSeconds int
+}
+
+func parseVideoInput(input string) (videoInput, error) {
+	if !strings.Contains(input, "/") {
+		return videoInput{id: input}, nil
+	}
+
+	u, err := url.Parse(input)
+	if err != nil {
+		return videoInput{}, fmt.Errorf("invalid URL: %w", err)
+	}
+
+	var videoID string
+	switch {
+	case u.Host == "youtu.be":
+		videoID = strings.TrimPrefix(u.Path, "/")
+	case strings.HasPrefix(u.Path, "/live/"):
+		videoID = strings.TrimPrefix(u.Path, "/live/")
+	default:
+		videoID = u.Query().Get("v")
+	}
+
+	if videoID == "" {
+		return videoInput{}, fmt.Errorf("could not extract video ID from URL")
+	}
+
+	result := videoInput{id: videoID}
+	if t := u.Query().Get("t"); t != "" {
+		result.progressSeconds, err = strconv.Atoi(t)
+		if err != nil {
+			return videoInput{}, fmt.Errorf("invalid t parameter: %w", err)
+		}
+	}
+
+	return result, nil
+}
+
+func (h *handler) AddCustomVideo(ctx context.Context, rawVideoID string) error {
+	input, err := parseVideoInput(rawVideoID)
+	if err != nil {
+		return err
+	}
+
+	exists, err := h.db.HasVideo(ctx, input.id)
 	if err != nil {
 		h.log.Error("Failed to check if video already exists", "call", "db.HasVideo", "err", err)
 		return err
@@ -233,7 +279,7 @@ func (h *handler) AddCustomVideo(ctx context.Context, videoID string) error {
 		return nil
 	}
 
-	video, err := h.youTubeClient.GetVideoMetadata(ctx, videoID)
+	video, err := h.youTubeClient.GetVideoMetadata(ctx, input.id)
 	if err != nil {
 		h.log.Error("Failed to get video metadata", "error", err)
 		return err
@@ -255,6 +301,14 @@ func (h *handler) AddCustomVideo(ctx context.Context, videoID string) error {
 	if err != nil {
 		if !errors.Is(err, db.ErrVideoExists) {
 			h.log.Error("Failed to save video to db", "call", "db.AddVideo", "err", err)
+			return err
+		}
+	}
+
+	if input.progressSeconds > 0 {
+		_, err = h.db.SetVideoProgress(ctx, input.id, input.progressSeconds)
+		if err != nil {
+			h.log.Error("Failed to set video progress", "error", err)
 			return err
 		}
 	}
