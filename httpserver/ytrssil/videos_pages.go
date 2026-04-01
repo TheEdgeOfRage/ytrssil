@@ -100,7 +100,7 @@ func (srv server) SetVideoProgressPage(c *gin.Context) {
 	}
 
 	sse := newSSE(c)
-	sse.PatchElementTempl(pages.ProgressBar(*video))
+	sse.PatchElementTempl(pages.VideoCard(*video))
 }
 
 func (srv server) AddVideoPage(c *gin.Context) {
