@@ -1,0 +1,1 @@
+ALTER TABLE videos ADD COLUMN is_live BOOLEAN DEFAULT false;

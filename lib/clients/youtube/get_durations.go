@@ -19,17 +19,23 @@ type APIVideoListResponse struct {
 }
 
 type APIVideo struct {
-	ID             string            `json:"id"`
-	Snippet        APISnippet        `json:"snippet"`
-	ContentDetails APIContentDetails `json:"contentDetails"`
-	Player         APIPlayer         `json:"player"`
+	ID                   string                   `json:"id"`
+	Snippet              APISnippet               `json:"snippet"`
+	ContentDetails       APIContentDetails        `json:"contentDetails"`
+	Player               APIPlayer                `json:"player"`
+	LiveStreamingDetails *APILiveStreamingDetails `json:"liveStreamingDetails"`
 }
 
 type APISnippet struct {
-	PublishedAt string `json:"publishedAt"`
-	ChannelID   string `json:"channelId"`
-	Title       string `json:"title"`
-	ChannelName string `json:"channelTitle"`
+	PublishedAt          string `json:"publishedAt"`
+	ChannelID            string `json:"channelId"`
+	Title                string `json:"title"`
+	ChannelName          string `json:"channelTitle"`
+	LiveBroadcastContent string `json:"liveBroadcastContent"`
+}
+
+type APILiveStreamingDetails struct {
+	ActualEndTime string `json:"actualEndTime"`
 }
 
 type APIPlayer struct {
@@ -63,7 +69,7 @@ func (c *youTubeClient) GetVideoDurations(ctx context.Context, videos map[string
 	videoIDs := ids.String()
 	query := url.Values{}
 	query.Add("id", videoIDs)
-	query.Add("part", "contentDetails")
+	query.Add("part", "contentDetails,liveStreamingDetails")
 	query.Add("key", c.apiKey)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "", nil)
@@ -115,6 +121,7 @@ func (c *youTubeClient) GetVideoDurations(ctx context.Context, videos map[string
 			return fmt.Errorf("failed to parse video duration [%v]: %w", v.ContentDetails.Duration, err)
 		}
 		videos[v.ID].DurationSeconds = int(math.Round(duration.Seconds()))
+		videos[v.ID].IsLive = v.LiveStreamingDetails != nil && v.LiveStreamingDetails.ActualEndTime == ""
 	}
 
 	return nil

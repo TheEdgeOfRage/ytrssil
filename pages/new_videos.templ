@@ -49,14 +49,23 @@ templ thumbnail(video models.Video) {
 				style="width: 100%; aspect-ratio: 16/9; object-fit: cover;"
 			/>
 		}
-		<span
-			focusable="false"
-			class="text-body bg-body bg-opacity-75 px-1 py-1 rounded"
-			style="pointer-events: none;  z-index: 2; position: absolute; bottom: 0.2rem; right: 0.2rem;"
-			fill="white"
-		>
-			{ video.Duration() }
-		</span>
+		if video.IsLive {
+			<span
+				focusable="false"
+				class="text-white bg-danger px-1 py-1 rounded fw-bold"
+				style="pointer-events: none; z-index: 2; position: absolute; bottom: 0.2rem; right: 0.2rem;"
+			>
+				LIVE
+			</span>
+		} else {
+			<span
+				focusable="false"
+				class="text-body bg-body bg-opacity-75 px-1 py-1 rounded"
+				style="pointer-events: none; z-index: 2; position: absolute; bottom: 0.2rem; right: 0.2rem;"
+			>
+				{ video.Duration() }
+			</span>
+		}
 	</a>
 	@ProgressBar(video)
 }

@@ -26,6 +26,8 @@ type Video struct {
 	ProgressSeconds int `json:"progress"`
 	// IsShort indicates if a video is a YouTube short
 	IsShort bool `json:"short"`
+	// IsLive indicates if the video is a currently active live stream
+	IsLive bool `json:"is_live"`
 	// IsDiscarded indicates if the video was discarded from the feed without watching
 	// This happens to shorts videos for channels that have shorts disabled
 	IsDiscarded bool `json:"is_discarded"`

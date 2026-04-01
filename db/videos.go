@@ -14,6 +14,7 @@ func (db *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models
 			, title
 			, published_timestamp
 			, is_short
+			, is_live
 			, duration
 			, progress
 			, is_discarded
@@ -48,6 +49,7 @@ func (db *postgresDB) GetNewVideos(ctx context.Context, sortDesc bool) ([]models
 			&video.Title,
 			&video.PublishedTime,
 			&video.IsShort,
+			&video.IsLive,
 			&video.DurationSeconds,
 			&video.ProgressSeconds,
 			&video.IsDiscarded,
@@ -78,6 +80,7 @@ func (db *postgresDB) GetWatchedVideos(
 			, published_timestamp
 			, watch_timestamp
 			, is_short
+			, is_live
 			, duration
 			, progress
 			, is_discarded
@@ -114,6 +117,7 @@ func (db *postgresDB) GetWatchedVideos(
 			&video.PublishedTime,
 			&video.WatchTime,
 			&video.IsShort,
+			&video.IsLive,
 			&video.DurationSeconds,
 			&video.ProgressSeconds,
 			&video.IsDiscarded,
@@ -156,9 +160,10 @@ func (db *postgresDB) AddVideo(ctx context.Context, video models.Video, channelI
 			, published_timestamp
 			, duration
 			, is_short
+			, is_live
 			, channel_id
 			, is_discarded
-		) VALUES ($1, $2, $3, $4, $5, $6, $7)
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		ON CONFLICT DO NOTHING
 	`
 
@@ -170,6 +175,7 @@ func (db *postgresDB) AddVideo(ctx context.Context, video models.Video, channelI
 		video.PublishedTime,
 		video.DurationSeconds,
 		video.IsShort,
+		video.IsLive,
 		channelID,
 		isDiscarded,
 	)
@@ -219,6 +225,7 @@ func (db *postgresDB) SetVideoProgress(ctx context.Context, videoID string, prog
 			, title
 			, published_timestamp
 			, is_short
+			, is_live
 			, duration
 			, progress
 			, channels.name
@@ -234,6 +241,7 @@ func (db *postgresDB) SetVideoProgress(ctx context.Context, videoID string, prog
 		&video.Title,
 		&video.PublishedTime,
 		&video.IsShort,
+		&video.IsLive,
 		&video.DurationSeconds,
 		&video.ProgressSeconds,
 		&video.ChannelName,
@@ -254,6 +262,7 @@ func (db *postgresDB) GetVideo(ctx context.Context, videoID string) (*models.Vid
 			, title
 			, published_timestamp
 			, is_short
+			, is_live
 			, duration
 			, progress
 			, watch_timestamp
@@ -276,6 +285,7 @@ func (db *postgresDB) GetVideo(ctx context.Context, videoID string) (*models.Vid
 		&video.Title,
 		&video.PublishedTime,
 		&video.IsShort,
+		&video.IsLive,
 		&video.DurationSeconds,
 		&video.ProgressSeconds,
 		&video.WatchTime,

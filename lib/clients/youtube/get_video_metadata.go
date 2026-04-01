@@ -16,7 +16,7 @@ import (
 func (c *youTubeClient) GetVideoMetadata(ctx context.Context, videoID string) (*models.Video, error) {
 	query := url.Values{}
 	query.Add("id", videoID)
-	query.Add("part", "snippet,contentDetails,player")
+	query.Add("part", "snippet,contentDetails,player,liveStreamingDetails")
 	query.Add("key", c.apiKey)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "", nil)
@@ -84,6 +84,8 @@ func (c *youTubeClient) GetVideoMetadata(ctx context.Context, videoID string) (*
 	if err != nil {
 		return nil, err
 	}
+
+	video.IsLive = videoData.LiveStreamingDetails != nil && videoData.LiveStreamingDetails.ActualEndTime == ""
 
 	return video, nil
 }
