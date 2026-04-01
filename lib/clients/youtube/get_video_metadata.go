@@ -8,7 +8,6 @@ import (
 	"math"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/TheEdgeOfRage/ytrssil-api/models"
@@ -75,11 +74,9 @@ func (c *youTubeClient) GetVideoMetadata(ctx context.Context, videoID string) (*
 	}
 	video.PublishedTime = publishedTime
 
-	durationStr := strings.TrimPrefix(videoData.ContentDetails.Duration, "PT")
-	durationStr = strings.ToLower(durationStr)
-	duration, err := time.ParseDuration(durationStr)
+	duration, err := parseISO8601Duration(videoData.ContentDetails.Duration)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse video duration [%v]: %w", durationStr, err)
+		return nil, fmt.Errorf("failed to parse video duration [%v]: %w", videoData.ContentDetails.Duration, err)
 	}
 	video.DurationSeconds = int(math.Round(duration.Seconds()))
 

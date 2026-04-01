@@ -41,6 +41,15 @@ type APIContentDetails struct {
 	Definition string `json:"definition"`
 }
 
+func parseISO8601Duration(s string) (time.Duration, error) {
+	if s == "P0D" {
+		return 0, nil
+	}
+	s = strings.TrimPrefix(s, "PT")
+	s = strings.ToLower(s)
+	return time.ParseDuration(s)
+}
+
 func (c *youTubeClient) GetVideoDurations(ctx context.Context, videos map[string]*models.Video) error {
 	if len(videos) == 0 {
 		return nil
@@ -95,17 +104,15 @@ func (c *youTubeClient) GetVideoDurations(ctx context.Context, videos map[string
 	}
 
 	for _, v := range respData.Items {
-		durationStr := strings.TrimPrefix(v.ContentDetails.Duration, "PT")
-		durationStr = strings.ToLower(durationStr)
-		duration, err := time.ParseDuration(durationStr)
+		duration, err := parseISO8601Duration(v.ContentDetails.Duration)
 		if err != nil {
 			c.log.Error(
 				"Failed to parse video duration",
 				"error", err,
-				"durationString", durationStr,
+				"durationString", v.ContentDetails.Duration,
 				"videoID", v.ID,
 			)
-			return fmt.Errorf("failed to parse video duration [%v]: %w", durationStr, err)
+			return fmt.Errorf("failed to parse video duration [%v]: %w", v.ContentDetails.Duration, err)
 		}
 		videos[v.ID].DurationSeconds = int(math.Round(duration.Seconds()))
 	}
