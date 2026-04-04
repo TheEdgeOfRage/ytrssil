@@ -52,6 +52,7 @@ func main() {
 		return
 	}
 
+	logger.Info("Running migrations")
 	if err := db.RunMigrations(cfg.DBURI); err != nil {
 		logger.Error("Failed to run migrations", "error", err)
 		return
@@ -67,6 +68,7 @@ func main() {
 		return
 	}
 	defer db.Close()
+
 	parser := feedparser.NewParser(logger)
 	youTubeClient := youtube.NewYouTubeClient(logger, cfg.YouTubeAPIKey)
 	downloader := downloader.NewYtdlpDownloader(logger)
@@ -74,6 +76,7 @@ func main() {
 		logger.Error("yt-dlp validation failed", "error", err)
 		return
 	}
+
 	handler := handler.New(
 		logger,
 		db,
