@@ -52,6 +52,11 @@ func main() {
 		return
 	}
 
+	if err := db.RunMigrations(cfg.DBURI); err != nil {
+		logger.Error("Failed to run migrations", "error", err)
+		return
+	}
+
 	db, err := db.NewPostgresDB(logger, cfg.DBURI)
 	if err != nil {
 		logger.Error(

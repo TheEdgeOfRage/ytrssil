@@ -48,4 +48,3 @@ migrate: bin/migrate
 
 image-build:
 	docker buildx build --push -t theedgeofrage/ytrssil:api --target api .
-	docker buildx build --push -t theedgeofrage/ytrssil:migrations --target migrations .

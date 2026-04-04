@@ -13,7 +13,7 @@
 
 - **HTTP**: Gin router with dual interfaces (HTML pages + JSON API), authentication middleware, Datastar SSE-driven templates
 - **Handler**: Business logic layer orchestrating channels, videos, downloads, and cleanup routines
-- **Database**: PostgreSQL with pgx connection pooling, 7 migrations tracking schema evolution
+- **Database**: PostgreSQL with pgx connection pooling, embedded migrations run at startup via golang-migrate
 - **External**: YouTube API client, RSS feed parser, yt-dlp downloader wrapper
 
 **Key Features**: Subscribe to YouTube channels via RSS, track watched/unwatched videos with progress, async video downloads with status polling, automatic file cleanup (2 days after watched), YouTube Shorts detection
@@ -44,6 +44,6 @@ All Go tooling is managed via `make` targets. Never run `go` commands directly.
 - `make test` — runs `go test -timeout=30s -race ./...`
 - `make templ` — generates Go code from `.templ` files via `templ generate`. Required before build.
 - `make gen-mocks` — regenerates mock files in `mocks/` using moq. Run after changing interfaces in `db/`, `feedparser/`, or `lib/clients/youtube/`.
-- `make migrate` — applies PostgreSQL migrations from `migrations/` dir. Configurable via `DB_URI` env var (default: `postgres://ytrssil:ytrssil@localhost:5432/ytrssil?sslmode=disable`)
+- `make migrate` — applies PostgreSQL migrations via CLI tool (for local dev/CI). In production, migrations are embedded in the binary and run at startup. Configurable via `DB_URI` env var (default: `postgres://ytrssil:ytrssil@localhost:5432/ytrssil?sslmode=disable`)
 
 **Tool binaries** are installed into `bin/` locally (golangci-lint, moq, migrate) and auto-installed by their respective targets.

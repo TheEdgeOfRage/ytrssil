@@ -26,6 +26,3 @@ COPY ./assets/ ./assets/
 RUN assets/load.sh && rm assets/load.sh;
 
 COPY --from=builder /app/dist/ ./
-
-FROM migrate/migrate:4 AS migrations
-COPY ./migrations/ /migrations/

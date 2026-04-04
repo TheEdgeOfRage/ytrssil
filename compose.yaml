@@ -31,17 +31,6 @@ services:
     volumes:
       - data:/var/lib/ytrssil
 
-  migrations:
-    image: theedgeofrage/ytrssil:migrations
-    restart: unless-stopped
-    depends_on:
-      - postgres
-    command:
-      - "-path=/migrations/"
-      - "-database"
-      - "postgresql://ytrssil:ytrssil@postgres/ytrssil?sslmode=disable"
-      - "up"
-
 volumes:
   postgres:
   data:

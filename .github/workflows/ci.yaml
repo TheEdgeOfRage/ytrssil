@@ -64,14 +64,5 @@ jobs:
           push: true
           tags: theedgeofrage/ytrssil:api
           target: api
-          cache-from: type=gha,scope=api
-          cache-to: type=gha,scope=api,mode=max
-
-      - name: Build and push migrations image
-        uses: docker/build-push-action@v7
-        with:
-          push: true
-          tags: theedgeofrage/ytrssil:migrations
-          target: migrations
-          cache-from: type=gha,scope=migrations
-          cache-to: type=gha,scope=migrations,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
