@@ -51,9 +51,30 @@ func parseISO8601Duration(s string) (time.Duration, error) {
 	if s == "P0D" {
 		return 0, nil
 	}
-	s = strings.TrimPrefix(s, "PT")
-	s = strings.ToLower(s)
-	return time.ParseDuration(s)
+
+	var total time.Duration
+	s = strings.ToLower(strings.TrimPrefix(s, "P"))
+
+	if i := strings.Index(s, "d"); i != -1 {
+		days, err := time.ParseDuration(s[:i] + "h")
+		if err != nil {
+			return 0, fmt.Errorf("failed to parse days: %w", err)
+		}
+		total += days * 24
+		s = s[i+1:]
+	}
+
+	s = strings.TrimPrefix(s, "t")
+	if s == "" {
+		return total, nil
+	}
+
+	d, err := time.ParseDuration(s)
+	if err != nil {
+		return 0, err
+	}
+
+	return total + d, nil
 }
 
 func (c *youTubeClient) GetVideoDurations(ctx context.Context, videos map[string]*models.Video) error {
