@@ -47,7 +47,7 @@ func (p *parser) fetch(url string) (io.ReadCloser, error) {
 	}
 
 	if response.StatusCode == http.StatusNotFound {
-		return nil, ErrInvalidChannelID
+		return nil, fmt.Errorf("%w: %s", ErrInvalidChannelID, url)
 	} else if response.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("failed to get feed with status %d", response.StatusCode)
 	}
