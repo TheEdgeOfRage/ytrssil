@@ -228,6 +228,12 @@ func (db *postgresDB) SetVideoProgress(ctx context.Context, videoID string, prog
 			, is_live
 			, duration
 			, progress
+			, watch_timestamp
+			, is_discarded
+			, downloaded_at
+			, file_path
+			, download_status
+			, download_error
 			, channels.name
 			, channels.id
 		FROM updated
@@ -244,6 +250,12 @@ func (db *postgresDB) SetVideoProgress(ctx context.Context, videoID string, prog
 		&video.IsLive,
 		&video.DurationSeconds,
 		&video.ProgressSeconds,
+		&video.WatchTime,
+		&video.IsDiscarded,
+		&video.DownloadedAt,
+		&video.FilePath,
+		&video.DownloadStatus,
+		&video.DownloadError,
 		&video.ChannelName,
 		&video.ChannelID,
 	)
