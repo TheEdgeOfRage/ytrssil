@@ -7,7 +7,7 @@
 
 **Ytrssil** is a YouTube RSS feed aggregator with video download capabilities built with Go, Gin, PostgreSQL, and Templ for server-side rendering.
 
-**Tech Stack**: Go 1.25, Gin (HTTP), Templ (SSR), PostgreSQL (pgx), yt-dlp (downloads), Datastar (frontend interactivity via SSE), Bootstrap 5 (UI)
+**Tech Stack**: Go, Gin (HTTP), Templ (SSR), PostgreSQL (pgx), yt-dlp (downloads), Datastar (frontend interactivity via SSE), Bootstrap 5 (UI)
 
 **Layers**:
 
