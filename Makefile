@@ -1,4 +1,4 @@
-.PHONY: all lint test air templ build gen-mocks migrate image-build
+.PHONY: all lint govulncheck test air templ build gen-mocks migrate image-build
 
 DB_URI ?= postgres://ytrssil:ytrssil@localhost:5432/ytrssil?sslmode=disable
 
@@ -11,9 +11,11 @@ bin/golangci-lint: bin
 bin/migrate: bin
 	GOBIN=$(PWD)/bin go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.19.1
 bin/air: bin
-	GOBIN=$(PWD)/bin go install github.com/air-verse/air@v1.64.5
+	GOBIN=$(PWD)/bin go install github.com/air-verse/air@v1.65.1
 bin/templ: bin
 	GOBIN=$(PWD)/bin go install github.com/a-h/templ/cmd/templ@v0.3.1001
+bin/govulncheck: bin
+	GOBIN=$(PWD)/bin go install golang.org/x/vuln/cmd/govulncheck@v1.2.0
 
 fmt:
 	go mod tidy
@@ -24,6 +26,10 @@ lint: bin/golangci-lint
 	go vet ./...
 	bin/golangci-lint run
 	bin/golangci-lint fmt -d
+	$(MAKE) govulncheck
+
+govulncheck:  bin/govulncheck
+	bin/govulncheck ./...
 
 test:
 	go test -timeout=30s -race ./...
